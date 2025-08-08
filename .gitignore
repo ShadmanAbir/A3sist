@@ -141,3 +141,6 @@ Thumbs.db
 .vs/A3sist/v17/DocumentLayout.backup.json
 
 .fake
+*.vsidx
+/.vs/A3sist/FileContentIndex/b11486c3-86df-4302-80cb-691125dc0321.vsidx
+/.vs/A3sist/FileContentIndex/cec92d8e-7421-434a-9bdf-2b14882de45b.vsidx
