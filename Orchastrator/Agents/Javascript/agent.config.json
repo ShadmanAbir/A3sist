@@ -1,0 +1,19 @@
+{
+  "agentName": "Agent.JavaScript",
+  "agentType": "Analyzer",
+  "capabilities": [
+    {
+      "name": "Analyze",
+      "description": "Analyzes JavaScript code for potential issues",
+      "supportedLanguages": ["JavaScript"],
+      "requiredContextTypes": ["CodeAnalysis"]
+    },
+    {
+      "name": "Refactor",
+      "description": "Refactors JavaScript code to improve quality",
+      "supportedLanguages": ["JavaScript"],
+      "requiredContextTypes": ["CodeRefactoring"]
+    }
+  ],
+  "entryPoint": "CodeAssist.Agents.JavaScript.AgentJavaScriptHandler"
+}

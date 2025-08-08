@@ -1,0 +1,25 @@
+{
+  "agentName": "Agent.CSharp",
+  "agentType": "Analyzer",
+  "capabilities": [
+    {
+      "name": "Analyze",
+      "description": "Analyzes C# code for potential issues",
+      "supportedLanguages": ["C#"],
+      "requiredContextTypes": ["CodeAnalysis"]
+    },
+    {
+      "name": "Refactor",
+      "description": "Refactors C# code to improve quality",
+      "supportedLanguages": ["C#"],
+      "requiredContextTypes": ["CodeRefactoring"]
+    },
+    {
+      "name": "ValidateXaml",
+      "description": "Validates XAML markup in C# projects",
+      "supportedLanguages": ["C#"],
+      "requiredContextTypes": ["XamlValidation"]
+    }
+  ],
+  "entryPoint": "CodeAssist.Agents.CSharp.AgentCSharpHandler"
+}

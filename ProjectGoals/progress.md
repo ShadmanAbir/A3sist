@@ -7,7 +7,7 @@
 
 ## In Progress
 - [x] Agent model scaffolding
-- [ ] Code routing system
+- [x] Code routing system
 - [ ] Language-specific agents
 
 ## Notes

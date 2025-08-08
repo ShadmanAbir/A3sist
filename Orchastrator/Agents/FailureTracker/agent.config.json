@@ -1,0 +1,25 @@
+{
+  "agentName": "FailureTracker",
+  "agentType": "FailureTracker",
+  "capabilities": [
+    {
+      "name": "LogFailure",
+      "description": "Logs task failures to failure-notes.md",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["FailureLogging"]
+    },
+    {
+      "name": "AnalyzeFailures",
+      "description": "Analyzes failure patterns and provides insights",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["FailureAnalysis"]
+    },
+    {
+      "name": "GetFailureInsights",
+      "description": "Provides insights about past failures to other agents",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["FailureInsights"]
+    }
+  ],
+  "entryPoint": "CodeAssist.Agents.FailureTracker.FailureTracker"
+}

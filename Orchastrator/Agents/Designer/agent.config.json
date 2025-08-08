@@ -1,0 +1,31 @@
+{
+  "agentName": "Designer",
+  "agentType": "Designer",
+  "capabilities": [
+    {
+      "name": "ArchitectureAnalysis",
+      "description": "Analyzes existing codebase architecture",
+      "supportedLanguages": ["C#", "Python", "JavaScript"],
+      "requiredContextTypes": ["CodeAnalysis"]
+    },
+    {
+      "name": "Scaffolding",
+      "description": "Generates project scaffolding suggestions",
+      "supportedLanguages": ["C#", "Python", "JavaScript"],
+      "requiredContextTypes": ["ProjectSetup"]
+    },
+    {
+      "name": "DesignPlanning",
+      "description": "Creates detailed design plans",
+      "supportedLanguages": ["C#", "Python", "JavaScript"],
+      "requiredContextTypes": ["DesignDocumentation"]
+    },
+    {
+      "name": "PatternRecommendation",
+      "description": "Recommends architectural patterns",
+      "supportedLanguages": ["C#", "Python", "JavaScript"],
+      "requiredContextTypes": ["PatternAnalysis"]
+    }
+  ],
+  "entryPoint": "CodeAssist.Agents.Designer.Designer"
+}

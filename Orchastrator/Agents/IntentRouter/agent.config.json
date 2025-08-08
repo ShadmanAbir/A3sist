@@ -1,0 +1,13 @@
+{
+  "agentName": "IntentRouter",
+  "agentType": "IntentRouter",
+  "capabilities": [
+    {
+      "name": "RouteIntent",
+      "description": "Routes coding tasks to the appropriate specialized agent",
+      "supportedLanguages": ["C#", "Python", "JavaScript"],
+      "requiredContextTypes": ["TaskRouting"]
+    }
+  ],
+  "entryPoint": "CodeAssist.Agents.IntentRouter.IntentRouter"
+}
