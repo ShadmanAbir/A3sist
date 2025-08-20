@@ -1,12 +1,14 @@
 using System;
 using System.IO;
-using System.Windows.Markup;
-using System.Xml;
+using Portable.Xaml;
 
-namespace CodeAssist.Shared.Utils
+namespace A3sist.Shared.Utils
 {
     public static class XamlHelper
     {
+        /// <summary>
+        /// Converts a XAML string to a simple HTML wrapper.
+        /// </summary>
         public static string ConvertXamlToHtml(string xaml)
         {
             if (string.IsNullOrEmpty(xaml))
@@ -14,13 +16,11 @@ namespace CodeAssist.Shared.Utils
 
             try
             {
-                // Parse the XAML
+                // Parse XAML into an object
                 var reader = new StringReader(xaml);
-                var xmlReader = XmlReader.Create(reader);
-                var xamlObject = XamlReader.Load(xmlReader);
+                var xamlObject = XamlServices.Load(reader);
 
                 // Convert to HTML (simplified example)
-                // In a real implementation, you would use a proper XAML to HTML converter
                 return $"<div class=\"xaml-content\">{xaml}</div>";
             }
             catch (Exception ex)
@@ -30,6 +30,9 @@ namespace CodeAssist.Shared.Utils
             }
         }
 
+        /// <summary>
+        /// Converts a simple HTML string to XAML FlowDocument wrapper.
+        /// </summary>
         public static string ConvertHtmlToXaml(string html)
         {
             if (string.IsNullOrEmpty(html))
@@ -37,8 +40,7 @@ namespace CodeAssist.Shared.Utils
 
             try
             {
-                // Convert HTML to XAML (simplified example)
-                // In a real implementation, you would use a proper HTML to XAML converter
+                // Wrap HTML content in a FlowDocument
                 return $"<FlowDocument xmlns=\"http://schemas.microsoft.com/winfx/2006/xaml/presentation\">{html}</FlowDocument>";
             }
             catch (Exception ex)
@@ -48,10 +50,12 @@ namespace CodeAssist.Shared.Utils
             }
         }
 
+        /// <summary>
+        /// Returns a simple XAML resource string.
+        /// </summary>
         public static string GetXamlResource(string resourceName)
         {
-            // In a real implementation, this would load XAML resources from embedded resources
-            // For this example, we'll return a simple XAML string
+            // Example placeholder resource
             return $@"<FlowDocument xmlns=""http://schemas.microsoft.com/winfx/2006/xaml/presentation"">
     <Paragraph>Resource: {resourceName}</Paragraph>
 </FlowDocument>";

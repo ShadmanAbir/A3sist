@@ -1,6 +1,6 @@
 using System;
 
-namespace CodeAssist.Shared.Messaging
+namespace A3sist.Shared.Messaging
 {
     public class AgentRequest
     {

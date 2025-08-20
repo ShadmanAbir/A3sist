@@ -27,5 +27,5 @@
       "requiredContextTypes": ["PatternAnalysis"]
     }
   ],
-  "entryPoint": "CodeAssist.Agents.Designer.Designer"
+  "entryPoint": "A3sist.Agents.Designer.Designer"
 }

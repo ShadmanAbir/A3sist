@@ -21,5 +21,5 @@
       "requiredContextTypes": ["ConflictResolution"]
     }
   ],
-  "entryPoint": "CodeAssist.Agents.GatherAgent.GatherAgent"
+  "entryPoint": "A3sist.Agents.GatherAgent.GatherAgent"
 }

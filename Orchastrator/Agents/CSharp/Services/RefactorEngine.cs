@@ -4,7 +4,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace CodeAssist.Agents.CSharp.Services
+namespace A3sist.Agents.CSharp.Services
 {
     public class RefactorEngine
     {

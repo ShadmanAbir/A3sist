@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace CodeAssist.Agents.CSharp.Services
+namespace A3sist.Agents.CSharp.Services
 {
     public class Analyzer
     {

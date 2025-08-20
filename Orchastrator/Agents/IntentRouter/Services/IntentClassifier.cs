@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 
-namespace CodeAssist.Agents.IntentRouter.Services
+namespace A3sist.Agents.IntentRouter.Services
 {
     public class IntentClassifier
     {

@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using CodeAssist.Shared.Utils;
+using A3sist.Shared.Utils;
 
-namespace CodeAssist.Agents.IntentRouter.Services
+namespace A3sist.Agents.IntentRouter.Services
 {
     public class FailureAnalyzer
     {

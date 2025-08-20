@@ -15,5 +15,5 @@
       "requiredContextTypes": ["CodeRefactoring"]
     }
   ],
-  "entryPoint": "CodeAssist.Agents.JavaScript.AgentJavaScriptHandler"
+  "entryPoint": "A3sist.Agents.JavaScript.AgentJavaScriptHandler"
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace CodeAssist.Shared.Attributes
+namespace A3sist.Shared.Attributes
 {
     [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
     public class AgentCapabilityAttribute : Attribute

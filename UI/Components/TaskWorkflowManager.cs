@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using A3sist.Shared.Messaging;
+using Microsoft.Extensions.Logging;
 
 namespace A3sist.UI.Components
 {

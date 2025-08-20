@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using CodeAssist.Agents.Designer.Models;
+using A3sist.Agents.Designer.Models;
 
-namespace CodeAssist.Agents.Designer.Services
+namespace A3sist.Agents.Designer.Services
 {
     public class ScaffoldingGenerator
     {

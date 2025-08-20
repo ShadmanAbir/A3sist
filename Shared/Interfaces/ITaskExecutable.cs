@@ -1,12 +1,12 @@
 using System.Threading.Tasks;
-using CodeAssist.Shared.Enums;
+using A3sist.Shared.Enums;
 
-namespace CodeAssist.Shared.Interfaces
+namespace A3sist.Shared.Interfaces
 {
     public interface ITaskExecutable
     {
         string TaskName { get; }
-        TaskStatus Status { get; }
+        System.Threading.Tasks.TaskStatus Status { get; }
 
         Task ExecuteAsync();
         Task CancelAsync();

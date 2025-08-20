@@ -1,8 +1,8 @@
+using A3sist.Shared.Enums;
+using A3sist.Shared.Messaging;
 using System.Threading.Tasks;
-using CodeAssist.Shared.Enums;
-using CodeAssist.Shared.Messaging;
 
-namespace CodeAssist.Shared.Interfaces
+namespace A3sist.Shared.Interfaces
 {
     public interface IAgent
     {

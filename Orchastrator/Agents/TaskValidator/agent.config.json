@@ -21,5 +21,5 @@
       "requiredContextTypes": ["TaskValidation"]
     }
   ],
-  "entryPoint": "CodeAssist.Agents.TaskValidator.TaskValidator"
+  "entryPoint": "A3sist.Agents.TaskValidator.TaskValidator"
 }

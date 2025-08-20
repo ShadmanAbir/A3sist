@@ -4,9 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using CodeAssist.Shared.Attributes;
+using A3sist.Shared.Attributes;
 
-namespace CodeAssist.Agents.IntentRouter.Services
+namespace A3sist.Agents.IntentRouter.Services
 {
     public class AgentRegistry
     {

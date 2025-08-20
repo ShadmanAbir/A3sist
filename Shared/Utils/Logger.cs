@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 
-namespace CodeAssist.Shared.Utils
+namespace A3sist.Shared.Utils
 {
     public static class Logger
     {

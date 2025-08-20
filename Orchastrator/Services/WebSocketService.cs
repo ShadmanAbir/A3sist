@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
-namespace CodeAssist.Services
+namespace A3sist.Services
 {
     public class WebSocketService
     {

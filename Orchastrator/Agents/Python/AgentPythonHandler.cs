@@ -1,11 +1,11 @@
 using System;
 using System.Threading.Tasks;
-using CodeAssist.Shared.Interfaces;
-using CodeAssist.Shared.Messaging;
-using CodeAssist.Shared.Enums;
-using CodeAssist.Agents.Python.Services;
+using A3sist.Shared.Interfaces;
+using A3sist.Shared.Messaging;
+using A3sist.Shared.Enums;
+using A3sist.Agents.Python.Services;
 
-namespace CodeAssist.Agents.Python
+namespace A3sist.Agents.Python
 {
     public class AgentPythonHandler : IAgent
     {

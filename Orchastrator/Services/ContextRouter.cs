@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using CodeAssist.Agents;
+using A3sist.Agents;
 
-namespace CodeAssist.Services
+namespace A3sist.Services
 {
     public class ContextRouter
     {

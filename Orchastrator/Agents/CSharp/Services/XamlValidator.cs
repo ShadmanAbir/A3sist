@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using System.Windows.Markup;
 using System.Xml;
 
-namespace CodeAssist.Agents.CSharp.Services
+namespace A3sist.Agents.CSharp.Services
 {
     public class XamlValidator
     {

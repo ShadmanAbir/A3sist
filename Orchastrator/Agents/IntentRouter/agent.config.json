@@ -9,5 +9,5 @@
       "requiredContextTypes": ["TaskRouting"]
     }
   ],
-  "entryPoint": "CodeAssist.Agents.IntentRouter.IntentRouter"
+  "entryPoint": "A3sist.Agents.IntentRouter.IntentRouter"
 }

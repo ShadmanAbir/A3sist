@@ -27,5 +27,5 @@
       "requiredContextTypes": ["KnowledgeUpdate"]
     }
   ],
-  "entryPoint": "CodeAssist.Agents.KnowledgeAgent.KnowledgeAgent"
+  "entryPoint": "A3sist.Agents.KnowledgeAgent.KnowledgeAgent"
 }

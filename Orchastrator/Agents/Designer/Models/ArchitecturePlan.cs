@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace CodeAssist.Agents.Designer.Models
+namespace A3sist.Agents.Designer.Models
 {
     public class ArchitecturePlan
     {

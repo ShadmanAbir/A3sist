@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.MSBuild;
-using CodeAssist.Agents.Designer.Models;
+using A3sist.Agents.Designer.Models;
 
-namespace CodeAssist.Agents.Designer.Services
+namespace A3sist.Agents.Designer.Services
 {
     public class ArchitectureAnalyzer
     {

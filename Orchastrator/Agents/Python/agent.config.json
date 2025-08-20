@@ -15,5 +15,5 @@
       "requiredContextTypes": ["CodeRefactoring"]
     }
   ],
-  "entryPoint": "CodeAssist.Agents.Python.AgentPythonHandler"
+  "entryPoint": "A3sist.Agents.Python.AgentPythonHandler"
 }

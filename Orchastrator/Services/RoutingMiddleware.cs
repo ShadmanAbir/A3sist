@@ -2,7 +2,7 @@ using System;
 using System.Diagnostics;
 using System.Threading.Tasks;
 
-namespace CodeAssist.Services
+namespace A3sist.Services
 {
     public class RoutingMiddleware
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace CodeAssist.Shared.Messaging
+namespace A3sist.Shared.Messaging
 {
     public class TaskMessage
     {
@@ -17,13 +17,5 @@ namespace CodeAssist.Shared.Messaging
             MessageId = Guid.NewGuid();
             Timestamp = DateTime.UtcNow;
         }
-    }
-
-    public enum TaskStatus
-    {
-        Pending,
-        InProgress,
-        Completed,
-        Failed
     }
 }

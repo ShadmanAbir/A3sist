@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
-namespace CodeAssist.Shared.Utils
+namespace A3sist.Shared.Utils
 {
     public class MarkdownParser
     {

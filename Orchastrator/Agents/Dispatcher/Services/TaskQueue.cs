@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using CodeAssist.Agents.Dispatcher.Models;
-using CodeAssist.Shared.Enums;
+using A3sist.Agents.Dispatcher.Models;
+using A3sist.Shared.Enums;
 
-namespace CodeAssist.Agents.Dispatcher.Services
+namespace A3sist.Agents.Dispatcher.Services
 {
     public class TaskQueue
     {

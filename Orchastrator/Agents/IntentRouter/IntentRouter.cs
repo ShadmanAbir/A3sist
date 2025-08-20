@@ -4,12 +4,12 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using CodeAssist.Shared.Interfaces;
-using CodeAssist.Shared.Messaging;
-using CodeAssist.Shared.Enums;
-using CodeAssist.Agents.IntentRouter.Services;
+using A3sist.Shared.Interfaces;
+using A3sist.Shared.Messaging;
+using A3sist.Shared.Enums;
+using A3sist.Agents.IntentRouter.Services;
 
-namespace CodeAssist.Agents.IntentRouter
+namespace A3sist.Agents.IntentRouter
 {
     public class IntentRouter : IAgent
     {

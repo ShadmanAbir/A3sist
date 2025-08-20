@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 
-namespace CodeAssist.Agents.TokenOptimizer.Services
+namespace A3sist.Agents.TokenOptimizer.Services
 {
     public class TaskCompressor
     {

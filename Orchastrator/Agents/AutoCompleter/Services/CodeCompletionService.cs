@@ -6,9 +6,9 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
-using CodeAssist.Agents.AutoCompleter;
+using A3sist.Agents.AutoCompleter;
 
-namespace CodeAssist.Agents.AutoCompleter.Services
+namespace A3sist.Agents.AutoCompleter.Services
 {
     public class CodeCompletionService
     {

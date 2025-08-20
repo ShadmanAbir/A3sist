@@ -21,5 +21,5 @@
       "requiredContextTypes": ["CodeCompletion"]
     }
   ],
-  "entryPoint": "CodeAssist.Agents.AutoCompleter.AutoCompleter"
+  "entryPoint": "A3sist.Agents.AutoCompleter.AutoCompleter"
 }

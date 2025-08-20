@@ -1,7 +1,7 @@
-# CodeAssist API Documentation
+# A3sist API Documentation
 
 ## Overview
-The CodeAssist API provides endpoints for context routing and real-time communication between agents in the CodeAssist system.
+The A3sist API provides endpoints for context routing and real-time communication between agents in the A3sist system.
 
 ## Base URL
 ```

@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using CodeAssist.Shared.Enums;
+using A3sist.Shared.Enums;
 
-namespace CodeAssist.Agents.Dispatcher.Models
+namespace A3sist.Agents.Dispatcher.Models
 {
     public class WorkflowRequest
     {
