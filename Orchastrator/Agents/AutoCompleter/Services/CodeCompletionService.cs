@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Text;
 using A3sist.Agents.AutoCompleter;
+using A3sist.Orchastrator.Agents.AutoCompleter.Models;
 
 namespace A3sist.Agents.AutoCompleter.Services
 {

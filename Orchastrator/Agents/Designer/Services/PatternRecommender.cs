@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using A3sist.Agents.Designer.Models;
+using A3sist.Orchastrator.Agents.Designer.Models;
 
 namespace A3sist.Agents.Designer.Services
 {
@@ -371,25 +372,4 @@ namespace A3sist.Agents.Designer.Services
         }
     }
 
-    public class ArchitecturalPattern
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public List<string> Benefits { get; set; } = new List<string>();
-        public string WhenToUse { get; set; }
-        public List<string> CommonComponents { get; set; } = new List<string>();
-        public List<string> ExampleFrameworks { get; set; } = new List<string>();
-    }
-
-    public class PatternRecommendation
-    {
-        public string PatternName { get; set; }
-        public string Description { get; set; }
-        public List<string> Benefits { get; set; } = new List<string>();
-        public string WhenToUse { get; set; }
-        public List<string> CommonComponents { get; set; } = new List<string>();
-        public List<string> ExampleFrameworks { get; set; } = new List<string>();
-        public float RelevanceScore { get; set; }
-        public string Justification { get; set; }
-    }
 }

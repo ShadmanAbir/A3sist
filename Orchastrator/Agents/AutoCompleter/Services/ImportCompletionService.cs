@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using A3sist.Agents.AutoCompleter;
+using A3sist.Orchastrator.Agents.AutoCompleter.Models;
+using Microsoft.IO;
 
 namespace A3sist.Agents.AutoCompleter.Services
 {
@@ -187,7 +189,7 @@ namespace A3sist.Agents.AutoCompleter.Services
 
             // Filter imports based on context
             var filteredImports = imports
-                .Where(i => i.Namespace.Contains(context.Code.Substring(context.CursorPosition - 1), StringComparison.OrdinalIgnoreCase))
+                .Where(i => i.Namespace.Contains(context.Code.Substring(context.CursorPosition - 1)))
                 .ToList();
 
             // Rank imports based on relevance
@@ -207,10 +209,5 @@ namespace A3sist.Agents.AutoCompleter.Services
         }
     }
 
-    public class ImportItem
-    {
-        public string Namespace { get; set; }
-        public string Description { get; set; }
-        public List<string> CommonTypes { get; set; } = new List<string>();
-    }
+    
 }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using A3sist.Agents.AutoCompleter;
+using A3sist.Orchastrator.Agents.AutoCompleter.Models;
 
 namespace A3sist.Agents.AutoCompleter.Services
 {
@@ -218,7 +219,7 @@ namespace A3sist.Agents.AutoCompleter.Services
 
             // Filter snippets based on context
             var filteredSnippets = snippets
-                .Where(s => s.Code.Contains(context.Code.Substring(context.CursorPosition - 1), StringComparison.OrdinalIgnoreCase))
+                .Where(s => s.Code.Contains(context.Code.Substring(context.CursorPosition - 1)))
                 .ToList();
 
             // Rank snippets based on relevance

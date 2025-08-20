@@ -9,7 +9,7 @@ namespace A3sist.Shared.Interfaces
     {
         string Name { get; }
         AgentType Type { get; }
-        AgentStatus Status { get; }
+        WorkStatus Status { get; }
 
         Task InitializeAsync();
         Task<AgentResponse> ExecuteAsync(AgentRequest request);

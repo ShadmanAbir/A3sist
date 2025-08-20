@@ -30,7 +30,6 @@
   <ItemGroup>
     <Folder Include="Agents\FixerAgent\" />
     <Folder Include="Agents\IntentRouter\" />
-    <Folder Include="Agents\Designer\" />
     <Folder Include="Agents\Chat\" />
     <Folder Include="Agents\CSharp\" />
     <Folder Include="Agents\Javascript\" />

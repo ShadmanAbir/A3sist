@@ -200,22 +200,4 @@ namespace A3sist.Agents.Designer.Services
             _templates.Clear();
         }
     }
-
-    public class ScaffoldingPlan
-    {
-        public string ProjectName { get; set; }
-        public string Language { get; set; }
-        public string Framework { get; set; }
-        public Dictionary<string, List<string>> Structure { get; set; } = new Dictionary<string, List<string>>();
-        public List<string> Dependencies { get; set; } = new List<string>();
-        public Dictionary<string, string> Configuration { get; set; } = new Dictionary<string, string>();
-    }
-
-    public class ProjectTemplate
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public Dictionary<string, List<string>> Structure { get; set; } = new Dictionary<string, List<string>>();
-        public List<string> Dependencies { get; set; } = new List<string>();
-    }
 }

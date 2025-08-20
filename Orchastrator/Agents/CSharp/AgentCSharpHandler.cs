@@ -14,7 +14,7 @@ namespace A3sist.Agents.CSharp
 
         public string Name => "Agent.CSharp";
         public AgentType Type => AgentType.Analyzer;
-        TaskStatus Status { get; private set; }
+        public WorkStatus Status { get; private set; }
 
         
 
@@ -23,18 +23,18 @@ namespace A3sist.Agents.CSharp
             _analyzer = new Analyzer();
             _refactorEngine = new RefactorEngine();
             _xamlValidator = new XamlValidator();
-            Status = TaskStatus.Pending;
+            Status = WorkStatus.Pending;
         }
 
         public async Task InitializeAsync()
         {
-            Status = TaskStatus.InProgress;
+            Status = WorkStatus.InProgress;
             await Task.WhenAll(
                 _analyzer.InitializeAsync(),
                 _refactorEngine.InitializeAsync(),
                 _xamlValidator.InitializeAsync()
             );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> ExecuteAsync(AgentRequest request)
@@ -48,7 +48,7 @@ namespace A3sist.Agents.CSharp
 
             try
             {
-                Status = TaskStatus.InProgress;
+                Status = WorkStatus.InProgress;
 
                 switch (request.TaskName.ToLower())
                 {
@@ -66,13 +66,13 @@ namespace A3sist.Agents.CSharp
                 }
 
                 response.IsSuccess = true;
-                Status = TaskStatus.Completed;
+                Status = WorkStatus.Completed;
             }
             catch (Exception ex)
             {
                 response.IsSuccess = false;
                 response.ErrorMessage = ex.Message;
-                Status = TaskStatus.Failed;
+                Status = WorkStatus.Failed;
             }
 
             return response;
@@ -80,13 +80,13 @@ namespace A3sist.Agents.CSharp
 
         public async Task ShutdownAsync()
         {
-            Status = TaskStatus.InProgress;
+            Status = WorkStatus.InProgress;
             await Task.WhenAll(
                 _analyzer.ShutdownAsync(),
                 _refactorEngine.ShutdownAsync(),
                 _xamlValidator.ShutdownAsync()
             );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> HandleMessageAsync(TaskMessage message)
