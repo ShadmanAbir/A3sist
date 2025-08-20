@@ -37,7 +37,6 @@
     <Folder Include="Agents\Python\" />
     <Folder Include="Agents\Reasoning\" />
     <Folder Include="Agents\Refactor\" />
-    <Folder Include="Models\" />
     <Folder Include="Services\" />
   </ItemGroup>
 

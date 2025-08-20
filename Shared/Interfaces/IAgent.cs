@@ -1,5 +1,6 @@
 using A3sist.Shared.Enums;
 using A3sist.Shared.Messaging;
+using A3sist.Shared.Models;
 using System.Threading.Tasks;
 
 namespace A3sist.Shared.Interfaces
@@ -8,7 +9,7 @@ namespace A3sist.Shared.Interfaces
     {
         string Name { get; }
         AgentType Type { get; }
-        TaskStatus Status { get; }
+        AgentStatus Status { get; }
 
         Task InitializeAsync();
         Task<AgentResponse> ExecuteAsync(AgentRequest request);

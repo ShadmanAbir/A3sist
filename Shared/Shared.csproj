@@ -49,12 +49,16 @@
     <Compile Include="Enums\AgentType.cs" />
     <Compile Include="Enums\TaskStatus.cs" />
     <Compile Include="Interfaces\IAgent.cs" />
+    <Compile Include="Interfaces\IAgentStatusService.cs" />
     <Compile Include="Interfaces\IFileSystem.cs" />
+    <Compile Include="Interfaces\INotificationService.cs" />
     <Compile Include="Interfaces\ITaskExecutable.cs" />
     <Compile Include="Messaging\AgentRequest.cs" />
     <Compile Include="Messaging\AgentResponse.cs" />
     <Compile Include="Messaging\AgentResult.cs" />
     <Compile Include="Messaging\TaskMessage.cs" />
+    <Compile Include="Models\AgentStatus.cs" />
+    <Compile Include="Models\Notification.cs" />
     <Compile Include="obj\Debug\.NETFramework,Version=v4.8.AssemblyAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Logger.cs" />

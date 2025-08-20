@@ -1,6 +1,6 @@
 namespace A3sist.Shared.Enums
 {
-    public enum TaskStatus
+    public enum AgentStatus
     {
         Pending,
         InProgress,
