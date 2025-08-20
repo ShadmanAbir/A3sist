@@ -1,52 +1,47 @@
 using System;
-using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
-public class LLMCacheService : IDisposable
+public class LLMCacheService
 {
     private readonly IMemoryCache _cache;
-    private readonly ConcurrentDictionary&lt;string, SemaphoreSlim&gt; _locks = new();
+    private readonly ILogger<LLMCacheService> _logger;
 
-    public LLMCacheService(IMemoryCache cache)
+    public LLMCacheService(IMemoryCache cache, ILogger<LLMCacheService> logger)
     {
         _cache = cache;
+        _logger = logger;
     }
 
-    public async Task&lt;T&gt; GetOrCreateAsync&lt;T&gt;(string key, Func&lt;Task&lt;T&gt;&gt; createItem, TimeSpan absoluteExpiration)
+    public async Task<string> GetCachedResponseAsync(string key)
     {
-        if (_cache.TryGetValue(key, out T cacheEntry))
+        if (_cache.TryGetValue(key, out string value))
         {
-            return cacheEntry;
+            _logger.LogInformation($"Cache hit for key: {key}");
+            return value;
         }
 
-        var mylock = _locks.GetOrAdd(key, k => new SemaphoreSlim(1, 1));
-
-        await mylock.WaitAsync();
         try
         {
-            if (_cache.TryGetValue(key, out cacheEntry))
-            {
-                return cacheEntry;
-            }
-
-            cacheEntry = await createItem();
-            _cache.Set(key, cacheEntry, absoluteExpiration);
-            return cacheEntry;
+            _logger.LogInformation($"Cache miss for key: {key}. Simulating cache miss.");
+            value = await SimulateCacheMissAsync(key);
+            _cache.Set(key, value, TimeSpan.FromMinutes(10));
+            _logger.LogInformation($"Cached response for key: {key}");
         }
-        finally
+        catch (Exception ex)
         {
-            mylock.Release();
-            _locks.TryRemove(key, out _);
+            _logger.LogError(ex, $"Error occurred while simulating cache miss for key: {key}");
+            throw;
         }
+
+        return value;
     }
 
-    public void Dispose()
+    private async Task<string> SimulateCacheMissAsync(string key)
     {
-        foreach (var semaphore in _locks.Values)
-        {
-            semaphore.Dispose();
-        }
-        _locks.Clear();
+        // Simulate a network call or some other async operation
+        await Task.Delay(1000); // Simulate delay
+        return $"Response for {key}";
     }
 }

@@ -1,14 +1,25 @@
 using Microsoft.Extensions.DependencyInjection;
+using System;
 
-public static class LLMServiceCollectionExtensions
+namespace Orchastrator.LLM
 {
-    public static IServiceCollection AddLLMClient(this IServiceCollection services, string baseUrl = "http://localhost:11434")
+    public static class LLMServiceCollectionExtensions
     {
-        services.AddHttpClient&lt;ILLMClient, CodestralLLMClient&gt;(client =>
+        public static IServiceCollection AddLLM(this IServiceCollection services)
         {
-            client.BaseAddress = new Uri(baseUrl);
-        });
+            try
+            {
+                services.AddSingleton<ILLMClient, CodestralLLMClient>();
+                services.AddSingleton<LLMCacheService>();
+                services.AddSingleton<LLMRetryPolicy>();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error occurred while adding LLM services: {ex.Message}");
+                throw;
+            }
 
-        return services;
+            return services;
+        }
     }
 }

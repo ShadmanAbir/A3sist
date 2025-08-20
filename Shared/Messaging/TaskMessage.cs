@@ -1,4 +1,5 @@
 using System;
+using A3sist.Shared.Enums;
 
 namespace A3sist.Shared.Messaging
 {

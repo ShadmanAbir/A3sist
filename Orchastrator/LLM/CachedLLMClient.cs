@@ -1,35 +1,43 @@
 using System;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Logging;
 
-public class CachedLLMClient : ILLMClient
+namespace Orchastrator.LLM
 {
-    private readonly ILLMClient _innerClient;
-    private readonly LLMCacheService _cacheService;
-    private readonly TimeSpan _cacheDuration = TimeSpan.FromMinutes(5);
-
-    public CachedLLMClient(ILLMClient innerClient, LLMCacheService cacheService)
+    public class CachedLLMClient : ILLMClient
     {
-        _innerClient = innerClient;
-        _cacheService = cacheService;
-    }
+        private readonly ILLMClient _llmClient;
+        private readonly IMemoryCache _cache;
+        private readonly ILogger<CachedLLMClient> _logger;
 
-    public async Task&lt;LLMResponse&gt; GetCompletionAsync(string prompt, LLMOptions options = null)
-    {
-        var cacheKey = $"completion:{prompt}:{options?.MaxTokens}:{options?.Temperature}";
+        public CachedLLMClient(ILLMClient llmClient, IMemoryCache cache, ILogger<CachedLLMClient> logger)
+        {
+            _llmClient = llmClient;
+            _cache = cache;
+            _logger = logger;
+        }
 
-        return await _cacheService.GetOrCreateAsync(
-            cacheKey,
-            () => _innerClient.GetCompletionAsync(prompt, options),
-            _cacheDuration);
-    }
+        public async Task<string> GetResponseAsync(string prompt)
+        {
+            if (_cache.TryGetValue(prompt, out string cachedResponse))
+            {
+                _logger.LogInformation($"Cache hit for prompt: {prompt}");
+                return cachedResponse;
+            }
 
-    public async Task&lt;LLMResponse&gt; GetChatCompletionAsync(string[] messages, LLMOptions options = null)
-    {
-        var cacheKey = $"chat:{string.Join("|", messages)}:{options?.MaxTokens}:{options?.Temperature}";
-
-        return await _cacheService.GetOrCreateAsync(
-            cacheKey,
-            () => _innerClient.GetChatCompletionAsync(messages, options),
-            _cacheDuration);
+            try
+            {
+                var response = await _llmClient.GetResponseAsync(prompt);
+                _cache.Set(prompt, response, TimeSpan.FromMinutes(10));
+                _logger.LogInformation($"Cached response for prompt: {prompt}");
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Error occurred while getting response from LLM for prompt: {prompt}");
+                throw;
+            }
+        }
     }
 }

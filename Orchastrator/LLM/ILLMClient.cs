@@ -1,11 +1,46 @@
 // File: c:\Repo\A3sist\Orchastrator\LLM\ILLMClient.cs
+using System;
+using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
-public interface ILLMClient
+namespace Orchastrator.LLM
 {
-    // For simple text completion
-    Task<LLMResponse> GetCompletionAsync(string prompt, LLMOptions options = null);
+    public interface ILLMClient
+    {
+        Task<string> GetResponseAsync(string prompt);
+    }
 
-    // For chat-style conversations
-    Task<LLMResponse> GetChatCompletionAsync(string[] messages, LLMOptions options = null);
+    public class CodestralLLMClient : ILLMClient
+    {
+        private readonly HttpClient _httpClient;
+        private readonly ILogger<CodestralLLMClient> _logger;
+
+        public CodestralLLMClient(ILogger<CodestralLLMClient> logger)
+        {
+            _httpClient = new HttpClient();
+            _logger = logger;
+        }
+
+        public async Task<string> GetResponseAsync(string prompt)
+        {
+            try
+            {
+                var request = new HttpRequestMessage(HttpMethod.Post, "https://api.codestral.com/v1/generate");
+                request.Content = new StringContent(prompt, System.Text.Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.SendAsync(request);
+                response.EnsureSuccessStatusCode();
+
+                var responseContent = await response.Content.ReadAsStringAsync();
+                _logger.LogInformation($"Received response from LLM: {responseContent}");
+                return responseContent;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting response from LLM.");
+                throw;
+            }
+        }
+    }
 }

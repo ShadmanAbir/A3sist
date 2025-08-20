@@ -1,4 +1,4 @@
-namespace CodeAssist.Shared.Enums
+namespace A3sist.Shared.Enums
 {
     public enum TaskStatus
     {
