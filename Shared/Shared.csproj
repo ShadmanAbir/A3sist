@@ -47,6 +47,7 @@
     <Compile Include="Attributes\AgentCapabilityAttribute.cs" />
     <Compile Include="Class1.cs" />
     <Compile Include="Enums\AgentType.cs" />
+    <Compile Include="Enums\TaskStatus.cs" />
     <Compile Include="Interfaces\IAgent.cs" />
     <Compile Include="Interfaces\IFileSystem.cs" />
     <Compile Include="Interfaces\ITaskExecutable.cs" />

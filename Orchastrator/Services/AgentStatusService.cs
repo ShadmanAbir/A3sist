@@ -1,0 +1,33 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace A3sist.Orchastrator.Services
+{
+    public class AgentStatusService : IAgentStatusService
+    {
+        private readonly ConcurrentDictionary<string, AgentStatus> _agentStatuses;
+
+        public AgentStatusService()
+        {
+            _agentStatuses = new ConcurrentDictionary<string, AgentStatus>();
+        }
+
+        public Task<AgentStatus> GetAgentStatusAsync(string agentId)
+        {
+            return Task.FromResult(_agentStatuses.GetOrAdd(agentId, new AgentStatus
+            {
+                AgentId = agentId,
+                Status = "Unknown",
+                LastUpdated = DateTime.UtcNow
+            }));
+        }
+
+        public Task UpdateAgentStatusAsync(string agentId, AgentStatus status)
+        {
+            _agentStatuses[agentId] = status;
+            return Task.CompletedTask;
+        }
+    }
+}

@@ -19,7 +19,7 @@ namespace Orchastrator
         protected override void InitializeServices(IServiceCollection serviceCollection)
         {
             base.InitializeServices(serviceCollection);
-
+            services.AddSingleton<IAgentStatusService, AgentStatusService>();
             // You can configure dependency injection here by adding services to the serviceCollection.
         }
     }
