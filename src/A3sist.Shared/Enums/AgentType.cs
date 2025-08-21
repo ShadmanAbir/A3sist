@@ -11,6 +11,7 @@ namespace A3sist.Shared.Enums
         Reasoning,
         IntentRouter,
         Unknown,
-        Dispatcher
+        Dispatcher,
+        Language
     }
 }

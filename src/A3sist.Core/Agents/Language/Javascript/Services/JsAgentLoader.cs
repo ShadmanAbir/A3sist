@@ -43,5 +43,14 @@ namespace A3sist.Orchastrator.Agents.JavaScript.Services
             }
             _analyzers.Clear();
         }
+
+        public void Dispose()
+        {
+            foreach (var analyzer in _analyzers)
+            {
+                analyzer?.Dispose();
+            }
+            _analyzers.Clear();
+        }
     }
 }

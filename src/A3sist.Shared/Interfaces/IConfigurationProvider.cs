@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 namespace A3sist.Shared.Interfaces
 {
     /// <summary>
-    /// Interface for configuration providers
+    /// Interface for configuration providers that can load, save, and validate configuration data
     /// </summary>
     public interface IConfigurationProvider
     {
@@ -21,6 +21,33 @@ namespace A3sist.Shared.Interfaces
         int Priority { get; }
 
         /// <summary>
+        /// Checks if the provider supports writing
+        /// </summary>
+        bool SupportsWrite { get; }
+
+        /// <summary>
+        /// Gets a configuration value by key
+        /// </summary>
+        /// <typeparam name="T">Type of the configuration value</typeparam>
+        /// <param name="key">Configuration key</param>
+        /// <returns>Configuration value</returns>
+        Task<T> GetValueAsync<T>(string key);
+
+        /// <summary>
+        /// Sets a configuration value
+        /// </summary>
+        /// <typeparam name="T">Type of the configuration value</typeparam>
+        /// <param name="key">Configuration key</param>
+        /// <param name="value">Configuration value</param>
+        Task SetValueAsync<T>(string key, T value);
+
+        /// <summary>
+        /// Gets all configuration values
+        /// </summary>
+        /// <returns>Dictionary of all configuration values</returns>
+        Task<Dictionary<string, object>> GetAllValuesAsync();
+
+        /// <summary>
         /// Loads configuration data
         /// </summary>
         /// <returns>Configuration data as key-value pairs</returns>
@@ -33,9 +60,15 @@ namespace A3sist.Shared.Interfaces
         Task SaveAsync(Dictionary<string, object> data);
 
         /// <summary>
-        /// Checks if the provider supports writing
+        /// Validates the configuration data
         /// </summary>
-        bool SupportsWrite { get; }
+        /// <returns>Validation result</returns>
+        Task<ConfigurationValidationResult> ValidateAsync();
+
+        /// <summary>
+        /// Reloads configuration data from source
+        /// </summary>
+        Task ReloadAsync();
 
         /// <summary>
         /// Event raised when configuration data changes

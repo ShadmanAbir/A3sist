@@ -35,5 +35,10 @@ namespace A3sist.Orchastrator.Agents.JavaScript.Services
         {
             await Task.Run(() => _engine.Invoke("analyzer.shutdown"));
         }
+
+        public void Dispose()
+        {
+            _engine?.Dispose();
+        }
     }
 }

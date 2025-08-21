@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <Extern href="stdidcmd.h"/>
+  <Extern href="vsshlids.h"/>
+
+  <Commands package="guidA3sistPackage">
+    <Groups>
+      <Group guid="guidA3sistPackageCmdSet" id="A3sistMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS"/>
+      </Group>
+      <Group guid="guidA3sistPackageCmdSet" id="A3sistContextMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_CTXT_CODEWIN"/>
+      </Group>
+    </Groups>
+
+    <Buttons>
+      <Button guid="guidA3sistPackageCmdSet" id="A3sistMainCommandId" priority="0x0100" type="Button">
+        <Parent guid="guidA3sistPackageCmdSet" id="A3sistMenuGroup" />
+        <Strings>
+          <ButtonText>A3sist Assistant</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidA3sistPackageCmdSet" id="ShowA3ToolWindowCommandId" priority="0x0101" type="Button">
+        <Parent guid="guidA3sistPackageCmdSet" id="A3sistMenuGroup" />
+        <Strings>
+          <ButtonText>Show A3sist Window</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidA3sistPackageCmdSet" id="ShowAgentStatusCommandId" priority="0x0102" type="Button">
+        <Parent guid="guidA3sistPackageCmdSet" id="A3sistMenuGroup" />
+        <Strings>
+          <ButtonText>Agent Status</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidA3sistPackageCmdSet" id="AnalyzeCodeCommandId" priority="0x0103" type="Button">
+        <Parent guid="guidA3sistPackageCmdSet" id="A3sistContextMenuGroup" />
+        <Strings>
+          <ButtonText>Analyze with A3sist</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidA3sistPackageCmdSet" id="RefactorCodeCommandId" priority="0x0104" type="Button">
+        <Parent guid="guidA3sistPackageCmdSet" id="A3sistContextMenuGroup" />
+        <Strings>
+          <ButtonText>Refactor with A3sist</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidA3sistPackageCmdSet" id="FixCodeCommandId" priority="0x0105" type="Button">
+        <Parent guid="guidA3sistPackageCmdSet" id="A3sistContextMenuGroup" />
+        <Strings>
+          <ButtonText>Fix with A3sist</ButtonText>
+        </Strings>
+      </Button>
+    </Buttons>
+  </Commands>
+
+  <KeyBindings>
+    <KeyBinding guid="guidA3sistPackageCmdSet" id="A3sistMainCommandId" editor="guidVSStd97" key1="VK_F12" mod1="Control Shift"/>
+    <KeyBinding guid="guidA3sistPackageCmdSet" id="AnalyzeCodeCommandId" editor="guidVSStd97" key1="VK_F11" mod1="Control Shift"/>
+    <KeyBinding guid="guidA3sistPackageCmdSet" id="RefactorCodeCommandId" editor="guidVSStd97" key1="VK_F10" mod1="Control Shift"/>
+    <KeyBinding guid="guidA3sistPackageCmdSet" id="FixCodeCommandId" editor="guidVSStd97" key1="VK_F9" mod1="Control Shift"/>
+  </KeyBindings>
+
+  <Symbols>
+    <GuidSymbol name="guidA3sistPackage" value="{12345678-1234-1234-1234-123456789012}" />
+    <GuidSymbol name="guidA3sistPackageCmdSet" value="{87654321-4321-4321-4321-210987654321}">
+      <IDSymbol name="A3sistMenuGroup" value="0x1020" />
+      <IDSymbol name="A3sistContextMenuGroup" value="0x1021" />
+      <IDSymbol name="A3sistMainCommandId" value="0x0100" />
+      <IDSymbol name="ShowA3ToolWindowCommandId" value="0x0101" />
+      <IDSymbol name="ShowAgentStatusCommandId" value="0x0102" />
+      <IDSymbol name="AnalyzeCodeCommandId" value="0x0103" />
+      <IDSymbol name="RefactorCodeCommandId" value="0x0104" />
+      <IDSymbol name="FixCodeCommandId" value="0x0105" />
+    </GuidSymbol>
+  </Symbols>
+</CommandTable>

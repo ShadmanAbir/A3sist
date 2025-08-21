@@ -195,7 +195,7 @@ namespace A3sist.Core.Services
                         if (parameter.ParameterType.IsInterface && 
                             !parameter.HasDefaultValue && 
                             parameter.ParameterType != typeof(ILogger) &&
-                            !parameter.ParametType.Name.StartsWith("ILogger"))
+                            !parameter.ParameterType.Name.StartsWith("ILogger"))
                         {
                             warnings.Add($"Constructor parameter {parameter.Name} of type {parameter.ParameterType.Name} should be registered in DI container");
                         }
@@ -305,7 +305,7 @@ namespace A3sist.Core.Services
             {
                 if (!string.IsNullOrEmpty(capability.FileExtensions))
                 {
-                    var extensions = capability.FileExtensions.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    var extensions = capability.FileExtensions.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                         .Select(ext => ext.Trim())
                         .Where(ext => !string.IsNullOrEmpty(ext));
                     metadata.SupportedFileExtensions.AddRange(extensions);
@@ -313,7 +313,7 @@ namespace A3sist.Core.Services
 
                 if (!string.IsNullOrEmpty(capability.Keywords))
                 {
-                    var keywords = capability.Keywords.Split(',', StringSplitOptions.RemoveEmptyEntries)
+                    var keywords = capability.Keywords.Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries)
                         .Select(kw => kw.Trim())
                         .Where(kw => !string.IsNullOrEmpty(kw));
                     metadata.Keywords.AddRange(keywords);

@@ -314,10 +314,11 @@ namespace A3sist.Core.Services
         private AgentStatus GetAgentCurrentStatus(IAgent agent)
         {
             // Try to get status from BaseAgent if possible
-            if (agent is A3sist.Core.Agents.Base.BaseAgent baseAgent)
-            {
-                return baseAgent.GetStatus();
-            }
+            // Note: BaseAgent reference removed to avoid dependency on incomplete agents
+            // if (agent is A3sist.Core.Agents.Base.BaseAgent baseAgent)
+            // {
+            //     return baseAgent.GetStatus();
+            // }
 
             // Fallback to basic status
             return new AgentStatus
@@ -336,7 +337,7 @@ namespace A3sist.Core.Services
         /// </summary>
         private void UpdateAgentStatus(string agentName, AgentStatus newStatus)
         {
-            var previousStatus = _agentStatuses.GetValueOrDefault(agentName);
+            _agentStatuses.TryGetValue(agentName, out var previousStatus);
             _agentStatuses.AddOrUpdate(agentName, newStatus, (key, oldValue) => newStatus);
 
             // Raise status changed event if status actually changed

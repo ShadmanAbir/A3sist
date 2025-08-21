@@ -6,6 +6,7 @@ using Serilog;
 using Serilog.Extensions.Logging;
 using A3sist.Shared.Interfaces;
 using A3sist.Core.Services;
+using A3sist.Core.Services.WorkflowSteps;
 using A3sist.Core.Configuration;
 using System.IO;
 
@@ -78,17 +79,72 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining</returns>
     public static IServiceCollection AddCoreServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Register configuration providers
+        services.AddConfigurationProviders(configuration);
+        
         // Register configuration service
         services.AddSingleton<IConfigurationService, ConfigurationService>();
+        
+        // Register settings persistence service
+        services.AddSingleton<ISettingsPersistenceService, SettingsPersistenceService>();
         
         // Register agent status service
         services.AddSingleton<IAgentStatusService, AgentStatusService>();
         
-        // Additional core services will be registered here in subsequent tasks
-        // - IAgentManager
-        // - IOrchestrator
-        // - ITaskQueueService
+        // Register agent manager
+        services.AddSingleton<IAgentManager, AgentManager>();
         
+        // Register orchestrator
+        services.AddSingleton<IOrchestrator, Orchestrator>();
+        
+        // Register task queue service
+        services.AddSingleton<ITaskQueueService, TaskQueueService>();
+        
+        // Register workflow service
+        services.AddSingleton<IWorkflowService, WorkflowService>();
+        
+        // Register task queue processor
+        services.AddHostedService<TaskQueueProcessor>();
+        
+        // Register workflow steps
+        services.AddSingleton<ValidationWorkflowStep>();
+        services.AddSingleton<PreprocessingWorkflowStep>();
+        
+        // Register intent classification services
+        services.AddSingleton<IIntentClassifier, IntentClassifier>();
+        services.AddSingleton<IRoutingRuleService, RoutingRuleService>();
+        
+        return services;
+    }
+
+    /// <summary>
+    /// Adds configuration providers to the dependency injection container
+    /// </summary>
+    /// <param name="services">The service collection</param>
+    /// <param name="configuration">The configuration instance</param>
+    /// <returns>The service collection for chaining</returns>
+    public static IServiceCollection AddConfigurationProviders(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Register configuration providers
+        services.AddSingleton<A3sist.Shared.Interfaces.IConfigurationProvider>(provider =>
+        {
+            var logger = provider.GetRequiredService<ILogger<A3sist.Core.Configuration.Providers.FileConfigurationProvider>>();
+            var configPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "A3sist", "config.json");
+            return new A3sist.Core.Configuration.Providers.FileConfigurationProvider(configPath, logger);
+        });
+
+        services.AddSingleton<A3sist.Shared.Interfaces.IConfigurationProvider>(provider =>
+        {
+            var logger = provider.GetRequiredService<ILogger<A3sist.Core.Configuration.Providers.RegistryConfigurationProvider>>();
+            return new A3sist.Core.Configuration.Providers.RegistryConfigurationProvider(@"SOFTWARE\A3sist", logger);
+        });
+
+        services.AddSingleton<A3sist.Shared.Interfaces.IConfigurationProvider>(provider =>
+        {
+            var logger = provider.GetRequiredService<ILogger<A3sist.Core.Configuration.Providers.EnvironmentConfigurationProvider>>();
+            return new A3sist.Core.Configuration.Providers.EnvironmentConfigurationProvider("A3SIST", logger);
+        });
+
         return services;
     }
 
@@ -100,6 +156,9 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining</returns>
     public static IServiceCollection AddAgentServices(this IServiceCollection services, IConfiguration configuration)
     {
+        // Register core agents
+        services.AddTransient<A3sist.Core.Agents.Core.IntentRouterAgent>();
+        
         // Agent services will be registered here in subsequent tasks
         // This includes:
         // - Base agent infrastructure

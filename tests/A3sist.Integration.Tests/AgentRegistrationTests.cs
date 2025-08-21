@@ -1,6 +1,5 @@
-using A3sist.Core.Agents.Base;
 using A3sist.Core.Services;
-using A3sist.Shared.Attributes;
+using A3sist.Integration.Tests.TestAgents;
 using A3sist.Shared.Enums;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
@@ -49,15 +48,15 @@ namespace A3sist.Integration.Tests
         public async Task AgentFactory_RegisterAndCreateAgent_Success()
         {
             // Arrange
-            var agentType = typeof(TestIntegrationAgent);
+            var agentType = typeof(MinimalTestAgent);
 
             // Act
             await _agentFactory.RegisterAgentTypeAsync(agentType);
-            var agent = await _agentFactory.CreateAgentAsync("TestIntegrationAgent");
+            var agent = await _agentFactory.CreateAgentAsync("MinimalTestAgent");
 
             // Assert
             Assert.NotNull(agent);
-            Assert.Equal("TestIntegrationAgent", agent.Name);
+            Assert.Equal("MinimalTestAgent", agent.Name);
             Assert.Equal(AgentType.Unknown, agent.Type);
         }
 
@@ -65,7 +64,7 @@ namespace A3sist.Integration.Tests
         public async Task AgentFactory_CreateAgentByType_Success()
         {
             // Arrange
-            var agentType = typeof(TestIntegrationAgent);
+            var agentType = typeof(MinimalTestAgent);
             await _agentFactory.RegisterAgentTypeAsync(agentType);
 
             // Act
@@ -73,7 +72,7 @@ namespace A3sist.Integration.Tests
 
             // Assert
             Assert.NotNull(agent);
-            Assert.Equal("TestIntegrationAgent", agent.Name);
+            Assert.Equal("MinimalTestAgent", agent.Name);
         }
 
         [Fact]
@@ -83,18 +82,18 @@ namespace A3sist.Integration.Tests
             var agentTypes = await _discoveryService.DiscoverAgentsAsync(Assembly.GetExecutingAssembly());
 
             // Assert
-            Assert.Contains(typeof(TestIntegrationAgent), agentTypes);
+            Assert.Contains(typeof(MinimalTestAgent), agentTypes);
         }
 
         [Fact]
         public async Task AgentDiscoveryService_GetAgentMetadata_ReturnsCorrectMetadata()
         {
             // Act
-            var metadata = await _discoveryService.GetAgentMetadataAsync(typeof(TestIntegrationAgent));
+            var metadata = await _discoveryService.GetAgentMetadataAsync(typeof(MinimalTestAgent));
 
             // Assert
             Assert.NotNull(metadata);
-            Assert.Equal("TestIntegrationAgent", metadata.Name);
+            Assert.Equal("MinimalTestAgent", metadata.Name);
             Assert.Equal(AgentType.Unknown, metadata.Type);
             Assert.Contains("test", metadata.Keywords);
             Assert.Contains(".test", metadata.SupportedFileExtensions);
@@ -104,7 +103,7 @@ namespace A3sist.Integration.Tests
         public async Task AgentDiscoveryService_ValidateAgentType_ReturnsValid()
         {
             // Act
-            var result = await _discoveryService.ValidateAgentTypeAsync(typeof(TestIntegrationAgent));
+            var result = await _discoveryService.ValidateAgentTypeAsync(typeof(MinimalTestAgent));
 
             // Assert
             Assert.True(result.IsValid);
@@ -119,7 +118,7 @@ namespace A3sist.Integration.Tests
 
             // Assert
             var registeredNames = await _agentFactory.GetRegisteredAgentNamesAsync();
-            Assert.Contains("TestIntegrationAgent", registeredNames);
+            Assert.Contains("MinimalTestAgent", registeredNames);
         }
 
         [Fact]
@@ -134,20 +133,20 @@ namespace A3sist.Integration.Tests
             await _discoveryService.AutoRegisterAgentsAsync(_agentFactory, Assembly.GetExecutingAssembly());
 
             // 3. Create agent instance
-            var agent = await _agentFactory.CreateAgentAsync("TestIntegrationAgent");
+            var agent = await _agentFactory.CreateAgentAsync("MinimalTestAgent");
             Assert.NotNull(agent);
 
             // 4. Register with agent manager
             await _agentManager.RegisterAgentAsync(agent);
 
             // 5. Verify agent is managed
-            var managedAgent = await _agentManager.GetAgentAsync("TestIntegrationAgent");
+            var managedAgent = await _agentManager.GetAgentAsync("MinimalTestAgent");
             Assert.NotNull(managedAgent);
 
             // 6. Get agent status
-            var status = await _agentManager.GetAgentStatusAsync("TestIntegrationAgent");
+            var status = await _agentManager.GetAgentStatusAsync("MinimalTestAgent");
             Assert.NotNull(status);
-            Assert.Equal("TestIntegrationAgent", status.Name);
+            Assert.Equal("MinimalTestAgent", status.Name);
 
             // 7. Test agent functionality
             var request = new AgentRequest("Test request");
@@ -155,8 +154,8 @@ namespace A3sist.Integration.Tests
             Assert.True(result.Success);
 
             // 8. Unregister agent
-            await _agentManager.UnregisterAgentAsync("TestIntegrationAgent");
-            var unregisteredAgent = await _agentManager.GetAgentAsync("TestIntegrationAgent");
+            await _agentManager.UnregisterAgentAsync("MinimalTestAgent");
+            var unregisteredAgent = await _agentManager.GetAgentAsync("MinimalTestAgent");
             Assert.Null(unregisteredAgent);
         }
 
@@ -164,23 +163,23 @@ namespace A3sist.Integration.Tests
         public async Task AgentFactory_GetAvailableAgentTypes_ReturnsRegisteredTypes()
         {
             // Arrange
-            await _agentFactory.RegisterAgentTypeAsync(typeof(TestIntegrationAgent));
+            await _agentFactory.RegisterAgentTypeAsync(typeof(MinimalTestAgent));
 
             // Act
             var availableTypes = await _agentFactory.GetAvailableAgentTypesAsync();
 
             // Assert
-            Assert.Contains(typeof(TestIntegrationAgent), availableTypes);
+            Assert.Contains(typeof(MinimalTestAgent), availableTypes);
         }
 
         [Fact]
         public async Task AgentFactory_IsAgentRegistered_ReturnsCorrectStatus()
         {
             // Arrange
-            await _agentFactory.RegisterAgentTypeAsync(typeof(TestIntegrationAgent));
+            await _agentFactory.RegisterAgentTypeAsync(typeof(MinimalTestAgent));
 
             // Act & Assert
-            Assert.True(await _agentFactory.IsAgentRegisteredAsync("TestIntegrationAgent"));
+            Assert.True(await _agentFactory.IsAgentRegisteredAsync("MinimalTestAgent"));
             Assert.False(await _agentFactory.IsAgentRegisteredAsync("NonExistentAgent"));
         }
 
@@ -190,33 +189,5 @@ namespace A3sist.Integration.Tests
         }
     }
 
-    /// <summary>
-    /// Test agent for integration testing
-    /// </summary>
-    [AgentCapability("TestCapability", 
-        Description = "Test capability for integration testing",
-        AgentType = AgentType.Unknown,
-        Keywords = "test,integration",
-        FileExtensions = ".test,.integration")]
-    public class TestIntegrationAgent : BaseAgent
-    {
-        public override string Name => "TestIntegrationAgent";
-        public override AgentType Type => AgentType.Unknown;
 
-        public TestIntegrationAgent(ILogger<TestIntegrationAgent> logger, IAgentConfiguration configuration)
-            : base(logger, configuration)
-        {
-        }
-
-        protected override async Task<AgentResult> HandleRequestAsync(AgentRequest request, CancellationToken cancellationToken)
-        {
-            await Task.Delay(10, cancellationToken); // Simulate work
-            return AgentResult.CreateSuccess("Integration test completed", "Test result");
-        }
-
-        protected override Task<bool> CanHandleRequestAsync(AgentRequest request)
-        {
-            return Task.FromResult(request.Prompt?.Contains("test", StringComparison.OrdinalIgnoreCase) == true);
-        }
-    }
 }

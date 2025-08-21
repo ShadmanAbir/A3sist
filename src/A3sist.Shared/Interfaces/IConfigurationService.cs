@@ -1,32 +1,54 @@
-using Microsoft.Extensions.Configuration;
+using A3sist.Shared.Models;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace A3sist.Shared.Interfaces;
-
-/// <summary>
-/// Interface for configuration service
-/// </summary>
-public interface IConfigurationService
+namespace A3sist.Shared.Interfaces
 {
     /// <summary>
-    /// Gets a configuration value by key
+    /// Interface for configuration management service
     /// </summary>
-    /// <typeparam name="T">The type of the configuration value</typeparam>
-    /// <param name="key">The configuration key</param>
-    /// <param name="defaultValue">The default value if key is not found</param>
-    /// <returns>The configuration value</returns>
-    T GetValue<T>(string key, T defaultValue = default!);
+    public interface IConfigurationService
+    {
+        /// <summary>
+        /// Gets a configuration value by key
+        /// </summary>
+        /// <typeparam name="T">Type of the configuration value</typeparam>
+        /// <param name="key">Configuration key</param>
+        /// <param name="defaultValue">Default value if key is not found</param>
+        /// <returns>Configuration value</returns>
+        Task<T> GetValueAsync<T>(string key, T defaultValue = default);
 
-    /// <summary>
-    /// Gets a configuration section
-    /// </summary>
-    /// <param name="key">The section key</param>
-    /// <returns>The configuration section</returns>
-    IConfigurationSection GetSection(string key);
+        /// <summary>
+        /// Sets a configuration value
+        /// </summary>
+        /// <typeparam name="T">Type of the configuration value</typeparam>
+        /// <param name="key">Configuration key</param>
+        /// <param name="value">Configuration value</param>
+        /// <returns>Task representing the set operation</returns>
+        Task SetValueAsync<T>(string key, T value);
 
-    /// <summary>
-    /// Checks if a configuration key exists
-    /// </summary>
-    /// <param name="key">The configuration key</param>
-    /// <returns>True if the key exists, false otherwise</returns>
-    bool KeyExists(string key);
+        /// <summary>
+        /// Gets all configuration values
+        /// </summary>
+        /// <returns>Dictionary of all configuration values</returns>
+        Task<Dictionary<string, object>> GetAllValuesAsync();
+
+        /// <summary>
+        /// Validates the configuration
+        /// </summary>
+        /// <returns>Configuration validation result</returns>
+        Task<ConfigurationValidationResult> ValidateAsync();
+
+        /// <summary>
+        /// Reloads configuration from source
+        /// </summary>
+        /// <returns>Task representing the reload operation</returns>
+        Task ReloadAsync();
+
+        /// <summary>
+        /// Event raised when configuration changes
+        /// </summary>
+        event EventHandler<ConfigurationChangedEventArgs> ConfigurationChanged;
+    }
 }
