@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Extensibility;
 
-namespace UI
+namespace A3sist.UI
 {
     /// <summary>
     /// Extension entrypoint for the VisualStudio.Extensibility extension.

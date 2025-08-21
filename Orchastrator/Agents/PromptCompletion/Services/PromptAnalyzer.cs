@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.ML;
 using Microsoft.ML.Data;
 
-namespace A3sist.Agents.PromptCompletion.Services
+namespace A3sist.Orchastrator.Agents.PromptCompletion.Services
 {
     public class PromptAnalyzer
     {

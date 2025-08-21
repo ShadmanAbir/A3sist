@@ -1,4 +1,4 @@
-﻿namespace Orchastrator.Agents.Designer.Models
+﻿namespace A3sist.Orchastrator.Agents.Designer.Models
 {
     public class DesignPattern
     {

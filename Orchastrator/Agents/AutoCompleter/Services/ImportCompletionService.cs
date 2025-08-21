@@ -2,11 +2,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using A3sist.Agents.AutoCompleter;
 using A3sist.Orchastrator.Agents.AutoCompleter.Models;
 using Microsoft.IO;
 
-namespace A3sist.Agents.AutoCompleter.Services
+namespace A3sist.Orchastrator.Agents.AutoCompleter.Services
 {
     public class ImportCompletionService
     {
@@ -209,5 +208,5 @@ namespace A3sist.Agents.AutoCompleter.Services
         }
     }
 
-    
+
 }

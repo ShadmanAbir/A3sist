@@ -7,7 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.Diagnostics;
 
-namespace A3sist.Agents.CSharp.Services
+namespace A3sist.Orchastrator.Agents.CSharp.Services
 {
     /// <summary>
     /// Provides code analysis capabilities for C# code.

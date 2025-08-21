@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
-namespace A3sist.Services
+namespace A3sist.Orchastrator.Services
 {
     public class ContextValidator
     {

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
 using A3sist.Shared.Enums;
-using A3sist.Agents.Dispatcher.Models;
-using A3sist.Agents.Dispatcher.Services;
+using A3sist.Orchastrator.Agents.Dispatcher.Models;
+using A3sist.Orchastrator.Agents.Dispatcher.Services;
 
-namespace A3sist.Agents.Dispatcher
+namespace A3sist.Orchastrator.Agents.Dispatcher
 {
     public class Dispatcher : IAgent
     {
@@ -20,7 +20,7 @@ namespace A3sist.Agents.Dispatcher
 
         public string Name => "Dispatcher";
         public AgentType Type => AgentType.Dispatcher;
-        public TaskStatus Status { get; private set; }
+        public WorkStatus Status { get; private set; }
 
         public Dispatcher()
         {
@@ -28,19 +28,19 @@ namespace A3sist.Agents.Dispatcher
             _taskScheduler = new TaskScheduler();
             _taskOrchestrator = new TaskOrchestrator();
             _failureHandler = new FailureHandler();
-            Status = TaskStatus.Pending;
+            Status = WorkStatus.Pending;
         }
 
         public async Task InitializeAsync()
         {
-            Status = TaskStatus.InProgress;
+            Status = WorkStatus.InProgress;
             await Task.WhenAll(
                 _taskQueue.InitializeAsync(),
                 _taskScheduler.InitializeAsync(),
                 _taskOrchestrator.InitializeAsync(),
                 _failureHandler.InitializeAsync()
             );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> ExecuteAsync(AgentRequest request)
@@ -54,7 +54,7 @@ namespace A3sist.Agents.Dispatcher
 
             try
             {
-                Status = TaskStatus.InProgress;
+                Status = WorkStatus.InProgress;
 
                 switch (request.TaskName.ToLower())
                 {
@@ -87,13 +87,13 @@ namespace A3sist.Agents.Dispatcher
                 }
 
                 response.IsSuccess = true;
-                Status = TaskStatus.Completed;
+                Status = WorkStatus.Completed;
             }
             catch (Exception ex)
             {
                 response.IsSuccess = false;
                 response.ErrorMessage = ex.Message;
-                Status = TaskStatus.Failed;
+                Status = WorkStatus.Failed;
             }
 
             return response;
@@ -101,14 +101,14 @@ namespace A3sist.Agents.Dispatcher
 
         public async Task ShutdownAsync()
         {
-            Status = TaskStatus.InProgress;
+            Status = WorkStatus.InProgress;
             await Task.WhenAll(
                 _taskQueue.ShutdownAsync(),
                 _taskScheduler.ShutdownAsync(),
                 _taskOrchestrator.ShutdownAsync(),
                 _failureHandler.ShutdownAsync()
             );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> HandleMessageAsync(TaskMessage message)

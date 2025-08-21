@@ -5,7 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-namespace A3sist.Agents.CSharp.Services
+namespace A3sist.Orchastrator.Agents.CSharp.Services
 {
     /// <summary>
     /// Provides code refactoring capabilities for C# code.
@@ -44,42 +44,42 @@ namespace A3sist.Agents.CSharp.Services
         /// <exception cref="ArgumentNullException">Thrown when code is null or empty.</exception>
         /// <exception cref="InvalidOperationException">Thrown when refactoring fails.</exception>
         public async Task<string> RefactorCodeAsync(string code)
-{
-    if (string.IsNullOrWhiteSpace(code))
-        throw new ArgumentNullException(nameof(code));
-
-    var tree = CSharpSyntaxTree.ParseText(code);
-    var root = await tree.GetRootAsync();
-
-    var nodes = root.DescendantNodes().OfType<LocalDeclarationStatementSyntax>();
-
-    foreach (var node in nodes)
-    {
-        if (node.Declaration.Variables.Count == 1)
         {
-            var variable = node.Declaration.Variables[0];
-            if (variable.Initializer != null)
+            if (string.IsNullOrWhiteSpace(code))
+                throw new ArgumentNullException(nameof(code));
+
+            var tree = CSharpSyntaxTree.ParseText(code);
+            var root = await tree.GetRootAsync();
+
+            var nodes = root.DescendantNodes().OfType<LocalDeclarationStatementSyntax>();
+
+            foreach (var node in nodes)
             {
-                var typeInfo = await GetTypeInfoAsync(tree, variable.Initializer.Value);
+                if (node.Declaration.Variables.Count == 1)
+                {
+                    var variable = node.Declaration.Variables[0];
+                    if (variable.Initializer != null)
+                    {
+                        var typeInfo = await GetTypeInfoAsync(tree, variable.Initializer.Value);
 
-if (typeInfo.Type is not null && typeInfo.Type is not IErrorTypeSymbol)
-{
-    var newDeclaration = node.WithDeclaration(
-        node.Declaration.WithType(
-            SyntaxFactory.ParseTypeName(typeInfo.Type.ToDisplayString())
-                .WithTriviaFrom(node.Declaration.Type)
-        )
-    );
+                        if (typeInfo.Type is not null && typeInfo.Type is not IErrorTypeSymbol)
+                        {
+                            var newDeclaration = node.WithDeclaration(
+                                node.Declaration.WithType(
+                                    SyntaxFactory.ParseTypeName(typeInfo.Type.ToDisplayString())
+                                        .WithTriviaFrom(node.Declaration.Type)
+                                )
+                            );
 
-    root = root.ReplaceNode(node, newDeclaration);
-}
+                            root = root.ReplaceNode(node, newDeclaration);
+                        }
 
+                    }
+                }
             }
-        }
-    }
 
-    return root.ToFullString();
-}
+            return root.ToFullString();
+        }
 
 
         /// <summary>
@@ -89,26 +89,26 @@ if (typeInfo.Type is not null && typeInfo.Type is not IErrorTypeSymbol)
         /// <param name="expression">The expression to analyze.</param>
         /// <returns>Type information for the expression.</returns>
         private Task<TypeInfo> GetTypeInfoAsync(SyntaxTree tree, ExpressionSyntax expression)
-{
-    if (tree == null)
-        throw new ArgumentNullException(nameof(tree));
+        {
+            if (tree == null)
+                throw new ArgumentNullException(nameof(tree));
 
-    if (expression == null)
-        throw new ArgumentNullException(nameof(expression));
+            if (expression == null)
+                throw new ArgumentNullException(nameof(expression));
 
-    var compilation = CSharpCompilation.Create("Analysis")
-        .AddSyntaxTrees(tree)
-        .AddReferences(
-            MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
-            MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location)
-        )
-        .WithOptions(_compilationOptions);
+            var compilation = CSharpCompilation.Create("Analysis")
+                .AddSyntaxTrees(tree)
+                .AddReferences(
+                    MetadataReference.CreateFromFile(typeof(object).Assembly.Location),
+                    MetadataReference.CreateFromFile(typeof(Enumerable).Assembly.Location)
+                )
+                .WithOptions(_compilationOptions);
 
-    var semanticModel = compilation.GetSemanticModel(tree);
-    var typeInfo = semanticModel.GetTypeInfo(expression);
+            var semanticModel = compilation.GetSemanticModel(tree);
+            var typeInfo = semanticModel.GetTypeInfo(expression);
 
-    return Task.FromResult(typeInfo);
-}
+            return Task.FromResult(typeInfo);
+        }
 
 
         /// <summary>

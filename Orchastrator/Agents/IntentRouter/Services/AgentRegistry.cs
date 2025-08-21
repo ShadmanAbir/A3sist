@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using A3sist.Shared.Attributes;
 
-namespace A3sist.Agents.IntentRouter.Services
+namespace A3sist.Orchastrator.Agents.IntentRouter.Services
 {
     public class AgentRegistry
     {
@@ -23,7 +23,7 @@ namespace A3sist.Agents.IntentRouter.Services
                 var configPath = Path.Combine(folder, "agent.config.json");
                 if (File.Exists(configPath))
                 {
-                    var configJson =  File.ReadAllText(configPath);
+                    var configJson = File.ReadAllText(configPath);
                     var agentConfig = JsonSerializer.Deserialize<AgentConfig>(configJson);
 
                     if (agentConfig != null)
@@ -68,37 +68,5 @@ namespace A3sist.Agents.IntentRouter.Services
             // Clean up resources
             _agents.Clear();
         }
-    }
-
-    public class AgentInfo
-    {
-        public string Name { get; set; }
-        public string Type { get; set; }
-        public List<string> SupportedLanguages { get; set; }
-        public List<AgentCapability> Capabilities { get; set; }
-    }
-
-    public class AgentCapability
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string[] SupportedLanguages { get; set; }
-        public string[] RequiredContextTypes { get; set; }
-    }
-
-    public class AgentConfig
-    {
-        public string AgentName { get; set; }
-        public string AgentType { get; set; }
-        public List<AgentCapabilityConfig> Capabilities { get; set; }
-        public string EntryPoint { get; set; }
-    }
-
-    public class AgentCapabilityConfig
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string[] SupportedLanguages { get; set; }
-        public string[] RequiredContextTypes { get; set; }
     }
 }

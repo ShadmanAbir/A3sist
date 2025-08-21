@@ -6,7 +6,6 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using A3sist.Agents.Designer.Models;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using A3sist.Orchastrator.Agents.Designer.Models;
 using Microsoft.CodeAnalysis.MSBuild;

@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Management.Instrumentation;
 using System.Threading.Tasks;
-using A3sist.Agents;
 
-namespace A3sist.Services
+namespace A3sist.Orchastrator.Services
 {
     public class ContextRouter
     {
@@ -26,7 +26,7 @@ namespace A3sist.Services
             if (agentType == null)
                 throw new ArgumentNullException(nameof(agentType));
 
-            if (!typeof(BaseAgent).IsAssignableFrom(agentType))
+            if (!typeof(BaseEvent).IsAssignableFrom(agentType))
                 throw new ArgumentException("Agent type must inherit from BaseAgent");
 
             _agentRegistry[contextType] = agentType;

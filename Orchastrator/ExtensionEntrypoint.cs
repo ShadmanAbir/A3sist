@@ -1,7 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.Extensibility;
 
-namespace Orchastrator
+namespace A3sist.Orchastrator
 {
     /// <summary>
     /// Extension entrypoint for the VisualStudio.Extensibility extension.

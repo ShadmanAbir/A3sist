@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using A3sist.Shared.Enums;
 
-namespace A3sist.Agents.Dispatcher.Models
+namespace A3sist.Orchastrator.Agents.Dispatcher.Models
 {
     public class WorkflowRequest
     {

@@ -1,7 +1,7 @@
 using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
 
-using A3sist.Shared.Models;
+using A3sist.Shared.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace A3sist.UI.Components

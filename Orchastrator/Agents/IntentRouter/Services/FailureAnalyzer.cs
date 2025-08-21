@@ -6,7 +6,7 @@ using System.Text.Json;
 using System.Threading.Tasks;
 using A3sist.Shared.Utils;
 
-namespace A3sist.Agents.IntentRouter.Services
+namespace A3sist.Orchastrator.Agents.IntentRouter.Services
 {
     public class FailureAnalyzer
     {

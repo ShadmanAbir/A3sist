@@ -2,10 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using A3sist.Agents.AutoCompleter;
 using A3sist.Orchastrator.Agents.AutoCompleter.Models;
 
-namespace A3sist.Agents.AutoCompleter.Services
+namespace A3sist.Orchastrator.Agents.AutoCompleter.Services
 {
     public class SnippetCompletionService
     {

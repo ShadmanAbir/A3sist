@@ -7,11 +7,9 @@ using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
 using A3sist.Shared.Enums;
-using A3sist.Agents.Designer.Services;
-using A3sist.Agents.Designer.Models;
 using A3sist.Orchastrator.Agents.Designer.Services;
 
-namespace A3sist.Agents.Designer
+namespace A3sist.Orchastrator.Agents.Designer
 {
     public class Designer : IAgent
     {

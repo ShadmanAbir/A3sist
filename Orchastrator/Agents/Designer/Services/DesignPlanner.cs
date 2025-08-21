@@ -4,11 +4,9 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
-using A3sist.Agents.Designer.Models;
 using A3sist.Orchastrator.Agents.Designer.Models;
-using Orchastrator.Agents.Designer.Models;
 
-namespace A3sist.Agents.Designer.Services
+namespace A3sist.Orchastrator.Agents.Designer.Services
 {
     public class DesignPlanner
     {

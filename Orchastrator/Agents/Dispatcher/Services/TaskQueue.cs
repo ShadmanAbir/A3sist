@@ -4,10 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Threading.Tasks.Dataflow;
-using A3sist.Agents.Dispatcher.Models;
+using A3sist.Orchastrator.Agents.Dispatcher.Models;
 using A3sist.Shared.Enums;
 
-namespace A3sist.Agents.Dispatcher.Services
+namespace A3sist.Orchastrator.Agents.Dispatcher.Services
 {
     public class TaskQueue
     {
@@ -18,25 +18,25 @@ namespace A3sist.Agents.Dispatcher.Services
 
         public TaskQueue()
         {
-           // Workflow queue — just a simple BufferBlock, ordering only
-var workflowOptions = new DataflowBlockOptions
-{
-    EnsureOrdered = true
-};
-var workflowQueue = new BufferBlock<WorkflowRequest>(workflowOptions);
+            // Workflow queue — just a simple BufferBlock, ordering only
+            var workflowOptions = new DataflowBlockOptions
+            {
+                EnsureOrdered = true
+            };
+            var workflowQueue = new BufferBlock<WorkflowRequest>(workflowOptions);
 
-// Task queue — use ActionBlock if you want parallel execution
-var taskOptions = new ExecutionDataflowBlockOptions
-{
-    EnsureOrdered = true,
-    MaxDegreeOfParallelism = Environment.ProcessorCount * 2
-};
+            // Task queue — use ActionBlock if you want parallel execution
+            var taskOptions = new ExecutionDataflowBlockOptions
+            {
+                EnsureOrdered = true,
+                MaxDegreeOfParallelism = Environment.ProcessorCount * 2
+            };
 
-//var taskQueue = new ActionBlock<WorkflowRequest>(async request =>
-//{
-//    // Your processing logic here
-//    await ProcessRequestAsync(request);
-//}, taskOptions);
+            //var taskQueue = new ActionBlock<WorkflowRequest>(async request =>
+            //{
+            //    // Your processing logic here
+            //    await ProcessRequestAsync(request);
+            //}, taskOptions);
 
             _taskQueue = new BufferBlock<TaskAssignment>(taskOptions);
         }

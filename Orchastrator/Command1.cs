@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Extensibility;
 using Microsoft.VisualStudio.Extensibility.Commands;
 using Microsoft.VisualStudio.Extensibility.Shell;
 
-namespace Orchastrator
+namespace A3sist.Orchastrator
 {
     /// <summary>
     /// Command1 handler.
@@ -22,7 +22,7 @@ namespace Orchastrator
         {
             // This optional TraceSource can be used for logging in the command. You can use dependency injection to access
             // other services here as well.
-            this.logger = Requires.NotNull(traceSource, nameof(traceSource));
+            logger = Requires.NotNull(traceSource, nameof(traceSource));
         }
 
         /// <inheritdoc />
@@ -44,7 +44,7 @@ namespace Orchastrator
         /// <inheritdoc />
         public override async Task ExecuteCommandAsync(IClientContext context, CancellationToken cancellationToken)
         {
-            await this.Extensibility.Shell().ShowPromptAsync("Hello from an extension!", PromptOptions.OK, cancellationToken);
+            await Extensibility.Shell().ShowPromptAsync("Hello from an extension!", PromptOptions.OK, cancellationToken);
         }
     }
 }

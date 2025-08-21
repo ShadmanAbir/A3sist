@@ -5,7 +5,7 @@ using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UI
+namespace A3sist.UI
 {
     /// <summary>
     /// A sample tool window.
@@ -21,7 +21,7 @@ namespace UI
         /// </summary>
         public A3ToolWindow()
         {
-            this.Title = "A3sist";
+            Title = "A3sist";
         }
 
         /// <inheritdoc />

@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace A3sist.Agents.Designer.Models
+namespace A3sist.Orchastrator.Agents.Designer.Models
 {
     public class DesignRequest
     {

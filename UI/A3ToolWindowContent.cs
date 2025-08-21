@@ -1,6 +1,6 @@
 ﻿using Microsoft.VisualStudio.Extensibility.UI;
 
-namespace UI
+namespace A3sist.UI
 {
     /// <summary>
     /// A remote user control to use as tool window UI content.

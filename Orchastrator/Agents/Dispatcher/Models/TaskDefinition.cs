@@ -1,4 +1,4 @@
-﻿namespace A3sist.Agents.Dispatcher.Models
+﻿namespace A3sist.Orchastrator.Agents.Dispatcher.Models
 {
     public class TaskDefinition
     {

@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.Extensibility.Commands;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace UI
+namespace A3sist.UI
 {
     /// <summary>
     /// A command for showing a tool window.
@@ -24,7 +24,7 @@ namespace UI
         /// <inheritdoc />
         public override async Task ExecuteCommandAsync(IClientContext context, CancellationToken cancellationToken)
         {
-            await this.Extensibility.Shell().ShowToolWindowAsync<A3ToolWindow>(activate: true, cancellationToken);
+            await Extensibility.Shell().ShowToolWindowAsync<A3ToolWindow>(activate: true, cancellationToken);
         }
     }
 }

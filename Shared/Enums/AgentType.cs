@@ -10,6 +10,7 @@ namespace A3sist.Shared.Enums
         Chat,
         Reasoning,
         IntentRouter,
-        Unknown
+        Unknown,
+        Dispatcher
     }
 }

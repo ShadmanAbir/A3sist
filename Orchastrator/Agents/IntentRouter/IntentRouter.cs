@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
 using A3sist.Shared.Enums;
-using A3sist.Agents.IntentRouter.Services;
+using A3sist.Orchastrator.Agents.IntentRouter.Services;
 
-namespace A3sist.Agents.IntentRouter
+namespace A3sist.Orchastrator.Agents.IntentRouter
 {
     public class IntentRouter : IAgent
     {

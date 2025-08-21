@@ -1,8 +1,7 @@
-using A3sist.Orchastrator.LLM;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 
-namespace Orchastrator.LLM
+namespace A3sist.Orchastrator.LLM
 {
     public static class LLMServiceCollectionExtensions
     {
@@ -12,7 +11,7 @@ namespace Orchastrator.LLM
             {
                 services.AddSingleton<ILLMClient, CodestralLLMClient>();
                 services.AddSingleton<LLMCacheService>();
-                
+
             }
             catch (Exception ex)
             {

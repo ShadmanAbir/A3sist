@@ -2,9 +2,9 @@ using System;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
 using A3sist.Shared.Enums;
-using A3sist.Agents.CSharp.Services;
+using A3sist.Orchastrator.Agents.CSharp.Services;
 
-namespace A3sist.Agents.CSharp
+namespace A3sist.Orchastrator.Agents.CSharp
 {
     public class AgentCSharpHandler : IAgent
     {
@@ -16,7 +16,7 @@ namespace A3sist.Agents.CSharp
         public AgentType Type => AgentType.Analyzer;
         public WorkStatus Status { get; private set; }
 
-        
+
 
         public AgentCSharpHandler()
         {

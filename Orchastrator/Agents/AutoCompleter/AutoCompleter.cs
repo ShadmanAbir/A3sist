@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
 using A3sist.Shared.Enums;
-using A3sist.Agents.AutoCompleter.Services;
 using A3sist.Orchastrator.Agents.AutoCompleter.Models;
+using A3sist.Orchastrator.Agents.AutoCompleter.Services;
 
-namespace A3sist.Agents.AutoCompleter
+namespace A3sist.Orchastrator.Agents.AutoCompleter
 {
     public class AutoCompleter : IAgent
     {
@@ -114,5 +114,5 @@ namespace A3sist.Agents.AutoCompleter
         }
     }
 
-    
+
 }

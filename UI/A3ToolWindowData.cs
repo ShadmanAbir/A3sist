@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.Extensibility.UI;
 using System.Runtime.Serialization;
 
-namespace UI
+namespace A3sist.UI
 {
     /// <summary>
     /// ViewModel for the A3ToolWindowContent remote user control.
@@ -23,7 +23,7 @@ namespace UI
         public string Name
         {
             get => _name;
-            set => SetProperty(ref this._name, value);
+            set => SetProperty(ref _name, value);
         }
 
         private string _text = string.Empty;
@@ -31,7 +31,7 @@ namespace UI
         public string Text
         {
             get => _text;
-            set => SetProperty(ref this._text, value);
+            set => SetProperty(ref _text, value);
         }
 
         [DataMember]
