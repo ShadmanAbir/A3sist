@@ -10,6 +10,10 @@ namespace A3sist.Shared.Messaging
         public string Context { get; set; }
         public DateTime Timestamp { get; set; }
         public string Requester { get; set; }
+        public string FilePath { get; set; }
+        public object Id { get; set; }
+        public object Prompt { get; set; }
+        public object LLMOptions { get; set; }
 
         public AgentRequest()
         {

@@ -23,7 +23,7 @@ namespace A3sist.Agents.IntentRouter.Services
                 var configPath = Path.Combine(folder, "agent.config.json");
                 if (File.Exists(configPath))
                 {
-                    var configJson = await File.ReadAllTextAsync(configPath);
+                    var configJson =  File.ReadAllText(configPath);
                     var agentConfig = JsonSerializer.Deserialize<AgentConfig>(configJson);
 
                     if (agentConfig != null)

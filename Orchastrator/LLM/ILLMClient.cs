@@ -4,10 +4,11 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace Orchastrator.LLM
+namespace A3sist.Orchastrator.LLM
 {
     public interface ILLMClient
     {
+        Task<bool> GetCompletionAsync(object prompt, object lLMOptions);
         Task<string> GetResponseAsync(string prompt);
     }
 
@@ -20,6 +21,11 @@ namespace Orchastrator.LLM
         {
             _httpClient = new HttpClient();
             _logger = logger;
+        }
+
+        public Task<bool> GetCompletionAsync(object prompt, object lLMOptions)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<string> GetResponseAsync(string prompt)

@@ -1,8 +1,6 @@
-using System;
-using System.Collections.Generic;
 using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
-using A3sist.Shared.Messaging;
+
 using A3sist.Shared.Models;
 using Microsoft.Extensions.Logging;
 
@@ -44,12 +42,12 @@ namespace A3sist.UI.Components
             try
             {
                 var result = await _suggestionService.ApplySuggestionAsync(suggestion);
-                if (result.Success)
+                if (result == true)
                 {
                     await _editorService.RefreshEditorView(suggestion.FilePath);
                     _logger.LogInformation($"Applied suggestion to {suggestion.FilePath}");
                 }
-                return result.Success;
+                return result;
             }
             catch (Exception ex)
             {

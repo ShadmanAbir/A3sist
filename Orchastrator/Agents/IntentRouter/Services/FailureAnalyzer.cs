@@ -23,7 +23,7 @@ namespace A3sist.Agents.IntentRouter.Services
             // Load failure records from the failure notes file
             if (File.Exists(_failureNotesPath))
             {
-                var content = await File.ReadAllTextAsync(_failureNotesPath);
+                var content = File.ReadAllText(_failureNotesPath);
                 _failureRecords = ParseFailureRecords(content);
             }
         }
@@ -79,7 +79,7 @@ namespace A3sist.Agents.IntentRouter.Services
         {
             // Check if this task has failed before
             var matchingRecords = _failureRecords
-                .Where(r => r.TaskDescription.Contains(taskDescription, StringComparison.OrdinalIgnoreCase))
+                .Where(r => r.TaskDescription.Contains(taskDescription))
                 .ToList();
 
             if (matchingRecords.Any())
@@ -125,7 +125,7 @@ namespace A3sist.Agents.IntentRouter.Services
 {record.Resolution}
 ";
 
-            await File.AppendAllTextAsync(_failureNotesPath, entry);
+            File.AppendAllText(_failureNotesPath, entry);
         }
 
         public async Task ShutdownAsync()

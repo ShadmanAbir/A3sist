@@ -3,6 +3,10 @@ using System.IO;
 using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
+using Microsoft.Build.Framework;
+using Microsoft.Extensions.Logging;
+using Serilog;
+
 
 namespace A3sist.Orchastrator.Agents
 {
@@ -42,12 +46,12 @@ namespace A3sist.Orchastrator.Agents
                     {
                         FilePath = input.FilePath,
                         OriginalContent = originalContent,
-                        NewContent = input.Content,
+                        NewContent = input.Content.ToString(),
                         RequiresReview = true
                     };
 
                     // Write the new content
-                    await _fileSystem.WriteAllTextAsync(input.FilePath, input.Content);
+                    await _fileSystem.WriteAllTextAsync(input.FilePath, input.Content.ToString());
 
                     result.Success = true;
                     result.Message = "File updated successfully with backup created";
@@ -56,7 +60,7 @@ namespace A3sist.Orchastrator.Agents
                 else
                 {
                     // Create new file
-                    await _fileSystem.WriteAllTextAsync(input.FilePath, input.Content);
+                    await _fileSystem.WriteAllTextAsync(input.FilePath, input.Content.ToString());
                     return AgentResult.CreateSuccess("New file created successfully", input.FilePath);
                 }
             }
@@ -65,6 +69,11 @@ namespace A3sist.Orchastrator.Agents
                 _logger.LogError(ex, $"Error processing file {input.FilePath}");
                 return AgentResult.CreateFailure($"Error processing file: {ex.Message}", ex, input.FilePath);
             }
+        }
+
+        internal async Task<bool> FixCodeAsync(string v)
+        {
+            throw new NotImplementedException();
         }
     }
 }

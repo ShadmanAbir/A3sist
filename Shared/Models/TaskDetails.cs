@@ -2,5 +2,6 @@
 {
     public class TaskDetails
     {
+        public string TaskId { get; set; }
     }
 }

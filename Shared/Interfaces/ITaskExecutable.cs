@@ -6,7 +6,7 @@ namespace A3sist.Shared.Interfaces
     public interface ITaskExecutable
     {
         string TaskName { get; }
-        System.Threading.Tasks.TaskStatus Status { get; }
+        WorkStatus Status { get; }
 
         Task ExecuteAsync();
         Task CancelAsync();

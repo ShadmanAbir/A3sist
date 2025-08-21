@@ -1,36 +1,32 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
 using A3sist.Shared.Enums;
-using A3sist.Agents.JavaScript.Services;
+using A3sist.Orchastrator.Agents.JavaScript.Services;
 
-namespace A3sist.Agents.JavaScript
+namespace A3sist.Orchastrator.Agents.JavaScript
 {
     public class AgentJavaScriptHandler : IAgent
     {
-        private readonly Analyzer _analyzer;
-        private readonly RefactorEngine _refactorEngine;
+        private readonly JsAgentLoader _loader;
 
         public string Name => "Agent.JavaScript";
         public AgentType Type => AgentType.Analyzer;
-        public TaskStatus Status { get; private set; }
+        public WorkStatus Status { get; private set; }
 
         public AgentJavaScriptHandler()
         {
-            _analyzer = new Analyzer();
-            _refactorEngine = new RefactorEngine();
-            Status = TaskStatus.Pending;
+            _loader = new JsAgentLoader();
+            Status = WorkStatus.Pending;
         }
 
         public async Task InitializeAsync()
         {
-            Status = TaskStatus.InProgress;
-            await Task.WhenAll(
-                _analyzer.InitializeAsync(),
-                _refactorEngine.InitializeAsync()
-            );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.InProgress;
+            await _loader.InitializeAsync();
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> ExecuteAsync(AgentRequest request)
@@ -44,28 +40,23 @@ namespace A3sist.Agents.JavaScript
 
             try
             {
-                Status = TaskStatus.InProgress;
+                Status = WorkStatus.InProgress;
 
-                switch (request.TaskName.ToLower())
-                {
-                    case "analyze":
-                        response.Result = await _analyzer.AnalyzeCodeAsync(request.Context);
-                        break;
-                    case "refactor":
-                        response.Result = await _refactorEngine.RefactorCodeAsync(request.Context);
-                        break;
-                    default:
-                        throw new NotSupportedException($"Task {request.TaskName} is not supported by this agent");
-                }
+                var analyzeTasks = _loader.Analyzers
+                    .Select(a => a.AnalyzeCodeAsync(request.Context));
 
+                var results = await Task.WhenAll(analyzeTasks);
+
+                response.Result = string.Join("\n", results);
                 response.IsSuccess = true;
-                Status = TaskStatus.Completed;
+
+                Status = WorkStatus.Completed;
             }
             catch (Exception ex)
             {
                 response.IsSuccess = false;
                 response.ErrorMessage = ex.Message;
-                Status = TaskStatus.Failed;
+                Status = WorkStatus.Failed;
             }
 
             return response;
@@ -73,17 +64,13 @@ namespace A3sist.Agents.JavaScript
 
         public async Task ShutdownAsync()
         {
-            Status = TaskStatus.InProgress;
-            await Task.WhenAll(
-                _analyzer.ShutdownAsync(),
-                _refactorEngine.ShutdownAsync()
-            );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.InProgress;
+            await _loader.ShutdownAsync();
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> HandleMessageAsync(TaskMessage message)
         {
-            // Handle incoming messages (e.g., from other agents)
             return await Task.FromResult(new AgentResponse
             {
                 RequestId = message.MessageId,

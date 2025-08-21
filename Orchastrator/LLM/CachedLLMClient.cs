@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 
-namespace Orchastrator.LLM
+namespace A3sist.Orchastrator.LLM
 {
     public class CachedLLMClient : ILLMClient
     {
@@ -16,6 +16,11 @@ namespace Orchastrator.LLM
             _llmClient = llmClient;
             _cache = cache;
             _logger = logger;
+        }
+
+        public Task<bool> GetCompletionAsync(object prompt, object lLMOptions)
+        {
+            throw new NotImplementedException();
         }
 
         public async Task<string> GetResponseAsync(string prompt)

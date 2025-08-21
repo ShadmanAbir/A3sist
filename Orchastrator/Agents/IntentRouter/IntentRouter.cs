@@ -19,25 +19,25 @@ namespace A3sist.Agents.IntentRouter
 
         public string Name => "IntentRouter";
         public AgentType Type => AgentType.IntentRouter;
-        public TaskStatus Status { get; private set; }
+        public WorkStatus Status { get; private set; }
 
         public IntentRouter()
         {
             _classifier = new IntentClassifier();
             _agentRegistry = new AgentRegistry();
             _failureAnalyzer = new FailureAnalyzer();
-            Status = TaskStatus.Pending;
+            Status = WorkStatus.Pending;
         }
 
         public async Task InitializeAsync()
         {
-            Status = TaskStatus.InProgress;
+            Status = WorkStatus.InProgress;
             await Task.WhenAll(
                 _classifier.InitializeAsync(),
                 _agentRegistry.InitializeAsync(),
                 _failureAnalyzer.InitializeAsync()
             );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> ExecuteAsync(AgentRequest request)
@@ -51,7 +51,7 @@ namespace A3sist.Agents.IntentRouter
 
             try
             {
-                Status = TaskStatus.InProgress;
+                Status = WorkStatus.InProgress;
 
                 if (request.TaskName.ToLower() != "routeintent")
                 {
@@ -70,13 +70,13 @@ namespace A3sist.Agents.IntentRouter
                 // Prepare the response
                 response.Result = JsonSerializer.Serialize(routingDecision);
                 response.IsSuccess = true;
-                Status = TaskStatus.Completed;
+                Status = WorkStatus.Completed;
             }
             catch (Exception ex)
             {
                 response.IsSuccess = false;
                 response.ErrorMessage = ex.Message;
-                Status = TaskStatus.Failed;
+                Status = WorkStatus.Failed;
             }
 
             return response;
@@ -131,13 +131,13 @@ namespace A3sist.Agents.IntentRouter
 
         public async Task ShutdownAsync()
         {
-            Status = TaskStatus.InProgress;
+            Status = WorkStatus.InProgress;
             await Task.WhenAll(
                 _classifier.ShutdownAsync(),
                 _agentRegistry.ShutdownAsync(),
                 _failureAnalyzer.ShutdownAsync()
             );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> HandleMessageAsync(TaskMessage message)

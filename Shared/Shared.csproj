@@ -51,14 +51,22 @@
     <Compile Include="Enums\WorkStatus.cs" />
     <Compile Include="Interfaces\IAgent.cs" />
     <Compile Include="Interfaces\IAgentStatusService.cs" />
+    <Compile Include="Interfaces\IEditorIntegrationService.cs" />
     <Compile Include="Interfaces\IFileSystem.cs" />
+    <Compile Include="Interfaces\ILLMConfigurationService.cs" />
     <Compile Include="Interfaces\INotificationService.cs" />
+    <Compile Include="Interfaces\ISuggestionService.cs" />
     <Compile Include="Interfaces\ITaskExecutable.cs" />
+    <Compile Include="Interfaces\ITaskQueueService.cs" />
+    <Compile Include="Models\TaskDetails.cs" />
+    <Compile Include="Models\TaskItem.cs" />
     <Compile Include="Messaging\AgentRequest.cs" />
     <Compile Include="Messaging\AgentResponse.cs" />
     <Compile Include="Messaging\AgentResult.cs" />
     <Compile Include="Messaging\TaskMessage.cs" />
     <Compile Include="Models\AgentStatus.cs" />
+    <Compile Include="Models\CodeSuggestion.cs" />
+    <Compile Include="Models\LLMConfiguration.cs" />
     <Compile Include="Models\Notification.cs" />
     <Compile Include="obj\Debug\.NETFramework,Version=v4.8.AssemblyAttributes.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
