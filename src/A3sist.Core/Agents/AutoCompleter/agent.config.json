@@ -1,0 +1,25 @@
+{
+  "agentName": "AutoCompleter",
+  "agentType": "AutoCompleter",
+  "capabilities": [
+    {
+      "name": "CodeCompletion",
+      "description": "Provides intelligent code completion suggestions",
+      "supportedLanguages": ["C#", "Python", "JavaScript"],
+      "requiredContextTypes": ["CodeCompletion"]
+    },
+    {
+      "name": "SnippetCompletion",
+      "description": "Provides code snippet suggestions",
+      "supportedLanguages": ["C#", "Python", "JavaScript"],
+      "requiredContextTypes": ["CodeCompletion"]
+    },
+    {
+      "name": "ImportCompletion",
+      "description": "Provides import/using statement suggestions",
+      "supportedLanguages": ["C#", "Python", "JavaScript"],
+      "requiredContextTypes": ["CodeCompletion"]
+    }
+  ],
+  "entryPoint": "A3sist.Agents.AutoCompleter.AutoCompleter"
+}

@@ -1,0 +1,25 @@
+{
+  "agentName": "GatherAgent",
+  "agentType": "GatherAgent",
+  "capabilities": [
+    {
+      "name": "CollectOutputs",
+      "description": "Collects outputs from multiple agents",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["OutputCollection"]
+    },
+    {
+      "name": "MergeOutputs",
+      "description": "Merges outputs from multiple agents",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["OutputMerging"]
+    },
+    {
+      "name": "ResolveConflicts",
+      "description": "Resolves conflicts in outputs from multiple agents",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["ConflictResolution"]
+    }
+  ],
+  "entryPoint": "A3sist.Agents.GatherAgent.GatherAgent"
+}

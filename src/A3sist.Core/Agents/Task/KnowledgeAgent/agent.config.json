@@ -1,0 +1,31 @@
+{
+  "agentName": "KnowledgeAgent",
+  "agentType": "KnowledgeAgent",
+  "capabilities": [
+    {
+      "name": "FindDocumentation",
+      "description": "Finds relevant documentation",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["DocumentationSearch"]
+    },
+    {
+      "name": "FindExamples",
+      "description": "Finds relevant code examples",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["ExampleSearch"]
+    },
+    {
+      "name": "FindBestPractices",
+      "description": "Finds relevant best practices",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["BestPracticeSearch"]
+    },
+    {
+      "name": "UpdateKnowledgeBase",
+      "description": "Updates the knowledge base with new findings",
+      "supportedLanguages": ["All"],
+      "requiredContextTypes": ["KnowledgeUpdate"]
+    }
+  ],
+  "entryPoint": "A3sist.Agents.KnowledgeAgent.KnowledgeAgent"
+}
