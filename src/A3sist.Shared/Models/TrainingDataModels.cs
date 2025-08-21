@@ -55,18 +55,7 @@ namespace A3sist.Shared.Models
         public List<string> ExcludeUsers { get; set; } = new List<string>();
     }
 
-    /// <summary>
-    /// Export formats for training data
-    /// </summary>
-    public enum ExportFormat
-    {
-        Json,
-        Csv,
-        Xml,
-        Parquet,
-        Jsonl,
-        Avro
-    }
+
 
     /// <summary>
     /// Date range options for filtering

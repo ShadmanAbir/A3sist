@@ -29,5 +29,6 @@
     <ProjectReference Include="..\..\src\A3sist.Core\A3sist.Core.csproj" />
     <ProjectReference Include="..\..\src\A3sist.UI\A3sist.UI.csproj" />
     <ProjectReference Include="..\..\src\A3sist.Shared\A3sist.Shared.csproj" />
+    <ProjectReference Include="..\A3sist.TestUtilities\A3sist.TestUtilities.csproj" />
   </ItemGroup>
 </Project>

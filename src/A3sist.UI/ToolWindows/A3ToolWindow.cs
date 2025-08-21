@@ -4,11 +4,12 @@ using Microsoft.VisualStudio.RpcContracts.RemoteUI;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
+using A3sist.UI.Services;
 
 namespace A3sist.UI
 {
     /// <summary>
-    /// A sample tool window.
+    /// Main A3sist agent interaction tool window with comprehensive UI features
     /// </summary>
     [VisualStudioContribution]
     [Guid("732e41d0-846d-418a-acef-f135b9f75e41")]
@@ -21,21 +22,29 @@ namespace A3sist.UI
         /// </summary>
         public A3ToolWindow()
         {
-            Title = "A3sist";
+            Title = "A3sist - AI Assistant";
         }
 
         /// <inheritdoc />
         public override ToolWindowConfiguration ToolWindowConfiguration => new()
         {
-            // Use this object initializer to set optional parameters for the tool window.
+            // Configure tool window placement and behavior
             Placement = ToolWindowPlacement.Floating,
+            AllowAutoCreation = true,
+            DockDirection = ToolWindowDockDirection.Tabbed
         };
 
         /// <inheritdoc />
-        public override Task InitializeAsync(CancellationToken cancellationToken)
+        public override async Task InitializeAsync(CancellationToken cancellationToken)
         {
-            // Use InitializeAsync for any one-time setup or initialization.
-            return Task.CompletedTask;
+            // Initialize notification service
+            var notificationService = ProgressNotificationService.Instance;
+            
+            // Show welcome notification
+            notificationService.ShowInfo("A3sist Ready", "AI Assistant is ready to help with your code");
+
+            // Perform any additional initialization
+            await Task.CompletedTask;
         }
 
         /// <inheritdoc />
@@ -48,7 +57,13 @@ namespace A3sist.UI
         protected override void Dispose(bool disposing)
         {
             if (disposing)
-                content.Dispose();
+            {
+                content?.Dispose();
+                
+                // Clean up any resources
+                var notificationService = ProgressNotificationService.Instance;
+                notificationService.ShowInfo("A3sist Closed", "AI Assistant tool window closed");
+            }
 
             base.Dispose(disposing);
         }

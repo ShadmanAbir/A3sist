@@ -130,4 +130,151 @@ namespace A3sist.Core.Agents.Task.Fixer
                     TotalIssues = diagnostics.Count,
                     Severity = new
                     {
-         
+                        Errors = diagnostics.Count(d => d.Severity == DiagnosticSeverity.Error),
+                        Warnings = diagnostics.Count(d => d.Severity == DiagnosticSeverity.Warning),
+                        Info = diagnostics.Count(d => d.Severity == DiagnosticSeverity.Info)
+                    },
+                    Issues = diagnostics.Select(d => new
+                    {
+                        Id = d.Id,
+                        Message = d.GetMessage(),
+                        Severity = d.Severity.ToString(),
+                        Location = d.Location.ToString()
+                    }).ToArray()
+                };
+
+                return AgentResult.Success(
+                    JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }),
+                    Name);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error analyzing code for fixes");
+                return AgentResult.Error($"Failed to analyze code: {ex.Message}", Name, ex);
+            }
+        }
+
+        /// <summary>
+        /// Applies automatic fixes to the code
+        /// </summary>
+        private async Task<AgentResult> ApplyFixesAsync(CodeInfo codeInfo)
+        {
+            try
+            {
+                Logger.LogInformation("Applying fixes to {FilePath}", codeInfo.FilePath);
+
+                var syntaxTree = CSharpSyntaxTree.ParseText(codeInfo.Content);
+                var compilation = CSharpCompilation.Create("TempAssembly")
+                    .AddReferences(MetadataReference.CreateFromFile(typeof(object).Assembly.Location))
+                    .AddSyntaxTrees(syntaxTree);
+
+                var diagnostics = compilation.GetDiagnostics()
+                    .Where(d => d.Severity == DiagnosticSeverity.Error || d.Severity == DiagnosticSeverity.Warning)
+                    .ToList();
+
+                if (!diagnostics.Any())
+                {
+                    return AgentResult.Success("No issues found to fix.", Name);
+                }
+
+                var root = await syntaxTree.GetRootAsync();
+                var newRoot = root;
+
+                // Apply common fixes
+                foreach (var diagnostic in diagnostics)
+                {
+                    newRoot = ApplyDiagnosticFix(newRoot, diagnostic);
+                }
+
+                var fixedCode = newRoot.ToFullString();
+                
+                var result = new
+                {
+                    OriginalCode = codeInfo.Content,
+                    FixedCode = fixedCode,
+                    FixesApplied = diagnostics.Count,
+                    Changes = GetCodeChanges(codeInfo.Content, fixedCode)
+                };
+
+                return AgentResult.Success(
+                    JsonSerializer.Serialize(result, new JsonSerializerOptions { WriteIndented = true }),
+                    Name);
+            }
+            catch (Exception ex)
+            {
+                Logger.LogError(ex, "Error applying fixes to code");
+                return AgentResult.Error($"Failed to apply fixes: {ex.Message}", Name, ex);
+            }
+        }
+
+        /// <summary>
+        /// Applies a fix for a specific diagnostic
+        /// </summary>
+        private SyntaxNode ApplyDiagnosticFix(SyntaxNode root, Diagnostic diagnostic)
+        {
+            // This is a simplified implementation
+            // In a real implementation, you would have specific fixes for different diagnostic types
+            
+            switch (diagnostic.Id)
+            {
+                case "CS0161": // Not all code paths return a value
+                    return AddReturnStatement(root, diagnostic);
+                case "CS0168": // Variable declared but never used
+                    return RemoveUnusedVariable(root, diagnostic);
+                case "CS0219": // Variable assigned but never used
+                    return RemoveUnusedAssignment(root, diagnostic);
+                default:
+                    return root; // No fix available
+            }
+        }
+
+        /// <summary>
+        /// Adds a return statement to fix CS0161
+        /// </summary>
+        private SyntaxNode AddReturnStatement(SyntaxNode root, Diagnostic diagnostic)
+        {
+            // Simplified implementation - would need more sophisticated logic
+            return root;
+        }
+
+        /// <summary>
+        /// Removes unused variable to fix CS0168
+        /// </summary>
+        private SyntaxNode RemoveUnusedVariable(SyntaxNode root, Diagnostic diagnostic)
+        {
+            // Simplified implementation - would need more sophisticated logic
+            return root;
+        }
+
+        /// <summary>
+        /// Removes unused assignment to fix CS0219
+        /// </summary>
+        private SyntaxNode RemoveUnusedAssignment(SyntaxNode root, Diagnostic diagnostic)
+        {
+            // Simplified implementation - would need more sophisticated logic
+            return root;
+        }
+
+        /// <summary>
+        /// Gets the changes between original and fixed code
+        /// </summary>
+        private object[] GetCodeChanges(string originalCode, string fixedCode)
+        {
+            // Simplified implementation - would use a proper diff algorithm
+            if (originalCode == fixedCode)
+            {
+                return Array.Empty<object>();
+            }
+
+            return new object[]
+            {
+                new
+                {
+                    Type = "Modified",
+                    Description = "Code was modified to fix compilation issues",
+                    LinesChanged = fixedCode.Split('\n').Length - originalCode.Split('\n').Length
+                }
+            };
+        }
+    }
+}

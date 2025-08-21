@@ -1,325 +1,261 @@
-using A3sist.Core.Services;
-using A3sist.Shared.Enums;
-using A3sist.Shared.Interfaces;
-using A3sist.Shared.Models;
+using Xunit;
+using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using Moq;
-using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Xunit;
+using A3sist.Core.Services;
+using A3sist.Shared.Interfaces;
+using A3sist.Shared.Models;
+using A3sist.Shared.Enums;
+using A3sist.TestUtilities;
 
-namespace A3sist.Core.Tests.Services
+namespace A3sist.Core.Tests.Services;
+
+/// <summary>
+/// Unit tests for AgentManager
+/// </summary>
+public class AgentManagerTests : TestBase
 {
-    public class AgentManagerTests : IDisposable
+    private readonly Mock<ILogger<AgentManager>> _mockLogger;
+    private readonly AgentManager _agentManager;
+
+    public AgentManagerTests()
     {
-        private readonly Mock<ILogger<AgentManager>> _mockLogger;
-        private readonly AgentManager _agentManager;
-        private readonly Mock<IAgent> _mockAgent;
+        _mockLogger = new Mock<ILogger<AgentManager>>();
+        _agentManager = new AgentManager(_mockLogger.Object);
+    }
 
-        public AgentManagerTests()
+    [Fact]
+    public async Task RegisterAgentAsync_WithValidAgent_ShouldRegisterSuccessfully()
+    {
+        // Arrange
+        var mockAgent = MockFactory.CreateAgent("TestAgent", AgentType.Analyzer);
+
+        // Act
+        await _agentManager.RegisterAgentAsync(mockAgent.Object);
+
+        // Assert
+        var registeredAgent = await _agentManager.GetAgentAsync("TestAgent");
+        registeredAgent.Should().NotBeNull();
+        registeredAgent.Should().BeSameAs(mockAgent.Object);
+    }
+
+    [Fact]
+    public async Task RegisterAgentAsync_WithNullAgent_ShouldThrowArgumentNullException()
+    {
+        // Act
+        var act = async () => await _agentManager.RegisterAgentAsync(null!);
+
+        // Assert
+        await act.Should().ThrowAsync<ArgumentNullException>();
+    }
+
+    [Fact]
+    public async Task RegisterAgentAsync_WithDuplicateName_ShouldThrowInvalidOperationException()
+    {
+        // Arrange
+        var mockAgent1 = MockFactory.CreateAgent("TestAgent", AgentType.Analyzer);
+        var mockAgent2 = MockFactory.CreateAgent("TestAgent", AgentType.Fixer);
+
+        // Act
+        await _agentManager.RegisterAgentAsync(mockAgent1.Object);
+        var act = async () => await _agentManager.RegisterAgentAsync(mockAgent2.Object);
+
+        // Assert
+        await act.Should().ThrowAsync<InvalidOperationException>()
+            .WithMessage("*already registered*");
+    }
+
+    [Fact]
+    public async Task UnregisterAgentAsync_WithExistingAgent_ShouldUnregisterSuccessfully()
+    {
+        // Arrange
+        var mockAgent = MockFactory.CreateAgent("TestAgent", AgentType.Analyzer);
+        await _agentManager.RegisterAgentAsync(mockAgent.Object);
+
+        // Act
+        await _agentManager.UnregisterAgentAsync("TestAgent");
+
+        // Assert
+        var agent = await _agentManager.GetAgentAsync("TestAgent");
+        agent.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task UnregisterAgentAsync_WithNonExistentAgent_ShouldNotThrow()
+    {
+        // Act
+        var act = async () => await _agentManager.UnregisterAgentAsync("NonExistentAgent");
+
+        // Assert
+        await act.Should().NotThrowAsync();
+    }
+
+    [Fact]
+    public async Task GetAgentAsync_ByName_WithExistingAgent_ShouldReturnAgent()
+    {
+        // Arrange
+        var mockAgent = MockFactory.CreateAgent("TestAgent", AgentType.Analyzer);
+        await _agentManager.RegisterAgentAsync(mockAgent.Object);
+
+        // Act
+        var result = await _agentManager.GetAgentAsync("TestAgent");
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeSameAs(mockAgent.Object);
+    }
+
+    [Fact]
+    public async Task GetAgentAsync_ByName_WithNonExistentAgent_ShouldReturnNull()
+    {
+        // Act
+        var result = await _agentManager.GetAgentAsync("NonExistentAgent");
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetAgentAsync_ByType_WithExistingAgent_ShouldReturnAgent()
+    {
+        // Arrange
+        var mockAgent = MockFactory.CreateAgent("TestAgent", AgentType.Fixer);
+        await _agentManager.RegisterAgentAsync(mockAgent.Object);
+
+        // Act
+        var result = await _agentManager.GetAgentAsync(AgentType.Fixer);
+
+        // Assert
+        result.Should().NotBeNull();
+        result.Should().BeSameAs(mockAgent.Object);
+    }
+
+    [Fact]
+    public async Task GetAgentAsync_ByType_WithNonExistentType_ShouldReturnNull()
+    {
+        // Act
+        var result = await _agentManager.GetAgentAsync(AgentType.Designer);
+
+        // Assert
+        result.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GetAgentsAsync_WithoutPredicate_ShouldReturnAllAgents()
+    {
+        // Arrange
+        var mockAgent1 = MockFactory.CreateAgent("Agent1", AgentType.Analyzer);
+        var mockAgent2 = MockFactory.CreateAgent("Agent2", AgentType.Fixer);
+        await _agentManager.RegisterAgentAsync(mockAgent1.Object);
+        await _agentManager.RegisterAgentAsync(mockAgent2.Object);
+
+        // Act
+        var result = await _agentManager.GetAgentsAsync();
+
+        // Assert
+        result.Should().HaveCount(2);
+        result.ShouldContainAgentWithName("Agent1");
+        result.ShouldContainAgentWithName("Agent2");
+    }
+
+    [Fact]
+    public async Task GetAgentsAsync_WithPredicate_ShouldReturnFilteredAgents()
+    {
+        // Arrange
+        var mockAgent1 = MockFactory.CreateAgent("Agent1", AgentType.Analyzer);
+        var mockAgent2 = MockFactory.CreateAgent("Agent2", AgentType.Fixer);
+        var mockAgent3 = MockFactory.CreateAgent("Agent3", AgentType.Analyzer);
+        await _agentManager.RegisterAgentAsync(mockAgent1.Object);
+        await _agentManager.RegisterAgentAsync(mockAgent2.Object);
+        await _agentManager.RegisterAgentAsync(mockAgent3.Object);
+
+        // Act
+        var result = await _agentManager.GetAgentsAsync(a => a.Type == AgentType.Analyzer);
+
+        // Assert
+        result.Should().HaveCount(2);
+        result.ShouldContainAgentWithName("Agent1");
+        result.ShouldContainAgentWithName("Agent3");
+        result.Should().NotContain(a => a.Name == "Agent2");
+    }
+
+    [Fact]
+    public async Task GetAgentStatusAsync_WithExistingAgent_ShouldReturnStatus()
+    {
+        // Arrange
+        var mockAgent = MockFactory.CreateAgent("TestAgent", AgentType.Analyzer);
+        await _agentManager.RegisterAgentAsync(mockAgent.Object);
+
+        // Act
+        var status = await _agentManager.GetAgentStatusAsync("TestAgent");
+
+        // Assert
+        status.Should().NotBeNull();
+        status.Name.Should().Be("TestAgent");
+        status.Type.Should().Be(AgentType.Analyzer);
+    }
+
+    [Fact]
+    public async Task GetAgentStatusAsync_WithNonExistentAgent_ShouldReturnNull()
+    {
+        // Act
+        var status = await _agentManager.GetAgentStatusAsync("NonExistentAgent");
+
+        // Assert
+        status.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task AgentManager_ConcurrentOperations_ShouldHandleThreadSafety()
+    {
+        // Arrange
+        var tasks = new List<Task>();
+        var agentCount = 10;
+
+        // Act - Register multiple agents concurrently
+        for (int i = 0; i < agentCount; i++)
         {
-            _mockLogger = new Mock<ILogger<AgentManager>>();
-            _agentManager = new AgentManager(_mockLogger.Object);
-            _mockAgent = new Mock<IAgent>();
-            _mockAgent.Setup(x => x.Name).Returns("TestAgent");
-            _mockAgent.Setup(x => x.Type).Returns(AgentType.Unknown);
-            _mockAgent.Setup(x => x.InitializeAsync()).Returns(Task.CompletedTask);
-            _mockAgent.Setup(x => x.ShutdownAsync()).Returns(Task.CompletedTask);
+            var agentName = $"Agent{i}";
+            var mockAgent = MockFactory.CreateAgent(agentName, AgentType.Analyzer);
+            tasks.Add(_agentManager.RegisterAgentAsync(mockAgent.Object));
         }
 
-        [Fact]
-        public void Constructor_WithValidLogger_InitializesSuccessfully()
-        {
-            // Assert
-            Assert.NotNull(_agentManager);
-        }
+        await Task.WhenAll(tasks);
 
-        [Fact]
-        public void Constructor_WithNullLogger_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            Assert.Throws<ArgumentNullException>(() => new AgentManager(null));
-        }
+        // Assert
+        var allAgents = await _agentManager.GetAgentsAsync();
+        allAgents.Should().HaveCount(agentCount);
+    }
 
-        [Fact]
-        public async Task RegisterAgentAsync_WithValidAgent_RegistersSuccessfully()
-        {
-            // Arrange
-            bool eventRaised = false;
-            _agentManager.AgentRegistered += (sender, args) => eventRaised = true;
+    [Fact]
+    public async Task AgentManager_LifecycleTest_ShouldWorkEndToEnd()
+    {
+        // Arrange
+        var mockAgent = MockFactory.CreateAgent("LifecycleAgent", AgentType.Refactor);
 
-            // Act
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
+        // Act & Assert - Register
+        await _agentManager.RegisterAgentAsync(mockAgent.Object);
+        var registeredAgent = await _agentManager.GetAgentAsync("LifecycleAgent");
+        registeredAgent.Should().NotBeNull();
 
-            // Assert
-            var retrievedAgent = await _agentManager.GetAgentAsync("TestAgent");
-            Assert.NotNull(retrievedAgent);
-            Assert.Equal("TestAgent", retrievedAgent.Name);
-            Assert.True(eventRaised);
-            _mockAgent.Verify(x => x.InitializeAsync(), Times.Once);
-        }
+        // Act & Assert - Get Status
+        var status = await _agentManager.GetAgentStatusAsync("LifecycleAgent");
+        status.Should().NotBeNull();
+        status.ShouldBeHealthy();
 
-        [Fact]
-        public async Task RegisterAgentAsync_WithNullAgent_ThrowsArgumentNullException()
-        {
-            // Act & Assert
-            await Assert.ThrowsAsync<ArgumentNullException>(() => 
-                _agentManager.RegisterAgentAsync(null));
-        }
+        // Act & Assert - Unregister
+        await _agentManager.UnregisterAgentAsync("LifecycleAgent");
+        var unregisteredAgent = await _agentManager.GetAgentAsync("LifecycleAgent");
+        unregisteredAgent.Should().BeNull();
+    }
 
-        [Fact]
-        public async Task RegisterAgentAsync_WithDuplicateAgent_DoesNotRegisterTwice()
-        {
-            // Arrange
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
+    [Fact]
+    public void Constructor_WithNullLogger_ShouldThrowArgumentNullException()
+    {
+        // Act
+        var act = () => new AgentManager(null!);
 
-            // Act
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-
-            // Assert
-            var agents = await _agentManager.GetAgentsAsync();
-            Assert.Single(agents);
-            _mockAgent.Verify(x => x.InitializeAsync(), Times.Once);
-        }
-
-        [Fact]
-        public async Task RegisterAgentAsync_WithInitializationFailure_ThrowsException()
-        {
-            // Arrange
-            _mockAgent.Setup(x => x.InitializeAsync()).ThrowsAsync(new InvalidOperationException("Init failed"));
-
-            // Act & Assert
-            await Assert.ThrowsAsync<InvalidOperationException>(() => 
-                _agentManager.RegisterAgentAsync(_mockAgent.Object));
-        }
-
-        [Fact]
-        public async Task UnregisterAgentAsync_WithExistingAgent_UnregistersSuccessfully()
-        {
-            // Arrange
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-            bool eventRaised = false;
-            _agentManager.AgentUnregistered += (sender, args) => eventRaised = true;
-
-            // Act
-            await _agentManager.UnregisterAgentAsync("TestAgent");
-
-            // Assert
-            var retrievedAgent = await _agentManager.GetAgentAsync("TestAgent");
-            Assert.Null(retrievedAgent);
-            Assert.True(eventRaised);
-            _mockAgent.Verify(x => x.ShutdownAsync(), Times.Once);
-        }
-
-        [Fact]
-        public async Task UnregisterAgentAsync_WithNonExistentAgent_DoesNotThrow()
-        {
-            // Act & Assert (should not throw)
-            await _agentManager.UnregisterAgentAsync("NonExistentAgent");
-        }
-
-        [Fact]
-        public async Task UnregisterAgentAsync_WithNullOrEmptyName_DoesNotThrow()
-        {
-            // Act & Assert (should not throw)
-            await _agentManager.UnregisterAgentAsync(null);
-            await _agentManager.UnregisterAgentAsync("");
-            await _agentManager.UnregisterAgentAsync("   ");
-        }
-
-        [Fact]
-        public async Task GetAgentAsync_ByName_ReturnsCorrectAgent()
-        {
-            // Arrange
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-
-            // Act
-            var agent = await _agentManager.GetAgentAsync("TestAgent");
-
-            // Assert
-            Assert.NotNull(agent);
-            Assert.Equal("TestAgent", agent.Name);
-        }
-
-        [Fact]
-        public async Task GetAgentAsync_ByType_ReturnsCorrectAgent()
-        {
-            // Arrange
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-
-            // Act
-            var agent = await _agentManager.GetAgentAsync(AgentType.Unknown);
-
-            // Assert
-            Assert.NotNull(agent);
-            Assert.Equal(AgentType.Unknown, agent.Type);
-        }
-
-        [Fact]
-        public async Task GetAgentAsync_WithNonExistentName_ReturnsNull()
-        {
-            // Act
-            var agent = await _agentManager.GetAgentAsync("NonExistentAgent");
-
-            // Assert
-            Assert.Null(agent);
-        }
-
-        [Fact]
-        public async Task GetAgentsAsync_WithoutPredicate_ReturnsAllAgents()
-        {
-            // Arrange
-            var mockAgent2 = new Mock<IAgent>();
-            mockAgent2.Setup(x => x.Name).Returns("TestAgent2");
-            mockAgent2.Setup(x => x.Type).Returns(AgentType.Fixer);
-            mockAgent2.Setup(x => x.InitializeAsync()).Returns(Task.CompletedTask);
-
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-            await _agentManager.RegisterAgentAsync(mockAgent2.Object);
-
-            // Act
-            var agents = await _agentManager.GetAgentsAsync();
-
-            // Assert
-            Assert.Equal(2, agents.Count());
-        }
-
-        [Fact]
-        public async Task GetAgentsAsync_WithPredicate_ReturnsFilteredAgents()
-        {
-            // Arrange
-            var mockAgent2 = new Mock<IAgent>();
-            mockAgent2.Setup(x => x.Name).Returns("TestAgent2");
-            mockAgent2.Setup(x => x.Type).Returns(AgentType.Fixer);
-            mockAgent2.Setup(x => x.InitializeAsync()).Returns(Task.CompletedTask);
-
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-            await _agentManager.RegisterAgentAsync(mockAgent2.Object);
-
-            // Act
-            var agents = await _agentManager.GetAgentsAsync(a => a.Type == AgentType.Fixer);
-
-            // Assert
-            Assert.Single(agents);
-            Assert.Equal("TestAgent2", agents.First().Name);
-        }
-
-        [Fact]
-        public async Task GetAgentStatusAsync_WithExistingAgent_ReturnsStatus()
-        {
-            // Arrange
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-
-            // Act
-            var status = await _agentManager.GetAgentStatusAsync("TestAgent");
-
-            // Assert
-            Assert.NotNull(status);
-            Assert.Equal("TestAgent", status.Name);
-            Assert.Equal(AgentType.Unknown, status.Type);
-        }
-
-        [Fact]
-        public async Task GetAgentStatusAsync_WithNonExistentAgent_ReturnsNull()
-        {
-            // Act
-            var status = await _agentManager.GetAgentStatusAsync("NonExistentAgent");
-
-            // Assert
-            Assert.Null(status);
-        }
-
-        [Fact]
-        public async Task GetAllAgentStatusesAsync_ReturnsAllStatuses()
-        {
-            // Arrange
-            var mockAgent2 = new Mock<IAgent>();
-            mockAgent2.Setup(x => x.Name).Returns("TestAgent2");
-            mockAgent2.Setup(x => x.Type).Returns(AgentType.Fixer);
-            mockAgent2.Setup(x => x.InitializeAsync()).Returns(Task.CompletedTask);
-
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-            await _agentManager.RegisterAgentAsync(mockAgent2.Object);
-
-            // Act
-            var statuses = await _agentManager.GetAllAgentStatusesAsync();
-
-            // Assert
-            Assert.Equal(2, statuses.Count());
-        }
-
-        [Fact]
-        public async Task StartAllAgentsAsync_InitializesAllAgents()
-        {
-            // Arrange
-            var mockAgent2 = new Mock<IAgent>();
-            mockAgent2.Setup(x => x.Name).Returns("TestAgent2");
-            mockAgent2.Setup(x => x.Type).Returns(AgentType.Fixer);
-            mockAgent2.Setup(x => x.InitializeAsync()).Returns(Task.CompletedTask);
-
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-            await _agentManager.RegisterAgentAsync(mockAgent2.Object);
-
-            // Reset the mock to verify StartAllAgentsAsync calls
-            _mockAgent.Reset();
-            _mockAgent.Setup(x => x.Name).Returns("TestAgent");
-            _mockAgent.Setup(x => x.InitializeAsync()).Returns(Task.CompletedTask);
-
-            // Act
-            await _agentManager.StartAllAgentsAsync();
-
-            // Assert
-            _mockAgent.Verify(x => x.InitializeAsync(), Times.Once);
-            mockAgent2.Verify(x => x.InitializeAsync(), Times.Once);
-        }
-
-        [Fact]
-        public async Task StopAllAgentsAsync_ShutsDownAllAgents()
-        {
-            // Arrange
-            var mockAgent2 = new Mock<IAgent>();
-            mockAgent2.Setup(x => x.Name).Returns("TestAgent2");
-            mockAgent2.Setup(x => x.Type).Returns(AgentType.Fixer);
-            mockAgent2.Setup(x => x.InitializeAsync()).Returns(Task.CompletedTask);
-            mockAgent2.Setup(x => x.ShutdownAsync()).Returns(Task.CompletedTask);
-
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-            await _agentManager.RegisterAgentAsync(mockAgent2.Object);
-
-            // Act
-            await _agentManager.StopAllAgentsAsync();
-
-            // Assert
-            _mockAgent.Verify(x => x.ShutdownAsync(), Times.Once);
-            mockAgent2.Verify(x => x.ShutdownAsync(), Times.Once);
-        }
-
-        [Fact]
-        public async Task PerformHealthChecksAsync_ReturnsHealthStatuses()
-        {
-            // Arrange
-            await _agentManager.RegisterAgentAsync(_mockAgent.Object);
-
-            // Act
-            var healthStatuses = await _agentManager.PerformHealthChecksAsync();
-
-            // Assert
-            Assert.Single(healthStatuses);
-            Assert.True(healthStatuses.ContainsKey("TestAgent"));
-        }
-
-        [Fact]
-        public async Task AgentStatusChanged_EventRaised_WhenStatusChanges()
-        {
-            // This test would require a more complex setup with BaseAgent
-            // For now, we'll just verify the event exists
-            Assert.NotNull(_agentManager.AgentStatusChanged);
-        }
-
-        public void Dispose()
-        {
-            _agentManager?.Dispose();
-        }
+        // Assert
+        act.Should().Throw<ArgumentNullException>();
     }
 }

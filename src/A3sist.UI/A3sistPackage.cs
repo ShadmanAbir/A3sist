@@ -9,6 +9,8 @@ using A3sist.Core;
 using A3sist.Core.Services;
 using A3sist.UI.Commands;
 using A3sist.UI.ToolWindows;
+using A3sist.UI.Components;
+using A3sist.UI.Services;
 using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.UI
@@ -52,6 +54,7 @@ namespace A3sist.UI
 
         private IServiceProvider? _serviceProvider;
         private ILogger<A3sistPackage>? _logger;
+        private StatusBarIntegration? _statusBarIntegration;
 
         #region Package Members
 
@@ -81,6 +84,12 @@ namespace A3sist.UI
 
                 // Initialize tool windows
                 await InitializeToolWindowsAsync(cancellationToken);
+
+                // Initialize status bar integration
+                await InitializeStatusBarAsync(cancellationToken);
+
+                // Initialize editor integration services
+                await InitializeEditorIntegrationAsync(cancellationToken);
 
                 _logger?.LogInformation("A3sist Visual Studio Package initialized successfully");
             }
@@ -132,6 +141,48 @@ namespace A3sist.UI
         }
 
         /// <summary>
+        /// Initialize status bar integration
+        /// </summary>
+        private async Task InitializeStatusBarAsync(CancellationToken cancellationToken)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            try
+            {
+                _statusBarIntegration = new StatusBarIntegration();
+                _statusBarIntegration.ShowMessage("Ready");
+                
+                _logger?.LogDebug("Status bar integration initialized");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Failed to initialize status bar integration");
+                // Don't throw - status bar integration is not critical
+            }
+        }
+
+        /// <summary>
+        /// Initialize editor integration services
+        /// </summary>
+        private async Task InitializeEditorIntegrationAsync(CancellationToken cancellationToken)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+
+            try
+            {
+                // Initialize service locator with registered services
+                EditorServiceRegistration.InitializeServiceLocator(_serviceProvider);
+                
+                _logger?.LogDebug("Editor integration services initialized");
+            }
+            catch (Exception ex)
+            {
+                _logger?.LogWarning(ex, "Failed to initialize editor integration services");
+                // Don't throw - editor integration is not critical for basic functionality
+            }
+        }
+
+        /// <summary>
         /// Gets the service provider for the package
         /// </summary>
         public IServiceProvider GetServiceProvider()
@@ -148,6 +199,9 @@ namespace A3sist.UI
                 try
                 {
                     _logger?.LogInformation("Disposing A3sist Visual Studio Package");
+                    
+                    // Dispose status bar integration
+                    _statusBarIntegration?.Dispose();
                     
                     // Dispose of core services if needed
                     if (_serviceProvider is IDisposable disposableProvider)

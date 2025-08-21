@@ -1,6 +1,7 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using A3sist.UI.Services;
 
 namespace A3sist.Core
 {
@@ -22,6 +23,9 @@ namespace A3sist.Core
             
             // Add stub orchestrator
             services.AddSingleton<Services.IOrchestrator, StubOrchestrator>();
+            
+            // Add editor integration services
+            services.AddEditorIntegrationServices();
             
             return services.BuildServiceProvider();
         }
