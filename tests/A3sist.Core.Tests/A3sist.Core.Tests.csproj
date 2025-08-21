@@ -30,5 +30,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\A3sist.Shared\A3sist.Shared.csproj" />
+    <ProjectReference Include="..\..\src\A3sist.Core\A3sist.Core.csproj" />
   </ItemGroup>
 </Project>
