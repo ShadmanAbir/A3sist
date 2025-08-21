@@ -1,5 +1,6 @@
-namespace A3sist;
-public class ScaffoldingPlan
+namespace A3sist.Orchastrator.Agents.Designer.Models
+{
+    public class ScaffoldingPlan
     {
         public string ProjectName { get; set; }
         public string Language { get; set; }
@@ -8,3 +9,5 @@ public class ScaffoldingPlan
         public List<string> Dependencies { get; set; } = new List<string>();
         public Dictionary<string, string> Configuration { get; set; } = new Dictionary<string, string>();
     }
+
+}

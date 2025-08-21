@@ -11,7 +11,7 @@ namespace A3sist.Shared.Messaging
         public DateTime Timestamp { get; set; }
         public string Sender { get; set; }
         public string Receiver { get; set; }
-        public TaskStatus Status { get; set; }
+        public WorkStatus Status { get; set; }
 
         public TaskMessage()
         {

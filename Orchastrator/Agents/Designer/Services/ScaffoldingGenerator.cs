@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using A3sist.Agents.Designer.Models;
+using A3sist.Orchastrator.Agents.Designer.Models;
 
 namespace A3sist.Agents.Designer.Services
 {

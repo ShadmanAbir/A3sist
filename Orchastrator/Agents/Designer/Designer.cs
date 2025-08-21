@@ -9,6 +9,7 @@ using A3sist.Shared.Messaging;
 using A3sist.Shared.Enums;
 using A3sist.Agents.Designer.Services;
 using A3sist.Agents.Designer.Models;
+using A3sist.Orchastrator.Agents.Designer.Services;
 
 namespace A3sist.Agents.Designer
 {
@@ -21,7 +22,7 @@ namespace A3sist.Agents.Designer
 
         public string Name => "Designer";
         public AgentType Type => AgentType.Designer;
-        public TaskStatus Status { get; private set; }
+        public WorkStatus Status { get; private set; }
 
         public Designer()
         {
@@ -29,19 +30,19 @@ namespace A3sist.Agents.Designer
             _scaffoldingGenerator = new ScaffoldingGenerator();
             _designPlanner = new DesignPlanner();
             _patternRecommender = new PatternRecommender();
-            Status = TaskStatus.Pending;
+            Status = WorkStatus.Pending;
         }
 
         public async Task InitializeAsync()
         {
-            Status = TaskStatus.InProgress;
+            Status = WorkStatus.InProgress;
             await Task.WhenAll(
                 _architectureAnalyzer.InitializeAsync(),
                 _scaffoldingGenerator.InitializeAsync(),
                 _designPlanner.InitializeAsync(),
                 _patternRecommender.InitializeAsync()
             );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> ExecuteAsync(AgentRequest request)
@@ -55,7 +56,7 @@ namespace A3sist.Agents.Designer
 
             try
             {
-                Status = TaskStatus.InProgress;
+                Status = WorkStatus.InProgress;
 
                 switch (request.TaskName.ToLower())
                 {
@@ -84,13 +85,13 @@ namespace A3sist.Agents.Designer
                 }
 
                 response.IsSuccess = true;
-                Status = TaskStatus.Completed;
+                Status = WorkStatus.Completed;
             }
             catch (Exception ex)
             {
                 response.IsSuccess = false;
                 response.ErrorMessage = ex.Message;
-                Status = TaskStatus.Failed;
+                Status = WorkStatus.Failed;
             }
 
             return response;
@@ -98,14 +99,14 @@ namespace A3sist.Agents.Designer
 
         public async Task ShutdownAsync()
         {
-            Status = TaskStatus.InProgress;
+            Status = WorkStatus.InProgress;
             await Task.WhenAll(
                 _architectureAnalyzer.ShutdownAsync(),
                 _scaffoldingGenerator.ShutdownAsync(),
                 _designPlanner.ShutdownAsync(),
                 _patternRecommender.ShutdownAsync()
             );
-            Status = TaskStatus.Completed;
+            Status = WorkStatus.Completed;
         }
 
         public async Task<AgentResponse> HandleMessageAsync(TaskMessage message)

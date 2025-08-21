@@ -1,15 +1,17 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis.CSharp.Syntax;
-using Microsoft.CodeAnalysis.MSBuild;
 using A3sist.Agents.Designer.Models;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
+using A3sist.Orchastrator.Agents.Designer.Models;
+using Microsoft.CodeAnalysis.MSBuild;
 
-namespace A3sist.Agents.Designer.Services
+namespace A3sist.Orchastrator.Agents.Designer.Services
 {
     /// <summary>
     /// Analyzes the architecture of a C# project.
@@ -126,7 +128,7 @@ namespace A3sist.Agents.Designer.Services
                 analysis.Dependencies.Add(new Dependency
                 {
                     SourceComponent = project.Name,
-                    TargetComponent = dependency.ProjectName,
+                    TargetComponent = dependency.Aliases[0],
                     Type = "DependsOn",
                     Description = "Project reference"
                 });
@@ -414,7 +416,7 @@ namespace A3sist.Agents.Designer.Services
         {
             if (_workspace != null)
             {
-                await _workspace.DisposeAsync();
+                _workspace.Dispose();
                 _workspace = null;
             }
         }

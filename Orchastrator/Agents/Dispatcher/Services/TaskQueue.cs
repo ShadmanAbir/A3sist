@@ -18,21 +18,25 @@ namespace A3sist.Agents.Dispatcher.Services
 
         public TaskQueue()
         {
-            // Create workflow queue with priority ordering
-            var workflowOptions = new DataflowBlockOptions
-            {
-                EnsureOrdered = true,
-                MaxDegreeOfParallelism = Environment.ProcessorCount
-            };
+           // Workflow queue — just a simple BufferBlock, ordering only
+var workflowOptions = new DataflowBlockOptions
+{
+    EnsureOrdered = true
+};
+var workflowQueue = new BufferBlock<WorkflowRequest>(workflowOptions);
 
-            _workflowQueue = new BufferBlock<WorkflowRequest>(workflowOptions);
+// Task queue — use ActionBlock if you want parallel execution
+var taskOptions = new ExecutionDataflowBlockOptions
+{
+    EnsureOrdered = true,
+    MaxDegreeOfParallelism = Environment.ProcessorCount * 2
+};
 
-            // Create task queue with priority ordering
-            var taskOptions = new DataflowBlockOptions
-            {
-                EnsureOrdered = true,
-                MaxDegreeOfParallelism = Environment.ProcessorCount * 2
-            };
+//var taskQueue = new ActionBlock<WorkflowRequest>(async request =>
+//{
+//    // Your processing logic here
+//    await ProcessRequestAsync(request);
+//}, taskOptions);
 
             _taskQueue = new BufferBlock<TaskAssignment>(taskOptions);
         }

@@ -9,20 +9,27 @@
     <VssdkCompatibleExtension>true</VssdkCompatibleExtension>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Agents\Chat\**" />
     <Compile Remove="Shared\**" />
+    <EmbeddedResource Remove="Agents\Chat\**" />
     <EmbeddedResource Remove="Shared\**" />
+    <None Remove="Agents\Chat\**" />
     <None Remove="Shared\**" />
+    <Page Remove="Agents\Chat\**" />
     <Page Remove="Shared\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MessagePack" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Build.Tasks.Core" Version="17.14.8" />
     <PackageReference Include="Microsoft.CodeAnalysis.Common" Version="4.14.0" />
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.Workspaces.MSBuild" Version="4.14.0" />
     <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="9.0.8" />
     <PackageReference Include="Microsoft.ML" Version="4.0.2" />
-    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.9.2092" />
-    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.9.2092" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.6.36389" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Sdk" Version="17.14.40254" />
+    <PackageReference Include="Microsoft.VisualStudio.Extensibility.Build" Version="17.14.40254" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" ExcludeAssets="runtime" />
     <PackageReference Include="Polly" Version="8.6.2" />
     <PackageReference Include="System.Net.Http" Version="4.3.4" />
   </ItemGroup>
@@ -30,7 +37,6 @@
   <ItemGroup>
     <Folder Include="Agents\FixerAgent\" />
     <Folder Include="Agents\IntentRouter\" />
-    <Folder Include="Agents\Chat\" />
     <Folder Include="Agents\CSharp\" />
     <Folder Include="Agents\Javascript\" />
     <Folder Include="Agents\Python\" />

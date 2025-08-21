@@ -15,24 +15,4 @@ namespace A3sist.Agents.Dispatcher.Models
         public string Requester { get; set; }
         public Dictionary<string, string> Metadata { get; set; } = new Dictionary<string, string>();
     }
-
-    public class TaskDefinition
-    {
-        public string TaskName { get; set; }
-        public string Description { get; set; }
-        public string AgentName { get; set; }
-        public string TaskType { get; set; }
-        public int MaxRetries { get; set; } = 3;
-        public TimeSpan Timeout { get; set; } = TimeSpan.FromMinutes(5);
-        public Dictionary<string, string> Parameters { get; set; } = new Dictionary<string, string>();
-        public List<string> Dependencies { get; set; } = new List<string>();
-    }
-
-    public enum WorkflowPriority
-    {
-        Critical,
-        High,
-        Normal,
-        Low
-    }
 }

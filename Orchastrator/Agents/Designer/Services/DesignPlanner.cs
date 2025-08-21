@@ -5,6 +5,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading.Tasks;
 using A3sist.Agents.Designer.Models;
+using A3sist.Orchastrator.Agents.Designer.Models;
+using Orchastrator.Agents.Designer.Models;
 
 namespace A3sist.Agents.Designer.Services
 {
@@ -336,22 +338,5 @@ namespace A3sist.Agents.Designer.Services
             // Clean up resources
             _designPatterns.Clear();
         }
-    }
-
-    public class DesignPattern
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-        public string Benefit { get; set; }
-        public string WhenToUse { get; set; }
-        public List<string> Components { get; set; } = new List<string>();
-        public List<Relationship> Relationships { get; set; } = new List<Relationship>();
-    }
-
-    public class Relationship
-    {
-        public string Source { get; set; }
-        public string Target { get; set; }
-        public string Type { get; set; } // e.g., "Uses", "DependsOn", "CommunicatesWith"
     }
 }
