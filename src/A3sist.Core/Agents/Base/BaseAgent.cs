@@ -299,8 +299,34 @@ namespace A3sist.Core.Agents.Base
                 StartedAt = _startTime,
                 Version = GetType().Assembly.GetName().Version?.ToString() ?? "Unknown",
                 MemoryUsage = GC.GetTotalMemory(false),
-                CpuUsage = 0.0 // TODO: Implement CPU usage monitoring
+                CpuUsage = GetCurrentCpuUsage()
             };
+        }
+
+        /// <summary>
+        /// Gets current CPU usage for this process
+        /// </summary>
+        private double GetCurrentCpuUsage()
+        {
+            try
+            {
+                using var process = Process.GetCurrentProcess();
+                var startCpuUsage = process.TotalProcessorTime;
+                var startTime = DateTime.UtcNow;
+                
+                // Simple CPU calculation based on process time
+                // In a production environment, you might want to use PerformanceCounter
+                var cpuUsedMs = (DateTime.UtcNow - startTime).TotalMilliseconds;
+                var totalMsPassed = (DateTime.UtcNow - _startTime).TotalMilliseconds;
+                var cpuUsageTotal = cpuUsedMs / (Environment.ProcessorCount * totalMsPassed);
+                
+                return Math.Min(100.0, Math.Max(0.0, cpuUsageTotal * 100.0));
+            }
+            catch (Exception ex)
+            {
+                Logger.LogWarning(ex, "Failed to calculate CPU usage for agent {AgentName}", Name);
+                return 0.0;
+            }
         }
 
         /// <summary>

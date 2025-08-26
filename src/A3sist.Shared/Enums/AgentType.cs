@@ -12,6 +12,10 @@ namespace A3sist.Shared.Enums
         IntentRouter,
         Unknown,
         Dispatcher,
-        Language
+        Language,
+        CSharp,
+        Validator,
+        Knowledge,
+        TestGenerator
     }
 }

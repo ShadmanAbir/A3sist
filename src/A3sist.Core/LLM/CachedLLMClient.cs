@@ -18,9 +18,35 @@ namespace A3sist.Orchastrator.LLM
             _logger = logger;
         }
 
-        public Task<bool> GetCompletionAsync(object prompt, object lLMOptions)
+        public async Task<bool> GetCompletionAsync(object prompt, object lLMOptions)
         {
-            throw new NotImplementedException();
+            try
+            {
+                if (prompt == null)
+                {
+                    _logger.LogWarning("GetCompletionAsync called with null prompt");
+                    return false;
+                }
+
+                var promptString = prompt.ToString();
+                var cacheKey = $"completion_{promptString}_{lLMOptions?.GetHashCode()}";
+
+                if (_cache.TryGetValue(cacheKey, out bool cachedResult))
+                {
+                    _logger.LogInformation($"Cache hit for completion prompt: {promptString}");
+                    return cachedResult;
+                }
+
+                var result = await _llmClient.GetCompletionAsync(prompt, lLMOptions);
+                _cache.Set(cacheKey, result, TimeSpan.FromMinutes(5));
+                _logger.LogInformation($"Cached completion result for prompt: {promptString}");
+                return result;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error in CachedLLMClient.GetCompletionAsync");
+                return false;
+            }
         }
 
         public async Task<string> GetResponseAsync(string prompt)

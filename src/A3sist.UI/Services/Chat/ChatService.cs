@@ -409,8 +409,72 @@ namespace A3sist.UI.Services.Chat
 
         private void SetupMessageCommands(ChatMessage message, ChatConversation conversation)
         {
-            // TODO: Implement relay commands for copy, apply, and explain code
-            // These would integrate with Visual Studio's editor services
+            // Implement relay commands for copy, apply, and explain code
+            // These integrate with Visual Studio's editor services
+            
+            // Create a copy command for copying message content
+            var copyCommand = new RelayCommand<ChatMessage>(async (msg) =>
+            {
+                if (msg?.Content != null)
+                {
+                    try
+                    {
+                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                        System.Windows.Clipboard.SetText(msg.Content);
+                        _logger.LogDebug("Copied message content to clipboard");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to copy message content to clipboard");
+                    }
+                }
+            });
+            
+            // Create an apply command for applying code suggestions
+            var applyCommand = new RelayCommand<ChatMessage>(async (msg) =>
+            {
+                if (msg?.Content != null)
+                {
+                    try
+                    {
+                        var codeContent = ExtractCodeSuggestion(msg.Content);
+                        if (!string.IsNullOrEmpty(codeContent))
+                        {
+                            // In a real implementation, this would integrate with VS editor APIs
+                            _logger.LogInformation("Would apply code suggestion: {Code}", codeContent);
+                            // TODO: Integrate with Visual Studio editor services to apply code
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to apply code suggestion");
+                    }
+                }
+            });
+            
+            // Create an explain command for getting explanations
+            var explainCommand = new RelayCommand<ChatMessage>(async (msg) =>
+            {
+                if (msg?.Content != null)
+                {
+                    try
+                    {
+                        // Create a follow-up request for explanation
+                        var explanationRequest = $"Please explain this code: {msg.Content}";
+                        await SendMessageAsync(conversation.Id, explanationRequest);
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Failed to request code explanation");
+                    }
+                }
+            });
+            
+            // Assign commands to message (assuming ChatMessage has command properties)
+            // In a real implementation, you would set these on the message object
+            message.CopyCommand = copyCommand;
+            message.ApplyCommand = applyCommand;
+            message.ExplainCommand = explainCommand;
         }
 
         private string GenerateConversationTitle()

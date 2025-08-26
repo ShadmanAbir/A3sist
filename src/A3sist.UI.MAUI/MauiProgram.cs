@@ -20,11 +20,10 @@ public static class MauiProgram
         // Register ViewModels and Services
         builder.Services.AddTransient<MainPage>();
         builder.Services.AddTransient<ChatPage>();
-        builder.Services.AddTransient<AgentStatusPage>();
         
-        // Register Core Services
-        builder.Services.AddSingleton<IChatService, ChatService>();
-        builder.Services.AddSingleton<IAgentStatusService, AgentStatusService>();
+        // Core services will be registered when implemented
+        // builder.Services.AddSingleton<IChatService, ChatService>();
+        // builder.Services.AddSingleton<IAgentStatusService, AgentStatusService>();
 
 #if DEBUG
         builder.Logging.AddDebug();

@@ -334,7 +334,7 @@ public class ConfigurationService : IConfigurationService, IDisposable
     private async Task ValidateA3sistConfiguration(ConfigurationValidationResult result)
     {
         var context = new ValidationContext(_a3sistConfig);
-        var validationResults = new List<ValidationResult>();
+        var validationResults = new List<System.ComponentModel.DataAnnotations.ValidationResult>();
         
         if (!Validator.TryValidateObject(_a3sistConfig, context, validationResults, true))
         {

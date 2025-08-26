@@ -8,22 +8,16 @@
 
     <TabBar>
         <ShellContent
-            Title="Chat"
-            ContentTemplate="{DataTemplate local:ChatPage}"
-            Route="ChatPage"
-            Icon="chat_icon.png" />
+            Title="Home"
+            ContentTemplate="{DataTemplate local:MainPage}"
+            Route="main"
+            Icon="home_icon.png" />
 
         <ShellContent
-            Title="Agent Status"
-            ContentTemplate="{DataTemplate local:AgentStatusPage}"
-            Route="AgentStatusPage"
-            Icon="status_icon.png" />
-            
-        <ShellContent
-            Title="Settings"
-            ContentTemplate="{DataTemplate local:SettingsPage}"
-            Route="SettingsPage"
-            Icon="settings_icon.png" />
+            Title="Chat"
+            ContentTemplate="{DataTemplate local:ChatPage}"
+            Route="chat"
+            Icon="chat_icon.png" />
     </TabBar>
 
 </Shell>

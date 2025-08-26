@@ -270,9 +270,19 @@ namespace A3sist.Shared.Models
         Security,
 
         /// <summary>
+        /// Authentication-related error
+        /// </summary>
+        Authentication,
+
+        /// <summary>
         /// Configuration error
         /// </summary>
         Configuration,
+
+        /// <summary>
+        /// Resource-related error
+        /// </summary>
+        Resource,
 
         /// <summary>
         /// Performance-related error

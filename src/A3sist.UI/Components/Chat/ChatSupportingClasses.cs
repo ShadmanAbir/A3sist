@@ -57,7 +57,7 @@ namespace A3sist.UI.Components.Chat
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return System.Windows.DependencyProperty.UnsetValue;
         }
     }
 

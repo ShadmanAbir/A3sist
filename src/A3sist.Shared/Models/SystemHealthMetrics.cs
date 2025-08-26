@@ -34,6 +34,24 @@ namespace A3sist.Shared.Models
         /// Agent performance metrics
         /// </summary>
         public Dictionary<string, AgentHealthMetrics> Agents { get; set; } = new();
+
+        /// <summary>
+        /// Convenience property for CPU usage percentage
+        /// </summary>
+        public double CpuUsagePercent
+        {
+            get => Cpu.UsagePercent;
+            set => Cpu.UsagePercent = value;
+        }
+
+        /// <summary>
+        /// Convenience property for memory usage in bytes
+        /// </summary>
+        public long MemoryUsageBytes
+        {
+            get => Memory.UsedBytes;
+            set => Memory.UsedBytes = value;
+        }
     }
 
     /// <summary>

@@ -1,4 +1,5 @@
 using A3sist.Orchastrator.LLM;
+using System;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -39,13 +40,33 @@ public class CodestralLLMClient : ILLMClient
         return responseObject.GetProperty("completion").GetString();
     }
 
-    public Task<bool> GetCompletionAsync(object prompt, object lLMOptions)
+    public async Task<bool> GetCompletionAsync(object prompt, object lLMOptions)
     {
-        throw new NotImplementedException();
+        try
+        {
+            if (prompt == null)
+                return false;
+
+            var promptString = prompt.ToString();
+            var response = await GetCompletionAsync(promptString, lLMOptions as LLMOptions);
+            return !string.IsNullOrEmpty(response);
+        }
+        catch (Exception)
+        {
+            return false;
+        }
     }
 
-    public Task<string> GetResponseAsync(string prompt)
+    public async Task<string> GetResponseAsync(string prompt)
     {
-        throw new NotImplementedException();
+        try
+        {
+            // Use the existing GetCompletionAsync method
+            return await GetCompletionAsync(prompt, new LLMOptions());
+        }
+        catch (Exception)
+        {
+            return string.Empty;
+        }
     }
 }

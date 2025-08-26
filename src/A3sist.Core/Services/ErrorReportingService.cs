@@ -626,13 +626,13 @@ namespace A3sist.Core.Services
             };
         }
 
-        private List<ErrorPattern> AnalyzePatterns(List<ErrorReport> errors)
+        private List<A3sist.Shared.Models.ErrorPattern> AnalyzePatterns(List<ErrorReport> errors)
         {
             // Basic pattern analysis - could be enhanced with ML
-            return new List<ErrorPattern>();
+            return new List<A3sist.Shared.Models.ErrorPattern>();
         }
 
-        private List<string> GenerateInsights(List<ErrorReport> errors, List<ErrorPattern> patterns)
+        private List<string> GenerateInsights(List<ErrorReport> errors, List<A3sist.Shared.Models.ErrorPattern> patterns)
         {
             var insights = new List<string>();
             
@@ -645,7 +645,7 @@ namespace A3sist.Core.Services
             return insights;
         }
 
-        private List<string> GenerateRecommendations(List<ErrorReport> errors, List<ErrorPattern> patterns)
+        private List<string> GenerateRecommendations(List<ErrorReport> errors, List<A3sist.Shared.Models.ErrorPattern> patterns)
         {
             var recommendations = new List<string>();
             
@@ -657,7 +657,7 @@ namespace A3sist.Core.Services
             return recommendations;
         }
 
-        private RiskAssessment AssessRisk(List<ErrorReport> errors, List<ErrorPattern> patterns)
+        private RiskAssessment AssessRisk(List<ErrorReport> errors, List<A3sist.Shared.Models.ErrorPattern> patterns)
         {
             var criticalErrors = errors.Count(e => e.Severity >= ErrorSeverity.Critical);
             var riskLevel = criticalErrors > 5 ? RiskLevel.High : 

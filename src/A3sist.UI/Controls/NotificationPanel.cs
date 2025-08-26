@@ -164,7 +164,7 @@ namespace A3sist.UI.Controls
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
-            throw new NotImplementedException();
+            return System.Windows.DependencyProperty.UnsetValue;
         }
     }
 }
