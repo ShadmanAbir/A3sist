@@ -205,10 +205,10 @@ This project is licensed under the MIT License - see the [LICENSE.txt](LICENSE.t
 
 <div align="center">
 
-**Made with ❤️ by the A3sist Team**
+**Made with ❤️ by Shadman Sakib**
 
 *Empowering developers with AI-assisted coding*
 
-[⭐ Star this repo](https://github.com/A3sist/A3sist) • [🚀 Try A3sist](https://marketplace.visualstudio.com/items?itemName=A3sist.AI.Assistant) • [📢 Follow updates](https://twitter.com/A3sistAI)
+[⭐ Star this repo](https://github.com/ShadmanAbir/A3sist) • [🚀 Try A3sist](https://marketplace.visualstudio.com/items?itemName=A3sist.AI.Assistant) • [📢 Follow updates](https://twitter.com/A3sistAI)
 
 </div>
