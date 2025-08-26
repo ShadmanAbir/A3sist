@@ -18,12 +18,21 @@
     <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments>/rootsuffix Exp</StartArguments>
     <RootNamespace>A3sist.UI.VSIX</RootNamespace>
+    <GenerateVSIXFiles>true</GenerateVSIXFiles>
+    <VSIXType>v3</VSIXType>
+    <CreateVsixContainer>true</CreateVsixContainer>
   </PropertyGroup>
 
   <ItemGroup>
     <VSCTCompile Include="A3sistCommands.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="source.extension.vsixmanifest">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
