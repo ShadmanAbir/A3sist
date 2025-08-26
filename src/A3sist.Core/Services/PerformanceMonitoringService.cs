@@ -388,6 +388,49 @@ namespace A3sist.Core.Services
             _disposed = true;
             _logger.LogInformation("Performance monitoring service disposed");
         }
+
+        public void StartOperation(string operationName)
+        {
+            if (_disposed)
+                return;
+
+            _logger.LogTrace("Starting operation: {OperationName}", operationName);
+            // Implementation for tracking operation start
+        }
+
+        public void RecordAgentExecution(string agentName, TimeSpan duration, bool success)
+        {
+            if (_disposed)
+                return;
+
+            _logger.LogTrace("Recording agent execution: {AgentName}, Duration: {Duration}ms, Success: {Success}", 
+                agentName, duration.TotalMilliseconds, success);
+            
+            // Record as timing metric
+            var metric = new PerformanceMetric
+            {
+                Name = $"agent.{agentName}.execution_time",
+                Type = MetricType.Timer,
+                Value = duration.TotalMilliseconds,
+                Unit = "ms",
+                Tags = new Dictionary<string, string>
+                {
+                    ["agent"] = agentName,
+                    ["success"] = success.ToString()
+                }
+            };
+            
+            RecordMetricAsync(metric).ConfigureAwait(false);
+        }
+
+        public void EndOperation(string operationName, bool success)
+        {
+            if (_disposed)
+                return;
+
+            _logger.LogTrace("Ending operation: {OperationName}, Success: {Success}", operationName, success);
+            // Implementation for tracking operation end
+        }
     }
 
     /// <summary>

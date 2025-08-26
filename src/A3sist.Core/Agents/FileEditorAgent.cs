@@ -44,17 +44,20 @@ namespace A3sist.Orchastrator.Agents
 
                     var result = new AgentResult
                     {
-                        FilePath = input.FilePath,
-                        OriginalContent = originalContent,
-                        NewContent = input.Content.ToString(),
-                        RequiresReview = true
+                        Success = true,
+                        Message = "File updated successfully with backup created",
+                        RequiresReview = true,
+                        Metadata = new Dictionary<string, object>
+                        {
+                            ["FilePath"] = input.FilePath,
+                            ["OriginalContent"] = originalContent,
+                            ["NewContent"] = input.Content.ToString()
+                        }
                     };
 
                     // Write the new content
                     await _fileSystem.WriteAllTextAsync(input.FilePath, input.Content.ToString());
 
-                    result.Success = true;
-                    result.Message = "File updated successfully with backup created";
                     return result;
                 }
                 else

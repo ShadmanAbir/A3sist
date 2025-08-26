@@ -38,7 +38,7 @@ namespace A3sist.Core.Agents.Core
         /// <summary>
         /// Initializes the agent and loads available MCP tools
         /// </summary>
-        protected override System.Threading.Tasks.Task InitializeAgentAsync()
+        protected override async System.Threading.Tasks.Task InitializeAgentAsync()
         {
             try
             {
@@ -206,24 +206,24 @@ Respond with a JSON array of tool names that would be most useful.
         {
             var parameters = toolName switch
             {
-                "code_analysis" => new
+                "code_analysis" => (object)new
                 {
                     code = request.Content,
                     language = DetectLanguage(request.FilePath),
                     analysis_type = "comprehensive"
                 },
-                "documentation_search" => new
+                "documentation_search" => (object)new
                 {
                     query = ExtractKeywords(request.Prompt),
                     context = "programming",
                     max_results = 5
                 },
-                "git_operations" => new
+                "git_operations" => (object)new
                 {
                     operation = "status",
                     repository_path = GetRepositoryPath(request.FilePath)
                 },
-                "file_operations" => new
+                "file_operations" => (object)new
                 {
                     operation = "read",
                     file_path = request.FilePath,

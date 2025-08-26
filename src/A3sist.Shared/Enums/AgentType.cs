@@ -18,6 +18,7 @@ namespace A3sist.Shared.Enums
         Knowledge,
         TestGenerator,
         JavaScript,
-        Python
+        Python,
+        Utility
     }
 }

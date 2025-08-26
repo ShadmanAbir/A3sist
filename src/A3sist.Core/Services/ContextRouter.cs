@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using A3sist.Core.Agents.Base;
 
 namespace A3sist.Orchastrator.Services
 {
@@ -25,7 +26,7 @@ namespace A3sist.Orchastrator.Services
             if (agentType == null)
                 throw new ArgumentNullException(nameof(agentType));
 
-            if (!typeof(BaseEvent).IsAssignableFrom(agentType))
+            if (!typeof(BaseAgent).IsAssignableFrom(agentType))
                 throw new ArgumentException("Agent type must inherit from BaseAgent");
 
             _agentRegistry[contextType] = agentType;

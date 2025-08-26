@@ -85,5 +85,26 @@ namespace A3sist.Shared.Interfaces
         /// Clears old metrics based on retention policy
         /// </summary>
         Task CleanupMetricsAsync();
+
+        /// <summary>
+        /// Starts tracking an operation
+        /// </summary>
+        /// <param name="operationName">Name of the operation</param>
+        void StartOperation(string operationName);
+
+        /// <summary>
+        /// Records agent execution metrics
+        /// </summary>
+        /// <param name="agentName">Name of the agent</param>
+        /// <param name="duration">Execution duration</param>
+        /// <param name="success">Whether the execution was successful</param>
+        void RecordAgentExecution(string agentName, TimeSpan duration, bool success);
+
+        /// <summary>
+        /// Ends tracking of an operation
+        /// </summary>
+        /// <param name="operationName">Name of the operation</param>
+        /// <param name="success">Whether the operation was successful</param>
+        void EndOperation(string operationName, bool success);
     }
 }

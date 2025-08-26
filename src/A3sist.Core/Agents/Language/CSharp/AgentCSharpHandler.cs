@@ -37,7 +37,7 @@ namespace A3sist.Orchastrator.Agents.CSharp
             _xamlValidator = new XamlValidator();
         }
 
-        protected override Task InitializeAgentAsync()
+        protected override async Task InitializeAgentAsync()
         {
             Logger.LogInformation("Initializing C# agent services");
             
@@ -120,7 +120,7 @@ namespace A3sist.Orchastrator.Agents.CSharp
             return false;
         }
 
-        protected override Task ShutdownAgentAsync()
+        protected override async Task ShutdownAgentAsync()
         {
             Logger.LogInformation("Shutting down C# agent services");
             
