@@ -39,7 +39,7 @@ namespace A3sist.Orchastrator.Agents.JavaScript
             _packageManager = new NpmPackageManager();
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override Task InitializeAgentAsync()
         {
             Logger.LogInformation("Initializing JavaScript agent services");
             
@@ -127,7 +127,7 @@ namespace A3sist.Orchastrator.Agents.JavaScript
             return false;
         }
 
-        protected override async Task ShutdownAgentAsync()
+        protected override Task ShutdownAgentAsync()
         {
             Logger.LogInformation("Shutting down JavaScript agent services");
             

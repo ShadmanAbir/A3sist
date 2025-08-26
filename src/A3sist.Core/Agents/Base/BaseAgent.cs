@@ -22,7 +22,7 @@ namespace A3sist.Core.Agents.Base
     {
         protected readonly ILogger Logger;
         protected readonly IAgentConfiguration Configuration;
-        protected readonly IValidationService? ValidationService;
+        protected readonly A3sist.Shared.Interfaces.IValidationService? ValidationService;
         protected readonly IPerformanceMonitoringService? PerformanceMonitoringService;
         private readonly AgentMetrics _metrics;
         private readonly SemaphoreSlim _initializationSemaphore;
@@ -58,7 +58,7 @@ namespace A3sist.Core.Agents.Base
         protected BaseAgent(
             ILogger logger, 
             IAgentConfiguration configuration,
-            IValidationService? validationService = null,
+            A3sist.Shared.Interfaces.IValidationService? validationService = null,
             IPerformanceMonitoringService? performanceMonitoringService = null)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));

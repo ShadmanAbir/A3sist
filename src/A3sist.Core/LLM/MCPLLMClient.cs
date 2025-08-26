@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using A3sist.Core.Configuration;
 using A3sist.Core.Services;
+using A3sist.Shared.Interfaces;
 
 namespace A3sist.Core.LLM
 {

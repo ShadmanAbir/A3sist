@@ -200,6 +200,8 @@ namespace A3sist.Core.Services
             return stats;
         }
 
+
+
         public async Task<IEnumerable<FrequentErrorSummary>> GetFrequentErrorsAsync(DateTime? startTime = null,
             DateTime? endTime = null, int limit = 10)
         {
