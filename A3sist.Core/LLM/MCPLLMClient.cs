@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using A3sist.Core.Configuration;
 using A3sist.Core.Services;
 using A3sist.Shared.Interfaces;
+using A3sist.Shared.Models;
 
 namespace A3sist.Core.LLM
 {
@@ -316,6 +317,13 @@ namespace A3sist.Core.LLM
         {
             Dispose();
             await Task.CompletedTask;
+        }
+
+        public async Task GetCompletionAsync(string ragPrompt, LLMOptions options)
+        {
+            // Implementation for GetCompletionAsync with LLMOptions
+            // For now, delegate to existing GetResponseAsync method
+            await GetResponseAsync(ragPrompt);
         }
 
         public void Dispose()
