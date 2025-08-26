@@ -165,14 +165,14 @@ namespace A3sist.Core.Tests.Agents.Base
         }
 
         [Fact]
-        public void LastActivity_UpdatesOnMetricChanges()
+        public async Task LastActivity_UpdatesOnMetricChanges()
         {
             // Arrange
             var metrics = new AgentMetrics();
             var initialActivity = metrics.LastActivity;
 
             // Act
-            Task.Delay(10).Wait(); // Small delay to ensure time difference
+            await Task.Delay(10); // Small delay to ensure time difference
             metrics.IncrementTasksProcessed();
 
             // Assert

@@ -2,6 +2,7 @@ using A3sist.Shared.Interfaces;
 using A3sist.Shared.Models;
 using A3sist.Shared.Enums;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -24,6 +25,7 @@ namespace A3sist.Core.Services
     public class ErrorReportingService : IErrorReportingService, IDisposable
     {
         private readonly ILogger<ErrorReportingService> _logger;
+        private readonly IConfiguration? _configuration;
         private readonly ConcurrentQueue<ErrorReport> _errorQueue;
         private readonly ConcurrentDictionary<string, List<ErrorReport>> _errorStorage;
         private readonly Timer _cleanupTimer;
@@ -36,9 +38,10 @@ namespace A3sist.Core.Services
         private readonly int _maxErrorsPerHash = 1000;
         private readonly int _maxTotalErrors = 50000;
 
-        public ErrorReportingService(ILogger<ErrorReportingService> logger)
+        public ErrorReportingService(ILogger<ErrorReportingService> logger, IConfiguration? configuration = null)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
+            _configuration = configuration;
             _errorQueue = new ConcurrentQueue<ErrorReport>();
             _errorStorage = new ConcurrentDictionary<string, List<ErrorReport>>();
             _startTime = DateTime.UtcNow;
@@ -582,7 +585,10 @@ namespace A3sist.Core.Services
         private Dictionary<string, string> CollectFilteredEnvironmentVariables()
         {
             var filtered = new Dictionary<string, string>();
-            var sensitiveKeys = new[] { "password", "secret", "key", "token", "credential" };
+            
+            // Get sensitive patterns from configuration, with fallback to default
+            var sensitiveKeys = _configuration?.GetSection("A3sist:Security:SensitiveDataPatterns")
+                .Get<string[]>() ?? new[] { "password", "secret", "key", "token", "credential" };
             
             foreach (var kvp in Environment.GetEnvironmentVariables().Cast<System.Collections.DictionaryEntry>())
             {

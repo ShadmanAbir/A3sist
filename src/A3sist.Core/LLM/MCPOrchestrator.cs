@@ -49,21 +49,32 @@ namespace A3sist.Core.LLM
                 return;
             }
 
-            // Register all A3sist MCP servers
-            RegisterMCPServer("core-development", "http://localhost:3001", 
-                new[] { "code_analysis", "code_refactor", "code_validation", "language_conversion" });
-            
-            RegisterMCPServer("vs-integration", "http://localhost:3002", 
-                new[] { "project_analysis", "solution_management", "nuget_operations", "msbuild_operations", "extension_integration" });
-            
-            RegisterMCPServer("knowledge", "http://localhost:3003", 
-                new[] { "documentation_search", "best_practices", "code_examples", "knowledge_update" });
-            
-            RegisterMCPServer("git-devops", "http://localhost:3004", 
-                new[] { "git_operations", "ci_cd_integration", "deployment_analysis" });
-            
-            RegisterMCPServer("testing-quality", "http://localhost:3005", 
-                new[] { "test_generation", "quality_metrics", "performance_analysis" });
+            // Register MCP servers from configuration
+            if (mcpConfig.Servers != null)
+            {
+                foreach (var serverConfig in mcpConfig.Servers)
+                {
+                    RegisterMCPServer(serverConfig.Name, serverConfig.Endpoint, serverConfig.Tools.ToArray());
+                }
+            }
+            else
+            {
+                // Fallback to default configuration if none provided
+                RegisterMCPServer("core-development", "http://localhost:3001", 
+                    new[] { "code_analysis", "code_refactor", "code_validation", "language_conversion" });
+                
+                RegisterMCPServer("vs-integration", "http://localhost:3002", 
+                    new[] { "project_analysis", "solution_management", "nuget_operations", "msbuild_operations", "extension_integration" });
+                
+                RegisterMCPServer("knowledge", "http://localhost:3003", 
+                    new[] { "documentation_search", "best_practices", "code_examples", "knowledge_update" });
+                
+                RegisterMCPServer("git-devops", "http://localhost:3004", 
+                    new[] { "git_operations", "ci_cd_integration", "deployment_analysis" });
+                
+                RegisterMCPServer("testing-quality", "http://localhost:3005", 
+                    new[] { "test_generation", "quality_metrics", "performance_analysis" });
+            }
 
             _logger.LogInformation("Initialized {ServerCount} MCP servers", _mcpServers.Count);
         }

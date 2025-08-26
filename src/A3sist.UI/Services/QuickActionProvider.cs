@@ -81,8 +81,9 @@ namespace A3sist.UI.Services
                 var filePath = textDocument.FilePath;
                 var lineNumber = range.Start.GetContainingLine().LineNumber + 1;
 
-                // Get suggestions asynchronously
-                var suggestions = GetSuggestionsAsync(filePath, lineNumber, cancellationToken).Result;
+                // Use ThreadHelper to safely call async method from sync context
+                var suggestions = ThreadHelper.JoinableTaskFactory.Run(async () =>
+                    await GetSuggestionsAsync(filePath, lineNumber, cancellationToken));
 
                 if (!suggestions.Any())
                     return Enumerable.Empty<SuggestedActionSet>();

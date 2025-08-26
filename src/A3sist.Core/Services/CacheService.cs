@@ -217,11 +217,11 @@ namespace A3sist.Core.Services
                             mc.Compact(0.25); // Compact 25% of cache
                         }
 
-                        if (_options.Performance.EnableAutoGC)
+                        // Only perform GC if explicitly enabled and memory usage is critical
+                        if (_options.Performance.EnableAutoGC && currentMemory > _options.Performance.MaxMemoryUsageMB * 1.5)
                         {
-                            GC.Collect();
-                            GC.WaitForPendingFinalizers();
-                            GC.Collect();
+                            _logger.LogWarning("Performing emergency garbage collection due to critical memory usage: {MemoryMB}MB", currentMemory);
+                            GC.Collect(0, GCCollectionMode.Optimized);
                         }
                     }
                 }
