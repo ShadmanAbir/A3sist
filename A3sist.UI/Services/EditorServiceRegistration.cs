@@ -1,111 +1,50 @@
 using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using A3sist.Shared.Interfaces;
-using A3sist.UI.Editors;
 
 namespace A3sist.UI.Services
 {
     /// <summary>
-    /// Service registration for editor integration services
+    /// Service registration for editor integration components
     /// </summary>
     public static class EditorServiceRegistration
     {
+        private static IServiceProvider? _serviceProvider;
+
         /// <summary>
-        /// Registers all editor integration services with the DI container
+        /// Initializes the service locator with the provided service provider
         /// </summary>
-        /// <param name="services">The service collection</param>
-        /// <returns>The service collection for chaining</returns>
-        public static IServiceCollection AddEditorIntegrationServices(this IServiceCollection services)
+        /// <param name="serviceProvider">The service provider to use</param>
+        public static void InitializeServiceLocator(IServiceProvider? serviceProvider)
         {
-            // Register core editor services
-            services.AddSingleton<CodeAnalysisProvider>();
-            services.AddSingleton<SuggestionProvider>();
-            services.AddSingleton<IEditorIntegrationService, EditorIntegrationService>();
-
-            // Register service locator services (temporary solution)
-            services.AddSingleton<IServiceLocator, ServiceLocatorImplementation>();
-
-            return services;
+            _serviceProvider = serviceProvider;
+            
+            var logger = _serviceProvider?.GetService<ILogger<EditorServiceRegistration>>();
+            logger?.LogInformation("Editor service locator initialized");
         }
 
         /// <summary>
-        /// Initializes the service locator with registered services
+        /// Gets a service from the service locator
         /// </summary>
-        /// <param name="serviceProvider">The service provider</param>
-        public static void InitializeServiceLocator(IServiceProvider serviceProvider)
+        /// <typeparam name="T">The service type</typeparam>
+        /// <returns>The service instance or null if not found</returns>
+        public static T? GetService<T>() where T : class
         {
-            try
-            {
-                // Register services with the static service locator
-                var suggestionService = serviceProvider.GetService<ISuggestionService>();
-                if (suggestionService != null)
-                {
-                    ServiceLocator.RegisterService<ISuggestionService>(suggestionService);
-                }
-
-                var orchestrator = serviceProvider.GetService<IOrchestrator>();
-                if (orchestrator != null)
-                {
-                    ServiceLocator.RegisterService<IOrchestrator>(orchestrator);
-                }
-
-                var codeAnalysisService = serviceProvider.GetService<ICodeAnalysisService>();
-                if (codeAnalysisService != null)
-                {
-                    ServiceLocator.RegisterService<ICodeAnalysisService>(codeAnalysisService);
-                }
-
-                // Register loggers
-                var loggerFactory = serviceProvider.GetService<ILoggerFactory>();
-                if (loggerFactory != null)
-                {
-                    ServiceLocator.RegisterService<ILogger<A3sistSuggestedActionsSource>>(
-                        loggerFactory.CreateLogger<A3sistSuggestedActionsSource>());
-                    ServiceLocator.RegisterService<ILogger<A3sistCompletionSource>>(
-                        loggerFactory.CreateLogger<A3sistCompletionSource>());
-                }
-            }
-            catch (Exception ex)
-            {
-                // Log error but don't throw to avoid breaking the extension
-                var logger = serviceProvider.GetService<ILogger<EditorServiceRegistration>>();
-                logger?.LogError(ex, "Error initializing service locator");
-            }
-        }
-    }
-
-    /// <summary>
-    /// Interface for service locator (for dependency injection)
-    /// </summary>
-    public interface IServiceLocator
-    {
-        T GetService<T>();
-        void RegisterService<T>(T service);
-    }
-
-    /// <summary>
-    /// Implementation of service locator using DI container
-    /// </summary>
-    internal class ServiceLocatorImplementation : IServiceLocator
-    {
-        private readonly IServiceProvider _serviceProvider;
-
-        public ServiceLocatorImplementation(IServiceProvider serviceProvider)
-        {
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            return _serviceProvider?.GetService<T>();
         }
 
-        public T GetService<T>()
+        /// <summary>
+        /// Gets a required service from the service locator
+        /// </summary>
+        /// <typeparam name="T">The service type</typeparam>
+        /// <returns>The service instance</returns>
+        /// <exception cref="InvalidOperationException">Thrown if service is not found</exception>
+        public static T GetRequiredService<T>() where T : class
         {
-            return _serviceProvider.GetService<T>();
-        }
-
-        public void RegisterService<T>(T service)
-        {
-            // In a real implementation, this would register with the DI container
-            // For now, we'll use the static service locator
-            ServiceLocator.RegisterService<T>(service);
+            if (_serviceProvider == null)
+                throw new InvalidOperationException("Service locator not initialized");
+                
+            return _serviceProvider.GetRequiredService<T>();
         }
     }
 }

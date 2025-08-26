@@ -672,7 +672,7 @@ namespace A3sist.Core.Services
         private async Task ExportAsJsonAsync(IEnumerable<ErrorReport> errors, string filePath)
         {
             var json = JsonSerializer.Serialize(errors, new JsonSerializerOptions { WriteIndented = true });
-            await File.WriteAllTextAsync(filePath, json);
+            await Task.Run(() => File.WriteAllText(filePath, json));
         }
 
         private async Task ExportAsCsvAsync(IEnumerable<ErrorReport> errors, string filePath)
@@ -685,7 +685,7 @@ namespace A3sist.Core.Services
                 csv.AppendLine($"{error.Timestamp:yyyy-MM-dd HH:mm:ss},{error.Message},{error.Severity},{error.Category},{error.Component}");
             }
             
-            await File.WriteAllTextAsync(filePath, csv.ToString());
+            await Task.Run(() => File.WriteAllText(filePath, csv.ToString()));
         }
 
         private async Task ExportAsXmlAsync(IEnumerable<ErrorReport> errors, string filePath)
@@ -707,7 +707,7 @@ namespace A3sist.Core.Services
             }
             
             xml.AppendLine("</ErrorReports>");
-            await File.WriteAllTextAsync(filePath, xml.ToString());
+            await Task.Run(() => File.WriteAllText(filePath, xml.ToString()));
         }
 
         public void Dispose()

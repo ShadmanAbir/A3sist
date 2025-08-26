@@ -1,21 +1,27 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net472</TargetFramework>
+    <TargetFrameworks>net472;net9.0-windows</TargetFrameworks>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <LangVersion>12</LangVersion>
     <TreatWarningsAsErrors>false</TreatWarningsAsErrors>
     <WarningsAsErrors />
-    <UseWPF>true</UseWPF>
-    <GeneratePkgDefFile>true</GeneratePkgDefFile>
-    <IncludeAssemblyInVSIXContainer>true</IncludeAssemblyInVSIXContainer>
-    <IncludeDebugSymbolsInVSIXContainer>true</IncludeDebugSymbolsInVSIXContainer>
-    <IncludeDebugSymbolsInLocalVSIXDeployment>false</IncludeDebugSymbolsInLocalVSIXDeployment>
-    <CopyBuildOutputToOutputDirectory>true</CopyBuildOutputToOutputDirectory>
-    <CopyOutputSymbolsToOutputDirectory>true</CopyOutputSymbolsToOutputDirectory>
-    <StartAction>Program</StartAction>
-    <StartProgram Condition="'$(DevEnvDir)' != ''">$(DevEnvDir)devenv.exe</StartProgram>
-    <StartArguments>/rootsuffix Exp</StartArguments>
+    <UseWPF Condition="'$(TargetFramework)' == 'net9.0-windows'">true</UseWPF>
+    <UseWPF Condition="'$(TargetFramework)' == 'net472'">true</UseWPF>
+    <!-- VSIX-specific properties (only for .NET 4.7.2) -->
+    <GeneratePkgDefFile Condition="'$(TargetFramework)' == 'net472'">true</GeneratePkgDefFile>
+    <IncludeAssemblyInVSIXContainer Condition="'$(TargetFramework)' == 'net472'">true</IncludeAssemblyInVSIXContainer>
+    <IncludeDebugSymbolsInVSIXContainer Condition="'$(TargetFramework)' == 'net472'">true</IncludeDebugSymbolsInVSIXContainer>
+    <IncludeDebugSymbolsInLocalVSIXDeployment Condition="'$(TargetFramework)' == 'net472'">false</IncludeDebugSymbolsInLocalVSIXDeployment>
+    <CopyBuildOutputToOutputDirectory Condition="'$(TargetFramework)' == 'net472'">true</CopyBuildOutputToOutputDirectory>
+    <CopyOutputSymbolsToOutputDirectory Condition="'$(TargetFramework)' == 'net472'">true</CopyOutputSymbolsToOutputDirectory>
+    <StartAction Condition="'$(TargetFramework)' == 'net472'">Program</StartAction>
+    <StartProgram Condition="'$(DevEnvDir)' != '' And '$(TargetFramework)' == 'net472'">$(DevEnvDir)devenv.exe</StartProgram>
+    <StartArguments Condition="'$(TargetFramework)' == 'net472'">/rootsuffix Exp</StartArguments>
+    <!-- WPF-specific properties (.NET 9) -->
+    <OutputType Condition="'$(TargetFramework)' == 'net9.0-windows'">WinExe</OutputType>
+    <AssemblyName>A3sist.UI</AssemblyName>
+    <RootNamespace>A3sist.UI</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,17 +33,24 @@
     <Resource Include="Resources\A3sistCommands.png" />
   </ItemGroup>
 
-  <ItemGroup>
+  <!-- VSIX-specific resources (.NET 4.7.2 only) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <VSCTCompile Include="A3sistCommands.vsct">
       <ResourceName>Menus.ctmenu</ResourceName>
     </VSCTCompile>
   </ItemGroup>
 
+  <!-- Shared dependencies -->
   <ItemGroup>
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="8.0.2" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="8.0.2" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+
+  <!-- VSIX-specific dependencies (.NET 4.7.2) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2101" />
     <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="17.14.249" />
@@ -45,10 +58,26 @@
     <PackageReference Include="Microsoft.VisualStudio.Text.Logic" Version="17.14.249" />
     <PackageReference Include="Microsoft.VisualStudio.CoreUtility" Version="17.14.249" />
     <PackageReference Include="Microsoft.VisualStudio.Imaging" Version="17.14.40264" />
+    <Reference Include="System.Design" />
+    <Reference Include="System.Windows.Forms" />
+  </ItemGroup>
+
+  <!-- WPF-specific dependencies (.NET 9) -->
+  <ItemGroup Condition="'$(TargetFramework)' == 'net9.0-windows'">
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.0" />
+    <FrameworkReference Include="Microsoft.WindowsDesktop.App" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\A3sist.Core\A3sist.Core.csproj" />
     <ProjectReference Include="..\A3sist.Shared\A3sist.Shared.csproj" />
+  </ItemGroup>
+
+  <!-- Framework-specific compilation -->
+  <ItemGroup>
+    <Compile Remove="Framework/VSIX/**" Condition="'$(TargetFramework)' == 'net9.0-windows'" />
+    <Compile Remove="Framework/WPF/**" Condition="'$(TargetFramework)' == 'net472'" />
   </ItemGroup>
 </Project>

@@ -42,38 +42,44 @@
                                         <!-- Dot 1 Animation -->
                                         <DoubleAnimation Storyboard.TargetName="Dot1"
                                                        Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                       Values="1;1.5;1" 
-                                                       Duration="0:0:1.2"
-                                                       BeginTime="0:0:0"/>
+                                                       From="1" To="1.5" 
+                                                       Duration="0:0:0.6"
+                                                       BeginTime="0:0:0"
+                                                       AutoReverse="True"/>
                                         <DoubleAnimation Storyboard.TargetName="Dot1"
                                                        Storyboard.TargetProperty="Opacity"
-                                                       Values="0.5;1;0.5" 
-                                                       Duration="0:0:1.2"
-                                                       BeginTime="0:0:0"/>
+                                                       From="0.5" To="1" 
+                                                       Duration="0:0:0.6"
+                                                       BeginTime="0:0:0"
+                                                       AutoReverse="True"/>
                                         
                                         <!-- Dot 2 Animation -->
                                         <DoubleAnimation Storyboard.TargetName="Dot2"
                                                        Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                       Values="1;1.5;1" 
-                                                       Duration="0:0:1.2"
-                                                       BeginTime="0:0:0.4"/>
+                                                       From="1" To="1.5" 
+                                                       Duration="0:0:0.6"
+                                                       BeginTime="0:0:0.4"
+                                                       AutoReverse="True"/>
                                         <DoubleAnimation Storyboard.TargetName="Dot2"
                                                        Storyboard.TargetProperty="Opacity"
-                                                       Values="0.5;1;0.5" 
-                                                       Duration="0:0:1.2"
-                                                       BeginTime="0:0:0.4"/>
+                                                       From="0.5" To="1" 
+                                                       Duration="0:0:0.6"
+                                                       BeginTime="0:0:0.4"
+                                                       AutoReverse="True"/>
                                         
                                         <!-- Dot 3 Animation -->
                                         <DoubleAnimation Storyboard.TargetName="Dot3"
                                                        Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                                                       Values="1;1.5;1" 
-                                                       Duration="0:0:1.2"
-                                                       BeginTime="0:0:0.8"/>
+                                                       From="1" To="1.5" 
+                                                       Duration="0:0:0.6"
+                                                       BeginTime="0:0:0.8"
+                                                       AutoReverse="True"/>
                                         <DoubleAnimation Storyboard.TargetName="Dot3"
                                                        Storyboard.TargetProperty="Opacity"
-                                                       Values="0.5;1;0.5" 
-                                                       Duration="0:0:1.2"
-                                                       BeginTime="0:0:0.8"/>
+                                                       From="0.5" To="1" 
+                                                       Duration="0:0:0.6"
+                                                       BeginTime="0:0:0.8"
+                                                       AutoReverse="True"/>
                                     </Storyboard>
                                 </BeginStoryboard>
                             </Trigger.EnterActions>

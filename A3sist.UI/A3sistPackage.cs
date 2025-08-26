@@ -7,10 +7,13 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using A3sist.Core;
 using A3sist.Core.Services;
+using A3sist.UI.Shared;
 using A3sist.UI.Commands;
 using A3sist.UI.ToolWindows;
-using A3sist.UI.Components;
-using A3sist.UI.Services;
+#if NET472
+using A3sist.UI.Framework.VSIX.Commands;
+using A3sist.UI.Framework.VSIX.ToolWindows;
+#endif
 using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.UI
@@ -37,7 +40,11 @@ namespace A3sist.UI
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(A3ToolWindow))]
     [ProvideToolWindow(typeof(AgentStatusWindow))]
+#if NET472
+    [ProvideToolWindow(typeof(A3sist.UI.Framework.VSIX.ToolWindows.ChatToolWindow))]
+#else
     [ProvideToolWindow(typeof(ChatToolWindow))]
+#endif
     [ProvideOptionPage(typeof(Options.GeneralOptionsPage), "A3sist", "General", 0, 0, true)]
     [ProvideOptionPage(typeof(Options.AgentOptionsPage), "A3sist", "Agents", 0, 0, true)]
     [ProvideOptionPage(typeof(Options.LLMOptionsPage), "A3sist", "LLM Settings", 0, 0, true)]
@@ -75,11 +82,19 @@ namespace A3sist.UI
 
             try
             {
-                // Initialize core services
-                _serviceProvider = Startup.CreateServiceProvider();
+                // Initialize unified core services with the new architecture
+                var services = new ServiceCollection();
+                
+                // Add A3sist unified services
+                services.AddA3sistUI();
+                services.AddRAGServices();
+                services.AddFrameworkLogging();
+                
+                // Build service provider
+                _serviceProvider = services.BuildServiceProvider();
                 _logger = _serviceProvider.GetService<ILogger<A3sistPackage>>();
                 
-                _logger?.LogInformation("Initializing A3sist Visual Studio Package");
+                _logger?.LogInformation("Initializing A3sist Unified Visual Studio Package");
 
                 // Initialize commands
                 await InitializeCommandsAsync(cancellationToken);
@@ -114,22 +129,27 @@ namespace A3sist.UI
         }
 
         /// <summary>
-        /// Initialize all commands
+        /// Initialize all commands with unified architecture
         /// </summary>
         private async Task InitializeCommandsAsync(CancellationToken cancellationToken)
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-            // Initialize main commands
+#if NET472
+            // Initialize VSIX-specific commands
+            await A3sist.UI.Framework.VSIX.Commands.ShowChatWindowCommand.InitializeAsync(this);
+            // Add other VSIX commands as needed
+#endif
+
+            // Initialize shared commands (these will work on both frameworks)
             await A3sistMainCommand.InitializeAsync(this);
             await ShowA3ToolWindowCommand.InitializeAsync(this);
             await ShowAgentStatusCommand.InitializeAsync(this);
-            await ShowChatWindowCommand.InitializeAsync(this);
             await AnalyzeCodeCommand.InitializeAsync(this);
             await RefactorCodeCommand.InitializeAsync(this);
             await FixCodeCommand.InitializeAsync(this);
 
-            _logger?.LogDebug("Commands initialized successfully");
+            _logger?.LogDebug("Unified commands initialized successfully");
         }
 
         /// <summary>

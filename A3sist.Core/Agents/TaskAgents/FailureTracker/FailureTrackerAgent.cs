@@ -839,7 +839,7 @@ namespace A3sist.Core.Agents.TaskAgents.FailureTracker
             var trend = "Stable";
             if (dailyFailures.Count >= 2)
             {
-                var recent = dailyFailures.TakeLast(3).Average(x => x.Count);
+                var recent = dailyFailures.Skip(Math.Max(0, dailyFailures.Count - 3)).Average(x => x.Count);
                 var older = dailyFailures.Take(dailyFailures.Count - 3).Average(x => x.Count);
                 
                 if (recent > older * 1.2)
