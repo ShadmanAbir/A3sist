@@ -17,7 +17,7 @@ public class ConfigurationService : IConfigurationService, IDisposable
 {
     private readonly IConfiguration _configuration;
     private readonly ILogger<ConfigurationService> _logger;
-    private readonly IConfigurationProvider[] _configurationProviders;
+    private readonly A3sist.Shared.Interfaces.IConfigurationProvider[] _configurationProviders;
     private readonly ConcurrentDictionary<string, object> _configurationCache;
     private readonly Timer _reloadTimer;
     private readonly object _lockObject = new object();
@@ -29,7 +29,7 @@ public class ConfigurationService : IConfigurationService, IDisposable
     public ConfigurationService(
         IConfiguration configuration,
         ILogger<ConfigurationService> logger,
-        IEnumerable<IConfigurationProvider> configurationProviders = null)
+        IEnumerable<A3sist.Shared.Interfaces.IConfigurationProvider> configurationProviders = null)
     {
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

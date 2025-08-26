@@ -7,6 +7,7 @@ using System.Runtime;
 using System.Threading;
 using System.Threading.Tasks;
 using A3sist.Core.Configuration;
+using A3sist.Core.Agents.Base;
 using A3sist.Shared.Models;
 
 namespace A3sist.Core.Services

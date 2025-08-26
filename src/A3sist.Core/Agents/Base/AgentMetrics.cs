@@ -14,6 +14,77 @@ namespace A3sist.Core.Agents.Base
         private long _totalProcessingTimeMs;
         private DateTime _lastActivity;
         private readonly object _lock = new object();
+        private TimeSpan _totalExecutionTime;
+        private TimeSpan _minExecutionTime = TimeSpan.MaxValue;
+        private TimeSpan _maxExecutionTime = TimeSpan.Zero;
+
+        /// <summary>
+        /// Gets or sets the agent name
+        /// </summary>
+        public string Name { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets the total execution time
+        /// </summary>
+        public TimeSpan TotalExecutionTime 
+        { 
+            get 
+            { 
+                lock (_lock) 
+                { 
+                    return _totalExecutionTime; 
+                } 
+            } 
+            set 
+            { 
+                lock (_lock) 
+                { 
+                    _totalExecutionTime = value; 
+                } 
+            } 
+        }
+
+        /// <summary>
+        /// Gets the minimum execution time
+        /// </summary>
+        public TimeSpan MinExecutionTime 
+        { 
+            get 
+            { 
+                lock (_lock) 
+                { 
+                    return _minExecutionTime == TimeSpan.MaxValue ? TimeSpan.Zero : _minExecutionTime; 
+                } 
+            } 
+            set 
+            { 
+                lock (_lock) 
+                { 
+                    _minExecutionTime = value; 
+                } 
+            } 
+        }
+
+        /// <summary>
+        /// Gets the maximum execution time
+        /// </summary>
+        public TimeSpan MaxExecutionTime 
+        { 
+            get 
+            { 
+                lock (_lock) 
+                { 
+                    return _maxExecutionTime; 
+                } 
+            } 
+            set 
+            { 
+                lock (_lock) 
+                { 
+                    _maxExecutionTime = value; 
+                } 
+            } 
+        }
 
         /// <summary>
         /// Gets the total number of tasks processed

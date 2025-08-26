@@ -36,7 +36,7 @@
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="9.0.8" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.8" />
     <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.8" />
-    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.249" />
+    <PackageReference Include="Microsoft.VisualStudio.SDK" Version="17.14.40265" />
     <PackageReference Include="Microsoft.VSSDK.BuildTools" Version="17.14.2101" />
     <PackageReference Include="Microsoft.VisualStudio.Language.Intellisense" Version="17.14.249" />
     <PackageReference Include="Microsoft.VisualStudio.Text.UI" Version="17.14.249" />
@@ -46,6 +46,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\A3sist.Core\A3sist.Core.csproj" />
     <ProjectReference Include="..\A3sist.Shared\A3sist.Shared.csproj" />
   </ItemGroup>
 </Project>
