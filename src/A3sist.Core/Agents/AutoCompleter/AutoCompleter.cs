@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
 using A3sist.Shared.Enums;
 using A3sist.Orchastrator.Agents.AutoCompleter.Models;
 using A3sist.Orchastrator.Agents.AutoCompleter.Services;
+using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Orchastrator.Agents.AutoCompleter
 {
@@ -40,53 +42,51 @@ namespace A3sist.Orchastrator.Agents.AutoCompleter
             Status = WorkStatus.Completed;
         }
 
-        public async Task<AgentResponse> ExecuteAsync(AgentRequest request)
+        public async Task<AgentResult> HandleAsync(AgentRequest request, CancellationToken cancellationToken = default)
         {
-            var response = new AgentResponse
-            {
-                RequestId = request.RequestId,
-                AgentName = Name,
-                TaskName = request.TaskName
-            };
-
             try
             {
                 Status = WorkStatus.InProgress;
 
-                var completionContext = JsonSerializer.Deserialize<CompletionContext>(request.Context);
+                var completionContext = JsonSerializer.Deserialize<CompletionContext>(request.Context?.GetValueOrDefault("context")?.ToString() ?? "{}");
 
-                switch (request.TaskName.ToLower())
+                switch (request.Prompt?.ToLower())
                 {
-                    case "codecompletion":
+                    case var p when p.Contains("code completion"):
                         var codeCompletions = await _codeCompletionService.GetCompletionsAsync(completionContext);
-                        response.Result = JsonSerializer.Serialize(codeCompletions);
-                        break;
+                        return AgentResult.CreateSuccess("Code completions generated", JsonSerializer.Serialize(codeCompletions), Name);
 
-                    case "snippetcompletion":
+                    case var p when p.Contains("snippet completion"):
                         var snippetCompletions = await _snippetCompletionService.GetCompletionsAsync(completionContext);
-                        response.Result = JsonSerializer.Serialize(snippetCompletions);
-                        break;
+                        return AgentResult.CreateSuccess("Snippet completions generated", JsonSerializer.Serialize(snippetCompletions), Name);
 
-                    case "importcompletion":
+                    case var p when p.Contains("import completion"):
                         var importCompletions = await _importCompletionService.GetCompletionsAsync(completionContext);
-                        response.Result = JsonSerializer.Serialize(importCompletions);
-                        break;
+                        return AgentResult.CreateSuccess("Import completions generated", JsonSerializer.Serialize(importCompletions), Name);
 
                     default:
-                        throw new NotSupportedException($"Task {request.TaskName} is not supported by this agent");
+                        return AgentResult.CreateFailure($"Task '{request.Prompt}' is not supported by this agent", agentName: Name);
                 }
-
-                response.IsSuccess = true;
-                Status = WorkStatus.Completed;
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.ErrorMessage = ex.Message;
                 Status = WorkStatus.Failed;
+                return AgentResult.CreateFailure($"AutoCompleter error: {ex.Message}", ex, Name);
             }
+            finally
+            {
+                Status = WorkStatus.Completed;
+            }
+        }
 
-            return response;
+        public async Task<bool> CanHandleAsync(AgentRequest request)
+        {
+            if (request?.Prompt == null) return false;
+
+            var prompt = request.Prompt.ToLowerInvariant();
+            var completionKeywords = new[] { "completion", "complete", "autocomplete", "intellisense", "suggest", "snippet", "import" };
+            
+            return completionKeywords.Any(keyword => prompt.Contains(keyword));
         }
 
         public async Task ShutdownAsync()

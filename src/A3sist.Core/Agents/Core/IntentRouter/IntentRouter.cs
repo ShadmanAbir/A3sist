@@ -3,11 +3,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
 using A3sist.Shared.Enums;
 using A3sist.Orchastrator.Agents.IntentRouter.Services;
+using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Orchastrator.Agents.IntentRouter
 {
@@ -40,46 +42,40 @@ namespace A3sist.Orchastrator.Agents.IntentRouter
             Status = WorkStatus.Completed;
         }
 
-        public async Task<AgentResponse> ExecuteAsync(AgentRequest request)
+        public async Task<AgentResult> HandleAsync(AgentRequest request, CancellationToken cancellationToken = default)
         {
-            var response = new AgentResponse
-            {
-                RequestId = request.RequestId,
-                AgentName = Name,
-                TaskName = request.TaskName
-            };
-
             try
             {
                 Status = WorkStatus.InProgress;
 
-                if (request.TaskName.ToLower() != "routeintent")
-                {
-                    throw new NotSupportedException($"Task {request.TaskName} is not supported by this agent");
-                }
-
                 // Classify the intent
-                var classification = await _classifier.ClassifyIntentAsync(request.Context);
+                var classification = await _classifier.ClassifyIntentAsync(request.Context?.ToString() ?? request.Prompt);
 
                 // Check for past failures
-                var failureAnalysis = await _failureAnalyzer.AnalyzeFailureAsync(request.Context);
+                var failureAnalysis = await _failureAnalyzer.AnalyzeFailureAsync(request.Context?.ToString() ?? request.Prompt);
 
                 // Determine the best agent
                 var routingDecision = await DetermineBestAgentAsync(classification, failureAnalysis);
 
-                // Prepare the response
-                response.Result = JsonSerializer.Serialize(routingDecision);
-                response.IsSuccess = true;
                 Status = WorkStatus.Completed;
+                return AgentResult.CreateSuccess("Intent routing completed", JsonSerializer.Serialize(routingDecision), Name);
             }
             catch (Exception ex)
             {
-                response.IsSuccess = false;
-                response.ErrorMessage = ex.Message;
                 Status = WorkStatus.Failed;
+                return AgentResult.CreateFailure($"IntentRouter error: {ex.Message}", ex, Name);
             }
+        }
 
-            return response;
+        public async Task<bool> CanHandleAsync(AgentRequest request)
+        {
+            if (request?.Prompt == null) return false;
+
+            var prompt = request.Prompt.ToLowerInvariant();
+            var routingKeywords = new[] { "route", "intent", "classify", "analyze", "determine", "which", "what", "how" };
+            
+            return routingKeywords.Any(keyword => prompt.Contains(keyword)) || 
+                   request.Context?.ContainsKey("requiresRouting") == true;
         }
 
         private async Task<RoutingDecision> DetermineBestAgentAsync(IntentClassification classification, FailureAnalysis failureAnalysis)

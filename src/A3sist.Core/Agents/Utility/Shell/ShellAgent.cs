@@ -13,6 +13,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Utility.Shell
 {
@@ -63,7 +64,7 @@ namespace A3sist.Core.Agents.Utility.Shell
                    ContainsCommandPattern(prompt);
         }
 
-        public override async Task<AgentResult> HandleAsync(AgentRequest request, CancellationToken cancellationToken = default)
+        protected override async System.Threading.Tasks.Task<AgentResult> HandleRequestAsync(AgentRequest request, CancellationToken cancellationToken)
         {
             try
             {
@@ -371,9 +372,9 @@ namespace A3sist.Core.Agents.Utility.Shell
             };
         }
 
-        public override async Task InitializeAsync()
+        protected override async Task InitializeAgentAsync()
         {
-            await base.InitializeAsync();
+            // Base initialization is handled by the base class
             Logger.LogInformation("ShellAgent initialized with {AllowedCount} allowed and {BlockedCount} blocked commands",
                 _allowedCommands.Count, _blockedCommands.Count);
         }

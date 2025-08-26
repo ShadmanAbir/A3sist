@@ -7,6 +7,7 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using A3sist.Core.Configuration;
+using A3sist.Core.Services;
 
 namespace A3sist.Core.LLM
 {

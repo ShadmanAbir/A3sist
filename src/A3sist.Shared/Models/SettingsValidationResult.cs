@@ -1,5 +1,5 @@
-using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace A3sist.Shared.Models
 {
@@ -11,31 +11,57 @@ namespace A3sist.Shared.Models
         /// <summary>
         /// Whether the settings are valid
         /// </summary>
-        public bool IsValid { get; set; }
+        public bool IsValid { get; private set; } = true;
 
         /// <summary>
         /// List of validation errors
         /// </summary>
-        public List<string> Errors { get; set; } = new List<string>();
+        public List<ValidationError> Errors { get; } = new List<ValidationError>();
 
         /// <summary>
         /// List of validation warnings
         /// </summary>
-        public List<string> Warnings { get; set; } = new List<string>();
+        public List<ValidationWarning> Warnings { get; } = new List<ValidationWarning>();
 
         /// <summary>
-        /// Settings that were automatically corrected
+        /// Additional metadata about the validation
         /// </summary>
-        public Dictionary<string, object> CorrectedSettings { get; set; } = new Dictionary<string, object>();
+        public Dictionary<string, object> Metadata { get; set; } = new Dictionary<string, object>();
 
         /// <summary>
-        /// Whether any settings were automatically corrected
+        /// Adds an error to the validation result
         /// </summary>
-        public bool HasCorrections => CorrectedSettings.Count > 0;
+        public void AddError(string property, string message)
+        {
+            Errors.Add(new ValidationError { Property = property, Message = message });
+            IsValid = false;
+        }
 
         /// <summary>
-        /// Whether there are any validation issues
+        /// Adds a warning to the validation result
         /// </summary>
-        public bool HasIssues => Errors.Count > 0 || Warnings.Count > 0;
+        public void AddWarning(string property, string message)
+        {
+            Warnings.Add(new ValidationWarning { Property = property, Message = message });
+        }
+
+        /// <summary>
+        /// Gets whether there are any errors or warnings
+        /// </summary>
+        public bool HasIssues => Errors.Any() || Warnings.Any();
+
+        /// <summary>
+        /// Gets a summary of the validation result
+        /// </summary>
+        public string GetSummary()
+        {
+            if (IsValid && !Warnings.Any())
+                return "Settings are valid with no issues.";
+            
+            if (IsValid && Warnings.Any())
+                return $"Settings are valid with {Warnings.Count} warning(s).";
+            
+            return $"Settings validation failed with {Errors.Count} error(s) and {Warnings.Count} warning(s).";
+        }
     }
 }

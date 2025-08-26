@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Utility.TrainingData
 {
@@ -46,7 +47,7 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             _interactionQueue = new Queue<AgentInteraction>();
         }
 
-        public override async Task<bool> CanHandleAsync(AgentRequest request)
+        protected override async Task<bool> CanHandleRequestAsync(AgentRequest request)
         {
             if (request?.Prompt == null) return false;
 
@@ -63,7 +64,7 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             return trainingKeywords.Any(keyword => prompt.Contains(keyword));
         }
 
-        public override async Task<AgentResult> HandleAsync(AgentRequest request, CancellationToken cancellationToken = default)
+        protected override async Task<AgentResult> HandleRequestAsync(AgentRequest request, CancellationToken cancellationToken)
         {
             try
             {
@@ -473,9 +474,9 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             return $"{number:n1} {suffixes[counter]}";
         }
 
-        public override async Task InitializeAsync()
+        protected override async Task InitializeAgentAsync()
         {
-            await base.InitializeAsync();
+            // Base initialization is handled by the base class
             Logger.LogInformation("TrainingDataGenerator initialized");
             
             // Initialize data repository
@@ -493,7 +494,7 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             }
         }
 
-        public override async Task ShutdownAsync()
+        protected override async Task ShutdownAgentAsync()
         {
             Logger.LogInformation("TrainingDataGenerator shutting down");
             
@@ -503,7 +504,7 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             // Process any remaining queued interactions
             await ProcessQueuedInteractionsAsync();
             
-            await base.ShutdownAsync();
+            // Base shutdown is handled by the base class
         }
     }
 }

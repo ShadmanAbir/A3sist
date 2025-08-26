@@ -9,23 +9,11 @@ using System.Threading.Tasks;
 using A3sist.Core.Configuration;
 using A3sist.Core.Agents.Base;
 using A3sist.Shared.Models;
+using A3sist.Shared.Interfaces;
 
 namespace A3sist.Core.Services
 {
-    /// <summary>
-    /// Interface for performance monitoring services
-    /// </summary>
-    public interface IPerformanceMonitoringService
-    {
-        void RecordAgentExecution(string agentName, TimeSpan duration, bool success);
-        void RecordMemoryUsage(long memoryBytes);
-        void RecordCacheHit(string cacheKey);
-        void RecordCacheMiss(string cacheKey);
-        Task<PerformanceMetrics> GetMetricsAsync();
-        Task<AgentPerformanceReport> GetAgentReportAsync(string agentName);
-        void StartOperation(string operationName);
-        void EndOperation(string operationName, bool success = true);
-    }
+
 
     /// <summary>
     /// Performance metrics data structure
@@ -371,6 +359,106 @@ namespace A3sist.Core.Services
             return totalRequests > 0 ? TimeSpan.FromTicks(totalTicks / totalRequests) : TimeSpan.Zero;
         }
 
+        // Shared interface implementation methods
+        public async Task RecordMetricAsync(A3sist.Shared.Models.PerformanceMetric metric)
+        {
+            await Task.CompletedTask;
+            if (metric.Name.Contains("agent"))
+            {
+                RecordAgentExecution(metric.Source ?? "Unknown", TimeSpan.FromMilliseconds(metric.Value), true);
+            }
+        }
+
+        public async Task RecordCounterAsync(string name, double value = 1, Dictionary<string, string>? tags = null)
+        {
+            await Task.CompletedTask;
+            _logger.LogTrace("Counter {Name} recorded: {Value}", name, value);
+        }
+
+        public async Task RecordGaugeAsync(string name, double value, Dictionary<string, string>? tags = null)
+        {
+            await Task.CompletedTask;
+            if (name.ToLower().Contains("memory"))
+            {
+                RecordMemoryUsage((long)value);
+            }
+        }
+
+        public async Task RecordHistogramAsync(string name, double value, Dictionary<string, string>? tags = null)
+        {
+            await Task.CompletedTask;
+            _logger.LogTrace("Histogram {Name} recorded: {Value}", name, value);
+        }
+
+        public async Task RecordTimingAsync(string name, TimeSpan duration, Dictionary<string, string>? tags = null)
+        {
+            await Task.CompletedTask;
+            RecordAgentExecution(tags?.GetValueOrDefault("agent") ?? "System", duration, true);
+        }
+
+        public IDisposable StartTimer(string name, Dictionary<string, string>? tags = null)
+        {
+            return new SharedMetricTimer(name, this);
+        }
+
+        public async Task<IEnumerable<A3sist.Shared.Models.PerformanceMetric>> GetMetricsAsync(string? metricName = null, DateTime? startTime = null, DateTime? endTime = null, Dictionary<string, string>? tags = null)
+        {
+            await Task.CompletedTask;
+            var metrics = new List<A3sist.Shared.Models.PerformanceMetric>();
+            
+            foreach (var agent in _agentMetrics)
+            {
+                metrics.Add(new A3sist.Shared.Models.PerformanceMetric
+                {
+                    Name = $"agent.{agent.Key}.execution_time",
+                    Type = MetricType.Timer,
+                    Value = agent.Value.TotalExecutionTime.TotalMilliseconds,
+                    Unit = "ms",
+                    Timestamp = agent.Value.LastActivity,
+                    Source = agent.Key
+                });
+            }
+            
+            return metrics;
+        }
+
+        public async Task<A3sist.Shared.Models.PerformanceStatistics> GetStatisticsAsync(string metricName, DateTime? startTime = null, DateTime? endTime = null, Dictionary<string, string>? tags = null)
+        {
+            await Task.CompletedTask;
+            return new A3sist.Shared.Models.PerformanceStatistics
+            {
+                MetricName = metricName,
+                StartTime = startTime ?? DateTime.UtcNow.AddDays(-1),
+                EndTime = endTime ?? DateTime.UtcNow
+            };
+        }
+
+        public async Task<SystemHealthMetrics> GetSystemHealthAsync()
+        {
+            var metrics = await GetMetricsAsync();
+            return new SystemHealthMetrics
+            {
+                Timestamp = DateTime.UtcNow,
+                CpuUsagePercent = (double)metrics.First().Value,
+                MemoryUsageBytes = GC.GetTotalMemory(false)
+            };
+        }
+
+        public async Task CleanupMetricsAsync()
+        {
+            await Task.CompletedTask;
+            var cutoffTime = DateTime.UtcNow.AddDays(-7);
+            var expiredAgents = _agentMetrics
+                .Where(kvp => kvp.Value.LastActivity < cutoffTime)
+                .Select(kvp => kvp.Key)
+                .ToList();
+            
+            foreach (var agent in expiredAgents)
+            {
+                _agentMetrics.TryRemove(agent, out _);
+            }
+        }
+
         public void Dispose()
         {
             if (_disposed)
@@ -392,6 +480,29 @@ namespace A3sist.Core.Services
             public string Name { get; set; } = string.Empty;
             public DateTime StartTime { get; set; }
             public Stopwatch Stopwatch { get; set; } = new();
+        }
+        
+        /// <summary>
+        /// Timer for shared metrics interface
+        /// </summary>
+        private class SharedMetricTimer : IDisposable
+        {
+            private readonly string _name;
+            private readonly EnhancedPerformanceMonitoringService _service;
+            private readonly Stopwatch _stopwatch;
+            
+            public SharedMetricTimer(string name, EnhancedPerformanceMonitoringService service)
+            {
+                _name = name;
+                _service = service;
+                _stopwatch = Stopwatch.StartNew();
+            }
+            
+            public void Dispose()
+            {
+                _stopwatch.Stop();
+                _service.RecordAgentExecution("Timer", _stopwatch.Elapsed, true);
+            }
         }
     }
 }

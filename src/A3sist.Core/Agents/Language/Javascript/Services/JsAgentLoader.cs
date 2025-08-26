@@ -1,4 +1,4 @@
-﻿using System;
+﻿﻿using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -14,7 +14,7 @@ namespace A3sist.Orchastrator.Agents.JavaScript.Services
 
         public IReadOnlyList<JsAnalyzerWrapper> Analyzers => _analyzers;
 
-        public JsAgentLoader(string scriptsPath = null)
+        public JsAgentLoader(string? scriptsPath = null)
         {
             _scriptsPath = scriptsPath ?? Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Scripts");
         }

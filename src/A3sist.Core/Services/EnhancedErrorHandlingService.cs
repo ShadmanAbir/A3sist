@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using A3sist.Shared.Messaging;
+using A3sist.Shared.Models;
 
 namespace A3sist.Core.Services
 {
@@ -74,31 +75,7 @@ namespace A3sist.Core.Services
         public List<string> Recommendations { get; set; } = new();
     }
 
-    /// <summary>
-    /// Error categories
-    /// </summary>
-    public enum ErrorCategory
-    {
-        Configuration,
-        Network,
-        Authentication,
-        Validation,
-        Processing,
-        Resource,
-        External,
-        Unknown
-    }
 
-    /// <summary>
-    /// Error severity levels
-    /// </summary>
-    public enum ErrorSeverity
-    {
-        Low,
-        Medium,
-        High,
-        Critical
-    }
 
     /// <summary>
     /// Enhanced error handling service with pattern analysis and recovery suggestions
@@ -174,22 +151,22 @@ namespace A3sist.Core.Services
             classification.Category = exception switch
             {
                 ArgumentException or ArgumentNullException or ArgumentOutOfRangeException => ErrorCategory.Validation,
-                UnauthorizedAccessException or System.Security.SecurityException => ErrorCategory.Authentication,
+                UnauthorizedAccessException or System.Security.SecurityException => ErrorCategory.Security,
                 TimeoutException or TaskCanceledException => ErrorCategory.Network,
-                OutOfMemoryException or System.IO.IOException => ErrorCategory.Resource,
+                OutOfMemoryException or System.IO.IOException => ErrorCategory.System,
                 NotSupportedException or NotImplementedException => ErrorCategory.Configuration,
                 HttpRequestException or System.Net.NetworkInformation.NetworkInformationException => ErrorCategory.Network,
-                _ => ErrorCategory.Unknown
+                _ => ErrorCategory.Application
             };
 
             // Determine severity
             classification.Severity = exception switch
             {
                 OutOfMemoryException or StackOverflowException => ErrorSeverity.Critical,
-                UnauthorizedAccessException or System.Security.SecurityException => ErrorSeverity.High,
-                TimeoutException or TaskCanceledException => ErrorSeverity.Medium,
-                ArgumentException or ArgumentNullException => ErrorSeverity.Low,
-                _ => ErrorSeverity.Medium
+                UnauthorizedAccessException or System.Security.SecurityException => ErrorSeverity.Critical,
+                TimeoutException or TaskCanceledException => ErrorSeverity.Warning,
+                ArgumentException or ArgumentNullException => ErrorSeverity.Info,
+                _ => ErrorSeverity.Warning
             };
 
             // Determine if transient/retryable
@@ -324,12 +301,12 @@ namespace A3sist.Core.Services
             return exception switch
             {
                 ArgumentException or ArgumentNullException => ErrorCategory.Validation,
-                UnauthorizedAccessException => ErrorCategory.Authentication,
+                UnauthorizedAccessException => ErrorCategory.Security,
                 TimeoutException or TaskCanceledException => ErrorCategory.Network,
-                OutOfMemoryException => ErrorCategory.Resource,
+                OutOfMemoryException => ErrorCategory.System,
                 NotSupportedException => ErrorCategory.Configuration,
-                HttpRequestException => ErrorCategory.External,
-                _ => ErrorCategory.Unknown
+                HttpRequestException => ErrorCategory.ExternalService,
+                _ => ErrorCategory.Application
             };
         }
 

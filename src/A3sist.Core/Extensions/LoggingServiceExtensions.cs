@@ -5,6 +5,7 @@ using A3sist.Shared.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using CoreLoggingConfiguration = A3sist.Core.Configuration.LoggingConfiguration;
 
 namespace A3sist.Core.Extensions
 {
@@ -52,7 +53,7 @@ namespace A3sist.Core.Extensions
         /// <param name="services">The service collection</param>
         /// <param name="loggingConfiguration">The logging configuration</param>
         /// <returns>The service collection for chaining</returns>
-        public static IServiceCollection AddA3sistLogging(this IServiceCollection services, LoggingConfiguration loggingConfiguration)
+        public static IServiceCollection AddA3sistLogging(this IServiceCollection services, CoreLoggingConfiguration loggingConfiguration)
         {
             services.AddSingleton(loggingConfiguration);
 

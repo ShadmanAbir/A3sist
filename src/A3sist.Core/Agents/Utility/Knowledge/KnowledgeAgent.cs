@@ -12,6 +12,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Utility.Knowledge
 {
@@ -43,7 +44,7 @@ namespace A3sist.Core.Agents.Utility.Knowledge
             _knowledgeCache = new Dictionary<string, KnowledgeEntry>();
         }
 
-        public override async Task<bool> CanHandleAsync(AgentRequest request)
+        protected override async Task<bool> CanHandleRequestAsync(AgentRequest request)
         {
             if (request?.Prompt == null) return false;
 
@@ -60,7 +61,7 @@ namespace A3sist.Core.Agents.Utility.Knowledge
             return knowledgeKeywords.Any(keyword => prompt.Contains(keyword));
         }
 
-        public override async Task<AgentResult> HandleAsync(AgentRequest request, CancellationToken cancellationToken = default)
+        protected override async Task<AgentResult> HandleRequestAsync(AgentRequest request, CancellationToken cancellationToken)
         {
             try
             {
@@ -296,9 +297,8 @@ namespace A3sist.Core.Agents.Utility.Knowledge
             return "Documentation";
         }
 
-        public override async Task InitializeAsync()
+        protected override async Task InitializeAgentAsync()
         {
-            await base.InitializeAsync();
             Logger.LogInformation("KnowledgeAgent initialized");
             
             // Load initial knowledge base
@@ -318,7 +318,7 @@ namespace A3sist.Core.Agents.Utility.Knowledge
             }
         }
 
-        public override async Task ShutdownAsync()
+        protected override async Task ShutdownAgentAsync()
         {
             Logger.LogInformation("KnowledgeAgent shutting down");
             
@@ -328,7 +328,7 @@ namespace A3sist.Core.Agents.Utility.Knowledge
                 _knowledgeCache.Clear();
             }
             
-            await base.ShutdownAsync();
+            await Task.CompletedTask;
         }
     }
 }

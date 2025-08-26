@@ -2,6 +2,9 @@ using A3sist.Core.Agents.Base;
 using A3sist.Shared.Enums;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
+using A3sist.Shared.Models;
+using Microsoft.CodeAnalysis;
+using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -10,6 +13,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Task.Fixer
 {

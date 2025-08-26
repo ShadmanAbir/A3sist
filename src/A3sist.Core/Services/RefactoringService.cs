@@ -68,7 +68,7 @@ namespace A3sist.Core.Services
             }
         }
 
-        public async Task<RefactoringResult> ApplyRefactoringAsync(string code, RefactoringType refactoringType, Dictionary<string, object> parameters = null, CancellationToken cancellationToken = default)
+        public async Task<RefactoringResult> ApplyRefactoringAsync(string code, RefactoringType refactoringType, Dictionary<string, object>? parameters = null, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrEmpty(code))
             {
