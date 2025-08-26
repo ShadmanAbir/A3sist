@@ -30,9 +30,10 @@ namespace A3sist.UI.VSIX.ToolWindows
             try
             {
                 // Get logger from package service provider
+                IServiceProvider? serviceProvider = null;
                 if (Package is A3sistVSIXPackage package)
                 {
-                    var serviceProvider = package.GetServiceProvider();
+                    serviceProvider = package.GetServiceProvider();
                     _logger = serviceProvider.GetService<ILogger<A3sistToolWindow>>();
                 }
 
@@ -41,7 +42,8 @@ namespace A3sist.UI.VSIX.ToolWindows
                 // This is the user control hosted by the tool window; Note that, even if this class implements IDisposable,
                 // we are not calling Dispose on this object. This is because ToolWindowPane calls Dispose on
                 // the object returned by the Content property.
-                _control = new A3sistToolWindowControl(_logger);
+                var controlLogger = serviceProvider?.GetService<ILogger<A3sistToolWindowControl>>();
+                _control = new A3sistToolWindowControl(controlLogger);
                 this.Content = _control;
 
                 _logger?.LogInformation("A3sist tool window initialized successfully");

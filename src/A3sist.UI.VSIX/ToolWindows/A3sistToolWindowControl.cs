@@ -84,8 +84,7 @@ namespace A3sist.UI.VSIX.ToolWindows
                 _webView.CoreWebView2.Settings.AreDefaultContextMenusEnabled = true;
 
                 // Navigate to MAUI application URL (placeholder for now)
-                var mauiUrl = "about:blank"; // Will be replaced with actual MAUI app URL
-                await _webView.CoreWebView2.NavigateToStringAsync(@"
+                _webView.CoreWebView2.NavigateToString(@"
                     <html>
                     <head><title>A3sist</title></head>
                     <body style='font-family: Segoe UI; padding: 20px; background: #f5f5f5;'>

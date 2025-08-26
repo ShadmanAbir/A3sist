@@ -120,7 +120,6 @@ namespace A3sist.UI.VSIX
             // Add basic logging
             services.AddLogging(builder =>
             {
-                builder.AddConsole();
                 builder.SetMinimumLevel(LogLevel.Information);
             });
 

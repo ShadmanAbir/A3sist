@@ -25,16 +25,18 @@ namespace A3sist.UI.VSIX.ToolWindows
             try
             {
                 // Get logger from package service provider
+                IServiceProvider? serviceProvider = null;
                 if (Package is A3sistVSIXPackage package)
                 {
-                    var serviceProvider = package.GetServiceProvider();
+                    serviceProvider = package.GetServiceProvider();
                     _logger = serviceProvider.GetService<ILogger<ChatToolWindow>>();
                 }
 
                 _logger?.LogInformation("Initializing A3sist chat tool window");
 
                 // This is the user control hosted by the tool window
-                _control = new ChatToolWindowControl(_logger);
+                var controlLogger = serviceProvider?.GetService<ILogger<ChatToolWindowControl>>();
+                _control = new ChatToolWindowControl(controlLogger);
                 this.Content = _control;
 
                 _logger?.LogInformation("A3sist chat tool window initialized successfully");
