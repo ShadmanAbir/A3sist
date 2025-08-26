@@ -7,7 +7,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
-using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Language.Python.Services
 {
@@ -29,7 +28,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Initializes the Python analyzer asynchronously
         /// </summary>
-        public async Task InitializeAsync()
+        public async System.Threading.Tasks.Task InitializeAsync()
         {
             // Check if Python is available
             try
@@ -456,7 +455,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Shuts down the analyzer asynchronously
         /// </summary>
-        public async Task ShutdownAsync()
+        public async System.Threading.Tasks.Task ShutdownAsync()
         {
             _keywordCounts.Clear();
             _issues.Clear();

@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
-namespace A3sist.Core.Agents.Task.FailureTracker
+namespace A3sist.Core.Agents.TaskAgents.FailureTracker
 {
     /// <summary>
     /// FailureTracker agent responsible for error tracking, failure pattern recognition, and recovery suggestions
@@ -86,7 +86,7 @@ namespace A3sist.Core.Agents.Task.FailureTracker
             }
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override async System.Threading.Tasks.Task InitializeAgentAsync()
         {
             Logger.LogInformation("Initializing FailureTracker agent");
             
@@ -97,7 +97,7 @@ namespace A3sist.Core.Agents.Task.FailureTracker
                 _failurePatterns.Count, _recoveryStrategies.Count);
         }
 
-        protected override async Task ShutdownAgentAsync()
+        protected override async System.Threading.Tasks.Task ShutdownAgentAsync()
         {
             Logger.LogInformation("Shutting down FailureTracker agent");
             
@@ -404,7 +404,7 @@ namespace A3sist.Core.Agents.Task.FailureTracker
             return record;
         }
 
-        private async Task UpdateFailurePatternsAsync(FailureRecord failure)
+        private async System.Threading.Tasks.Task UpdateFailurePatternsAsync(FailureRecord failure)
         {
             var patternKey = GeneratePatternKey(failure);
             
@@ -890,13 +890,13 @@ namespace A3sist.Core.Agents.Task.FailureTracker
             return "generic"; // Default action
         }
 
-        private async Task LoadPersistedDataAsync()
+        private async System.Threading.Tasks.Task LoadPersistedDataAsync()
         {
             // In a real implementation, this would load from a database or file system
             await Task.CompletedTask;
         }
 
-        private async Task PersistDataAsync()
+        private async System.Threading.Tasks.Task PersistDataAsync()
         {
             // In a real implementation, this would save to a database or file system
             await Task.CompletedTask;

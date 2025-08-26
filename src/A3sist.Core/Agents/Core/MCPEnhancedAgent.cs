@@ -38,7 +38,7 @@ namespace A3sist.Core.Agents.Core
         /// <summary>
         /// Initializes the agent and loads available MCP tools
         /// </summary>
-        protected override async Task InitializeAgentAsync()
+        protected override System.Threading.Tasks.Task InitializeAgentAsync()
         {
             try
             {

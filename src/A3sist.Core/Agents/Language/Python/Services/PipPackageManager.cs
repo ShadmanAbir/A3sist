@@ -6,7 +6,6 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
-using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Language.Python.Services
 {
@@ -26,7 +25,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Initializes the pip package manager asynchronously
         /// </summary>
-        public async Task InitializeAsync()
+        public async System.Threading.Tasks.Task InitializeAsync()
         {
             // Check if pip is available
             try
@@ -49,7 +48,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <param name="command">The pip command to execute</param>
         /// <param name="packageName">Optional package name for package-specific commands</param>
         /// <returns>The command execution result</returns>
-        public async Task<string> ExecuteCommandAsync(string command, string packageName = null)
+        public async System.Threading.Tasks.Task<string> ExecuteCommandAsync(string command, string packageName = null)
         {
             try
             {
@@ -91,7 +90,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// </summary>
         /// <param name="testPattern">Optional test pattern to run specific tests</param>
         /// <returns>Test execution results</returns>
-        public async Task<string> RunTestsAsync(string testPattern = null)
+        public async System.Threading.Tasks.Task<string> RunTestsAsync(string testPattern = null)
         {
             try
             {
@@ -123,7 +122,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// Gets package information from requirements.txt or setup.py
         /// </summary>
         /// <returns>Package information</returns>
-        public async Task<string> GetPackageInfoAsync()
+        public async System.Threading.Tasks.Task<string> GetPackageInfoAsync()
         {
             try
             {
@@ -183,7 +182,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// Checks for outdated packages
         /// </summary>
         /// <returns>Outdated packages information</returns>
-        public async Task<string> CheckOutdatedPackagesAsync()
+        public async System.Threading.Tasks.Task<string> CheckOutdatedPackagesAsync()
         {
             try
             {
@@ -208,7 +207,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// Creates a requirements.txt file from currently installed packages
         /// </summary>
         /// <returns>Operation result</returns>
-        public async Task<string> FreezeRequirementsAsync()
+        public async System.Threading.Tasks.Task<string> FreezeRequirementsAsync()
         {
             try
             {
@@ -236,7 +235,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Executes a pip command and returns the result
         /// </summary>
-        private async Task<(bool Success, string Output, string Error)> ExecutePipCommandAsync(string arguments)
+        private async System.Threading.Tasks.Task<(bool Success, string Output, string Error)> ExecutePipCommandAsync(string arguments)
         {
             try
             {
@@ -273,7 +272,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Executes a Python command and returns the result
         /// </summary>
-        private async Task<(bool Success, string Output, string Error)> ExecutePythonCommandAsync(string arguments)
+        private async System.Threading.Tasks.Task<(bool Success, string Output, string Error)> ExecutePythonCommandAsync(string arguments)
         {
             try
             {
@@ -343,7 +342,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Shuts down the package manager asynchronously
         /// </summary>
-        public async Task ShutdownAsync()
+        public async System.Threading.Tasks.Task ShutdownAsync()
         {
             // Clean up resources
             await Task.CompletedTask;

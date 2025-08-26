@@ -521,36 +521,3 @@ public class SettingsData
     public Dictionary<string, object> Settings { get; set; }
     public string Checksum { get; set; }
 }
-
-/// <summary>
-/// Information about a settings backup
-/// </summary>
-public class BackupInfo
-{
-    public string FilePath { get; set; }
-    public string FileName { get; set; }
-    public DateTime CreatedAt { get; set; }
-    public string Version { get; set; }
-    public long Size { get; set; }
-}
-
-/// <summary>
-/// Result of settings validation
-/// </summary>
-public class SettingsValidationResult
-{
-    public bool IsValid { get; set; } = true;
-    public List<ValidationError> Errors { get; set; } = new();
-    public List<ValidationWarning> Warnings { get; set; } = new();
-
-    public void AddError(string property, string message)
-    {
-        Errors.Add(new ValidationError { Property = property, Message = message });
-        IsValid = false;
-    }
-
-    public void AddWarning(string property, string message)
-    {
-        Warnings.Add(new ValidationWarning { Property = property, Message = message });
-    }
-}

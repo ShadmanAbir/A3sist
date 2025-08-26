@@ -15,7 +15,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
 
-namespace A3sist.Core.Agents.Task.Fixer
+namespace A3sist.Core.Agents.TaskAgents.Fixer
 {
     /// <summary>
     /// FixerAgent responsible for automated code error detection and fixing
@@ -84,7 +84,7 @@ namespace A3sist.Core.Agents.Task.Fixer
             }
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override async System.Threading.Tasks.Task InitializeAgentAsync()
         {
             Logger.LogInformation("Initializing FixerAgent");
             
@@ -100,7 +100,7 @@ namespace A3sist.Core.Agents.Task.Fixer
             Logger.LogInformation("FixerAgent initialized with {ProviderCount} fix providers", _fixProviders.Count);
         }
 
-        protected override async Task ShutdownAgentAsync()
+        protected override async System.Threading.Tasks.Task ShutdownAgentAsync()
         {
             Logger.LogInformation("Shutting down FixerAgent");
             

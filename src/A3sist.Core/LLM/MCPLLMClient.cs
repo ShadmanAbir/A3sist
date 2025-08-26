@@ -256,6 +256,68 @@ namespace A3sist.Core.LLM
             }
         }
 
+        public string CurrentModel => _options.LLM.Model;
+
+        public bool IsAvailable { get; private set; } = true;
+
+        public async Task<string> CompleteAsync(string prompt, CancellationToken cancellationToken = default)
+        {
+            return await GetResponseAsync(prompt);
+        }
+
+        public async Task<string> CompleteAsync(string prompt, Dictionary<string, object>? options = null, CancellationToken cancellationToken = default)
+        {
+            return await GetResponseAsync(prompt);
+        }
+
+        public async Task CompleteStreamAsync(string prompt, Action<string> onChunk, CancellationToken cancellationToken = default)
+        {
+            // For now, simulate streaming by sending the complete response
+            var response = await GetResponseAsync(prompt);
+            onChunk(response);
+        }
+
+        public async Task<IEnumerable<string>> GetAvailableModelsAsync()
+        {
+            var request = new MCPRequest
+            {
+                Method = "models/list",
+                Params = new { }
+            };
+
+            try
+            {
+                var response = await SendMCPRequestAsync<MCPModelsResponse>(request);
+                return response?.Models ?? new List<string> { _options.LLM.Model };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to get available models via MCP");
+                return new List<string> { _options.LLM.Model };
+            }
+        }
+
+        public async Task InitializeAsync()
+        {
+            try
+            {
+                var models = await GetAvailableModelsAsync();
+                IsAvailable = models.Any();
+                _logger.LogInformation("MCPLLMClient initialized with {ModelCount} available models", models.Count());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to initialize MCPLLMClient");
+                IsAvailable = false;
+            }
+        }
+
+        public async Task DisposeAsync()
+        {
+            Dispose();
+            await Task.CompletedTask;
+        }
+
         public void Dispose()
         {
             _httpClient?.Dispose();
@@ -333,6 +395,14 @@ namespace A3sist.Core.LLM
     {
         public string? Result { get; set; }
         public object? Metadata { get; set; }
+    }
+
+    /// <summary>
+    /// MCP models list response
+    /// </summary>
+    public class MCPModelsResponse : MCPResponse
+    {
+        public List<string> Models { get; set; } = new();
     }
 
     #endregion

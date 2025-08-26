@@ -5,7 +5,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
-using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Language.Python.Services
 {
@@ -19,7 +18,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Initializes the Python refactoring engine asynchronously
         /// </summary>
-        public async Task InitializeAsync()
+        public async System.Threading.Tasks.Task InitializeAsync()
         {
             // Initialize refactoring engine components
             await Task.CompletedTask;
@@ -306,7 +305,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Shuts down the refactoring engine asynchronously
         /// </summary>
-        public async Task ShutdownAsync()
+        public async System.Threading.Tasks.Task ShutdownAsync()
         {
             // Clean up resources
             await Task.CompletedTask;

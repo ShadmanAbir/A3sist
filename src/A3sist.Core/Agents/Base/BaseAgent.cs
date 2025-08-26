@@ -222,7 +222,7 @@ namespace A3sist.Core.Agents.Base
         /// <summary>
         /// Initializes the agent asynchronously
         /// </summary>
-        public async Task InitializeAsync()
+        public async System.Threading.Tasks.Task InitializeAsync()
         {
             if (_isInitialized)
                 return;
@@ -259,7 +259,7 @@ namespace A3sist.Core.Agents.Base
         /// <summary>
         /// Shuts down the agent asynchronously
         /// </summary>
-        public async Task ShutdownAsync()
+        public async System.Threading.Tasks.Task ShutdownAsync()
         {
             if (_isShuttingDown)
                 return;
@@ -319,7 +319,7 @@ namespace A3sist.Core.Agents.Base
         /// <summary>
         /// Virtual method for derived classes to implement custom initialization logic
         /// </summary>
-        protected virtual Task InitializeAgentAsync()
+        protected virtual System.Threading.Tasks.Task InitializeAgentAsync()
         {
             return Task.CompletedTask;
         }
@@ -327,7 +327,7 @@ namespace A3sist.Core.Agents.Base
         /// <summary>
         /// Virtual method for derived classes to implement custom shutdown logic
         /// </summary>
-        protected virtual Task ShutdownAgentAsync()
+        protected virtual System.Threading.Tasks.Task ShutdownAgentAsync()
         {
             return Task.CompletedTask;
         }

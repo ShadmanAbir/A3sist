@@ -40,7 +40,7 @@ namespace A3sist.Core.Agents.Language.Python
             _venvManager = new VirtualEnvironmentManager();
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override System.Threading.Tasks.Task InitializeAgentAsync()
         {
             Logger.LogInformation("Initializing Python agent services");
             
@@ -127,7 +127,7 @@ namespace A3sist.Core.Agents.Language.Python
             return false;
         }
 
-        protected override async Task ShutdownAgentAsync()
+        protected override System.Threading.Tasks.Task ShutdownAgentAsync()
         {
             Logger.LogInformation("Shutting down Python agent services");
             

@@ -97,7 +97,7 @@ namespace A3sist.Core.Agents.Core.Dispatcher
             }
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override System.Threading.Tasks.Task InitializeAgentAsync()
         {
             Logger.LogInformation("Initializing Dispatcher agent");
             
@@ -115,7 +115,7 @@ namespace A3sist.Core.Agents.Core.Dispatcher
             Logger.LogInformation("Dispatcher agent initialized with max concurrent tasks: {MaxTasks}", _maxConcurrentTasks);
         }
 
-        protected override async Task ShutdownAgentAsync()
+        protected override System.Threading.Tasks.Task ShutdownAgentAsync()
         {
             Logger.LogInformation("Shutting down Dispatcher agent");
             
@@ -354,7 +354,7 @@ namespace A3sist.Core.Agents.Core.Dispatcher
             return execution;
         }
 
-        private async Task ExecuteTaskAsync(TaskExecution execution)
+        private async System.Threading.Tasks.Task ExecuteTaskAsync(TaskExecution execution)
         {
             try
             {
@@ -562,7 +562,7 @@ namespace A3sist.Core.Agents.Core.Dispatcher
         public DateTime? EndTime { get; set; }
         public AgentResult? Result { get; set; }
         public CancellationTokenSource CancellationTokenSource { get; set; } = null!;
-        public Task CompletionTask { get; set; } = null!;
+        public System.Threading.Tasks.Task CompletionTask { get; set; } = null!;
     }
 
     /// <summary>

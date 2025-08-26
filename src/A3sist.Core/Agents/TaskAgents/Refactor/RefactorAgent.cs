@@ -10,9 +10,8 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
-using Task = System.Threading.Tasks.Task;
 
-namespace A3sist.Core.Agents.Task.Refactor
+namespace A3sist.Core.Agents.TaskAgents.Refactor
 {
     /// <summary>
     /// RefactorAgent responsible for code refactoring analysis and suggestions
@@ -87,7 +86,7 @@ namespace A3sist.Core.Agents.Task.Refactor
             }
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override async System.Threading.Tasks.Task InitializeAgentAsync()
         {
             Logger.LogInformation("Initializing RefactorAgent");
             
@@ -100,7 +99,7 @@ namespace A3sist.Core.Agents.Task.Refactor
             Logger.LogInformation("RefactorAgent initialized with {ProviderCount} language providers", _languageProviders.Count);
         }
 
-        protected override async Task ShutdownAgentAsync()
+        protected override async System.Threading.Tasks.Task ShutdownAgentAsync()
         {
             Logger.LogInformation("Shutting down RefactorAgent");
             

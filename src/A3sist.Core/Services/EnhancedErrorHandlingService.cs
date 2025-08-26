@@ -18,7 +18,7 @@ namespace A3sist.Core.Services
         Task<ErrorHandlingResult> HandleErrorAsync(Exception exception, string context, string? agentName = null);
         Task<ErrorClassification> ClassifyErrorAsync(Exception exception);
         Task<List<ErrorPattern>> GetErrorPatternsAsync();
-        Task<ErrorReport> GenerateErrorReportAsync(TimeSpan? period = null);
+        Task<ErrorSummaryReport> GenerateErrorReportAsync(TimeSpan? period = null);
         void RecordError(Exception exception, string context, string? agentName = null);
     }
 
@@ -61,9 +61,9 @@ namespace A3sist.Core.Services
     }
 
     /// <summary>
-    /// Comprehensive error report
+    /// Comprehensive error summary report
     /// </summary>
-    public class ErrorReport
+    public class ErrorSummaryReport
     {
         public DateTime GeneratedAt { get; set; } = DateTime.UtcNow;
         public TimeSpan Period { get; set; }
@@ -192,7 +192,7 @@ namespace A3sist.Core.Services
         /// <summary>
         /// Generates a comprehensive error report
         /// </summary>
-        public async Task<ErrorReport> GenerateErrorReportAsync(TimeSpan? period = null)
+        public async Task<ErrorSummaryReport> GenerateErrorReportAsync(TimeSpan? period = null)
         {
             await Task.CompletedTask; // For async consistency
 
@@ -203,7 +203,7 @@ namespace A3sist.Core.Services
             {
                 var recentErrorsList = _recentErrors.Where(e => e.Timestamp >= cutoffTime).ToList();
                 
-                var report = new ErrorReport
+                var report = new ErrorSummaryReport
                 {
                     Period = reportPeriod,
                     TotalErrors = recentErrorsList.Count
@@ -389,7 +389,7 @@ namespace A3sist.Core.Services
         /// <summary>
         /// Generates recommendations based on error report
         /// </summary>
-        private List<string> GenerateRecommendations(ErrorReport report)
+        private List<string> GenerateRecommendations(ErrorSummaryReport report)
         {
             var recommendations = new List<string>();
 

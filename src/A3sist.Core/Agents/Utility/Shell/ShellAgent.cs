@@ -14,7 +14,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
-using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Utility.Shell
 {
@@ -373,7 +372,7 @@ namespace A3sist.Core.Agents.Utility.Shell
             };
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override async System.Threading.Tasks.Task InitializeAgentAsync()
         {
             // Base initialization is handled by the base class
             Logger.LogInformation("ShellAgent initialized with {AllowedCount} allowed and {BlockedCount} blocked commands",

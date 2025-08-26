@@ -1,4 +1,4 @@
-using A3sist.Core.Agents.Task.FailureTracker;
+using A3sist.Core.Agents.TaskAgents.FailureTracker;
 using A3sist.Shared.Enums;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;

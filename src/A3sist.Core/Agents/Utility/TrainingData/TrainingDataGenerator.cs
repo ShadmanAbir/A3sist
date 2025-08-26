@@ -12,7 +12,6 @@ using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
-using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Utility.TrainingData
 {
@@ -213,7 +212,7 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             };
         }
 
-        public async Task RecordInteractionAsync(AgentInteraction interaction)
+        public async System.Threading.Tasks.Task RecordInteractionAsync(AgentInteraction interaction)
         {
             try
             {
@@ -237,7 +236,7 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             }
         }
 
-        private async Task ProcessQueuedInteractionsAsync()
+        private async System.Threading.Tasks.Task ProcessQueuedInteractionsAsync()
         {
             var interactions = new List<AgentInteraction>();
             
@@ -443,7 +442,7 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             };
         }
 
-        private async Task ConfigureDataCollectionAsync(DataCollectionOptions options, CancellationToken cancellationToken)
+        private async System.Threading.Tasks.Task ConfigureDataCollectionAsync(DataCollectionOptions options, CancellationToken cancellationToken)
         {
             await _dataRepository.UpdateCollectionSettingsAsync(options, cancellationToken);
             
@@ -475,7 +474,7 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             return $"{number:n1} {suffixes[counter]}";
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override async System.Threading.Tasks.Task InitializeAgentAsync()
         {
             // Base initialization is handled by the base class
             Logger.LogInformation("TrainingDataGenerator initialized");
@@ -495,7 +494,7 @@ namespace A3sist.Core.Agents.Utility.TrainingData
             }
         }
 
-        protected override async Task ShutdownAgentAsync()
+        protected override async System.Threading.Tasks.Task ShutdownAgentAsync()
         {
             Logger.LogInformation("TrainingDataGenerator shutting down");
             

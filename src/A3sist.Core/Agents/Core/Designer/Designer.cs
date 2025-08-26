@@ -82,34 +82,33 @@ namespace A3sist.Core.Agents.Core.Designer
             }
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override System.Threading.Tasks.Task InitializeAgentAsync()
         {
             Logger.LogInformation("Initializing Designer agent");
             
-            await Task.WhenAll(
+            return System.Threading.Tasks.Task.WhenAll(
                 _architectureAnalyzer.InitializeAsync(),
                 _scaffoldingGenerator.InitializeAsync(),
                 _designPlanner.InitializeAsync(),
                 _patternRecommender.InitializeAsync()
-            );
-            
-            Logger.LogInformation("Designer agent initialized successfully");
+            ).ContinueWith(_ => {
+                Logger.LogInformation("Designer agent initialized successfully");
+            });
         }
 
-        protected override async Task ShutdownAgentAsync()
+        protected override System.Threading.Tasks.Task ShutdownAgentAsync()
         {
             Logger.LogInformation("Shutting down Designer agent");
             
-            await Task.WhenAll(
+            return System.Threading.Tasks.Task.WhenAll(
                 _architectureAnalyzer.ShutdownAsync(),
                 _scaffoldingGenerator.ShutdownAsync(),
                 _designPlanner.ShutdownAsync(),
                 _patternRecommender.ShutdownAsync()
-            );
-            
-            _architectureAnalyzer?.Dispose();
-            
-            Logger.LogInformation("Designer agent shutdown completed");
+            ).ContinueWith(_ => {
+                _architectureAnalyzer?.Dispose();
+                Logger.LogInformation("Designer agent shutdown completed");
+            });
         }
 
         private async Task<AgentResult> AnalyzeArchitectureAsync(AgentRequest request, CancellationToken cancellationToken)

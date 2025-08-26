@@ -1,4 +1,8 @@
 using A3sist.Shared.Models;
+using A3sist.Shared.Enums;
+using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace A3sist.Shared.Interfaces
 {

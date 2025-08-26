@@ -14,6 +14,7 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using ErrorReport = A3sist.Shared.Models.ErrorReport;
 
 namespace A3sist.Core.Services
 {

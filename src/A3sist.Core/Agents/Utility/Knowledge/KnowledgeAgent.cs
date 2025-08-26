@@ -13,7 +13,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
-using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Utility.Knowledge
 {
@@ -225,7 +224,7 @@ namespace A3sist.Core.Agents.Utility.Knowledge
             return string.Join("\n\n", response);
         }
 
-        private async Task UpdateKnowledgeBaseAsync(
+        private async System.Threading.Tasks.Task UpdateKnowledgeBaseAsync(
             AgentRequest request, 
             string response, 
             CancellationToken cancellationToken)
@@ -298,7 +297,7 @@ namespace A3sist.Core.Agents.Utility.Knowledge
             return "Documentation";
         }
 
-        protected override async Task InitializeAgentAsync()
+        protected override async System.Threading.Tasks.Task InitializeAgentAsync()
         {
             Logger.LogInformation("KnowledgeAgent initialized");
             
@@ -306,7 +305,7 @@ namespace A3sist.Core.Agents.Utility.Knowledge
             await LoadInitialKnowledgeBaseAsync();
         }
 
-        private async Task LoadInitialKnowledgeBaseAsync()
+        private async System.Threading.Tasks.Task LoadInitialKnowledgeBaseAsync()
         {
             try
             {
@@ -319,7 +318,7 @@ namespace A3sist.Core.Agents.Utility.Knowledge
             }
         }
 
-        protected override async Task ShutdownAgentAsync()
+        protected override async System.Threading.Tasks.Task ShutdownAgentAsync()
         {
             Logger.LogInformation("KnowledgeAgent shutting down");
             

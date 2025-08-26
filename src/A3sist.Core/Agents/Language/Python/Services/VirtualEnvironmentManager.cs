@@ -5,7 +5,6 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Task = System.Threading.Tasks.Task;
-using Task = System.Threading.Tasks.Task;
 
 namespace A3sist.Core.Agents.Language.Python.Services
 {
@@ -25,7 +24,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Initializes the virtual environment manager asynchronously
         /// </summary>
-        public async Task InitializeAsync()
+        public async System.Threading.Tasks.Task InitializeAsync()
         {
             // Check if Python venv module is available
             try
@@ -48,7 +47,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <param name="command">The venv command to execute</param>
         /// <param name="envName">Optional environment name</param>
         /// <returns>The command execution result</returns>
-        public async Task<string> ExecuteCommandAsync(string command, string envName = null)
+        public async System.Threading.Tasks.Task<string> ExecuteCommandAsync(string command, string envName = null)
         {
             try
             {
@@ -524,7 +523,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <summary>
         /// Shuts down the virtual environment manager asynchronously
         /// </summary>
-        public async Task ShutdownAsync()
+        public async System.Threading.Tasks.Task ShutdownAsync()
         {
             // Clean up resources
             await Task.CompletedTask;
