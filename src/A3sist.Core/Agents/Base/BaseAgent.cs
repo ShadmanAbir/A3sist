@@ -19,6 +19,8 @@ namespace A3sist.Core.Agents.Base
     {
         protected readonly ILogger Logger;
         protected readonly IAgentConfiguration Configuration;
+        protected readonly IValidationService? ValidationService;
+        protected readonly IPerformanceMonitoringService? PerformanceMonitoringService;
         private readonly AgentMetrics _metrics;
         private readonly SemaphoreSlim _initializationSemaphore;
         private bool _isInitialized;
@@ -50,10 +52,16 @@ namespace A3sist.Core.Agents.Base
         /// </summary>
         public AgentMetrics Metrics => _metrics;
 
-        protected BaseAgent(ILogger logger, IAgentConfiguration configuration)
+        protected BaseAgent(
+            ILogger logger, 
+            IAgentConfiguration configuration,
+            IValidationService? validationService = null,
+            IPerformanceMonitoringService? performanceMonitoringService = null)
         {
             Logger = logger ?? throw new ArgumentNullException(nameof(logger));
             Configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
+            ValidationService = validationService;
+            PerformanceMonitoringService = performanceMonitoringService;
             _metrics = new AgentMetrics();
             _initializationSemaphore = new SemaphoreSlim(1, 1);
             _startTime = DateTime.UtcNow;
@@ -83,8 +91,33 @@ namespace A3sist.Core.Agents.Base
                 await InitializeAsync();
             }
 
+            // Validate request if validation service is available
+            if (ValidationService != null)
+            {
+                var validationResult = await ValidationService.ValidateRequestAsync(request);
+                if (!validationResult.IsValid)
+                {
+                    var validationErrorResult = AgentResult.CreateFailure(
+                        $"Request validation failed: {string.Join(", ", validationResult.Errors)}", 
+                        agentName: Name);
+                    Logger.LogWarning("Request {RequestId} validation failed in agent {AgentName}: {Errors}", 
+                        request.Id, Name, string.Join(", ", validationResult.Errors));
+                    return validationErrorResult;
+                }
+                
+                // Log warnings if any
+                if (validationResult.Warnings.Any())
+                {
+                    Logger.LogWarning("Request {RequestId} has validation warnings: {Warnings}", 
+                        request.Id, string.Join(", ", validationResult.Warnings));
+                }
+            }
+
             var stopwatch = Stopwatch.StartNew();
             Logger.LogInformation("Processing request {RequestId} in agent {AgentName}", request.Id, Name);
+
+            // Start performance monitoring if available
+            PerformanceMonitoringService?.StartOperation($"{Name}_HandleRequest_{request.Id}");
 
             try
             {
@@ -122,6 +155,10 @@ namespace A3sist.Core.Agents.Base
                 Status = WorkStatus.Completed;
                 Health = HealthStatus.Healthy;
 
+                // Record performance metrics
+                PerformanceMonitoringService?.RecordAgentExecution(Name, stopwatch.Elapsed, result.Success);
+                PerformanceMonitoringService?.EndOperation($"{Name}_HandleRequest_{request.Id}", result.Success);
+
                 return result;
             }
             catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
@@ -131,6 +168,9 @@ namespace A3sist.Core.Agents.Base
                 Status = WorkStatus.Cancelled;
                 Logger.LogWarning("Request {RequestId} was cancelled after {ElapsedMs}ms", 
                     request.Id, stopwatch.ElapsedMilliseconds);
+                
+                PerformanceMonitoringService?.RecordAgentExecution(Name, stopwatch.Elapsed, false);
+                PerformanceMonitoringService?.EndOperation($"{Name}_HandleRequest_{request.Id}", false);
                 
                 return AgentResult.CreateFailure("Operation was cancelled", agentName: Name);
             }
@@ -143,6 +183,9 @@ namespace A3sist.Core.Agents.Base
                 
                 Logger.LogError(ex, "Unhandled exception in agent {AgentName} processing request {RequestId}", 
                     Name, request.Id);
+                
+                PerformanceMonitoringService?.RecordAgentExecution(Name, stopwatch.Elapsed, false);
+                PerformanceMonitoringService?.EndOperation($"{Name}_HandleRequest_{request.Id}", false);
                 
                 return AgentResult.CreateFailure($"Unhandled exception: {ex.Message}", ex, Name);
             }

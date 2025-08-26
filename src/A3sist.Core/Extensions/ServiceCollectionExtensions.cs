@@ -28,6 +28,7 @@ public static class ServiceCollectionExtensions
         // Add configuration
         services.AddSingleton(configuration);
         services.Configure<A3sistConfiguration>(configuration.GetSection(A3sistConfiguration.SectionName));
+        services.Configure<A3sistOptions>(configuration.GetSection(A3sistOptions.SectionName));
 
         // Add logging
         services.AddA3sistLogging(configuration);
@@ -40,6 +41,9 @@ public static class ServiceCollectionExtensions
         
         // Add LLM services
         services.AddLLMServices(configuration);
+
+        // Add enhanced services
+        services.AddEnhancedServices(configuration);
 
         return services;
     }
@@ -113,6 +117,26 @@ public static class ServiceCollectionExtensions
         // Register intent classification services
         services.AddSingleton<IIntentClassifier, IntentClassifier>();
         services.AddSingleton<IRoutingRuleService, RoutingRuleService>();
+        
+        return services;
+    }
+
+    /// <summary>
+    /// Adds enhanced services to the dependency injection container
+    /// </summary>
+    /// <param name="services">The service collection</param>
+    /// <param name="configuration">The configuration instance</param>
+    /// <returns>The service collection for chaining</returns>
+    public static IServiceCollection AddEnhancedServices(this IServiceCollection services, IConfiguration configuration)
+    {
+        // Add memory cache for caching service
+        services.AddMemoryCache();
+        
+        // Register enhanced services
+        services.AddSingleton<ICacheService, CacheService>();
+        services.AddSingleton<IValidationService, ValidationService>();
+        services.AddSingleton<IPerformanceMonitoringService, EnhancedPerformanceMonitoringService>();
+        services.AddSingleton<IEnhancedErrorHandlingService, EnhancedErrorHandlingService>();
         
         return services;
     }
