@@ -1,0 +1,195 @@
+version: '3.8'
+
+services:
+  # Core Development MCP Server
+  core-development:
+    build:
+      context: ./core-development
+      dockerfile: Dockerfile
+    image: a3sist/core-development:latest
+    container_name: a3sist-core-dev
+    ports:
+      - "3001:3001"
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - PORT=3001
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - a3sist-mcp
+
+  # Visual Studio Integration MCP Server
+  vs-integration:
+    build:
+      context: ./vs-integration
+      dockerfile: Dockerfile
+    image: a3sist/vs-integration:latest
+    container_name: a3sist-vs-integration
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - PORT=3002
+    volumes:
+      - ./logs:/app/logs
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - a3sist-mcp
+
+  # Knowledge & Documentation MCP Server
+  knowledge:
+    build:
+      context: ./knowledge
+      dockerfile: Dockerfile
+    image: a3sist/knowledge:latest
+    container_name: a3sist-knowledge
+    ports:
+      - "3003:3003"
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - PORT=3003
+    volumes:
+      - ./logs:/app/logs
+      - ./knowledge/data:/app/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - a3sist-mcp
+
+  # Git & DevOps MCP Server
+  git-devops:
+    build:
+      context: ./git-devops
+      dockerfile: Dockerfile
+    image: a3sist/git-devops:latest
+    container_name: a3sist-git-devops
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - PORT=3004
+    volumes:
+      - ./logs:/app/logs
+      - ~/.gitconfig:/root/.gitconfig:ro
+      - ~/.ssh:/root/.ssh:ro
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - a3sist-mcp
+
+  # Testing & Quality Assurance MCP Server
+  testing-quality:
+    build:
+      context: ./testing-quality
+      dockerfile: Dockerfile
+    image: a3sist/testing-quality:latest
+    container_name: a3sist-testing-quality
+    ports:
+      - "3005:3005"
+    environment:
+      - NODE_ENV=production
+      - LOG_LEVEL=info
+      - PORT=3005
+    volumes:
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - a3sist-mcp
+
+  # Nginx reverse proxy (optional)
+  nginx:
+    image: nginx:alpine
+    container_name: a3sist-nginx
+    ports:
+      - "3000:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - core-development
+      - vs-integration
+      - knowledge
+      - git-devops
+      - testing-quality
+    restart: unless-stopped
+    networks:
+      - a3sist-mcp
+
+  # Monitoring with Prometheus (optional)
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: a3sist-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--web.enable-lifecycle'
+    restart: unless-stopped
+    networks:
+      - a3sist-mcp
+
+  # Grafana Dashboard (optional)
+  grafana:
+    image: grafana/grafana:latest
+    container_name: a3sist-grafana
+    ports:
+      - "3006:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./monitoring/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
+      - ./monitoring/grafana/datasources:/etc/grafana/provisioning/datasources:ro
+    depends_on:
+      - prometheus
+    restart: unless-stopped
+    networks:
+      - a3sist-mcp
+
+networks:
+  a3sist-mcp:
+    driver: bridge
+    name: a3sist-mcp-network
+
+volumes:
+  prometheus_data:
+  grafana_data:

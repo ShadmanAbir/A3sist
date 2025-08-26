@@ -182,6 +182,7 @@ public static class ServiceCollectionExtensions
     {
         // Register core agents
         services.AddTransient<A3sist.Core.Agents.Core.IntentRouterAgent>();
+        services.AddTransient<A3sist.Core.Agents.Core.MCPEnhancedAgent>();
         
         // Agent services will be registered here in subsequent tasks
         // This includes:
@@ -204,11 +205,18 @@ public static class ServiceCollectionExtensions
         // HTTP client for LLM services
         services.AddHttpClient();
         
-        // LLM services will be registered here in subsequent tasks
-        // This includes:
-        // - ILLMClient implementations
-        // - LLM cache service
-        // - LLM retry policies
+        // Register LLM client implementations
+        services.AddSingleton<ILLMClient, MCPLLMClient>();
+        services.AddSingleton<MCPLLMClient>();
+        
+        // Register MCP Orchestrator for coordinating multiple servers
+        services.AddSingleton<MCPOrchestrator>();
+        
+        // Traditional LLM clients for backward compatibility
+        services.AddSingleton<CodestralLLMClient>();
+        
+        // LLM cache service
+        services.AddSingleton<LLMCacheService>();
         
         return services;
     }
