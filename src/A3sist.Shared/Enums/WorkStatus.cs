@@ -7,6 +7,8 @@ namespace A3sist.Shared.Enums
         Completed,
         Failed,
         Cancelled,
-        Paused
+        Paused,
+        Unknown,
+        Active
     }
 }

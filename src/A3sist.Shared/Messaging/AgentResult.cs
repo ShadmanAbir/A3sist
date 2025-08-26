@@ -126,5 +126,13 @@ namespace A3sist.Shared.Messaging
                 RequiresReview = true
             };
         }
+
+        /// <summary>
+        /// Creates an error result (alias for CreateFailure)
+        /// </summary>
+        public static AgentResult Error(string message, string? agentName = null, Exception? exception = null)
+        {
+            return CreateFailure(message, exception, agentName);
+        }
     }
 }

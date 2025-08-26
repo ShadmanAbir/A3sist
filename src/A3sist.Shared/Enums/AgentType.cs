@@ -16,6 +16,8 @@ namespace A3sist.Shared.Enums
         CSharp,
         Validator,
         Knowledge,
-        TestGenerator
+        TestGenerator,
+        JavaScript,
+        Python
     }
 }

@@ -463,10 +463,10 @@ namespace A3sist.Core.Services
             return exception switch
             {
                 ArgumentException or ArgumentNullException or ArgumentOutOfRangeException => ErrorCategory.Validation,
-                UnauthorizedAccessException or SecurityException => ErrorCategory.Security,
+                UnauthorizedAccessException or System.Security.SecurityException => ErrorCategory.Security,
                 System.Net.NetworkInformation.NetworkInformationException or System.Net.WebException => ErrorCategory.Network,
                 System.Data.Common.DbException => ErrorCategory.Database,
-                ConfigurationException => ErrorCategory.Configuration,
+                System.Configuration.ConfigurationException => ErrorCategory.Configuration,
                 OutOfMemoryException or StackOverflowException => ErrorCategory.Performance,
                 _ => ErrorCategory.Application
             };

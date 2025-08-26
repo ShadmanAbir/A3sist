@@ -441,7 +441,7 @@ namespace A3sist.Core.Services
             return new SystemHealthMetrics
             {
                 Timestamp = DateTime.UtcNow,
-                CpuUsagePercent = (double)metrics.First().Value,
+                CpuUsagePercent = GetCpuUsage(),
                 MemoryUsageBytes = GC.GetTotalMemory(false)
             };
         }

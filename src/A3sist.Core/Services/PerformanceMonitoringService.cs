@@ -204,7 +204,7 @@ namespace A3sist.Core.Services
             var variance = values.Sum(v => Math.Pow(v - average, 2)) / count;
             var standardDeviation = Math.Sqrt(variance);
 
-            var timeRange = endTime ?? DateTime.UtcNow - (startTime ?? metrics.Min(m => m.Timestamp));
+            var timeRange = (endTime ?? DateTime.UtcNow) - (startTime ?? metrics.Min(m => m.Timestamp));
             var rate = timeRange.TotalSeconds > 0 ? sum / timeRange.TotalSeconds : 0;
 
             return new PerformanceStatistics

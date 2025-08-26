@@ -150,10 +150,7 @@ namespace A3sist.Core.Services
 
                 var loggerConfig = new LoggerConfiguration()
                     .MinimumLevel.Is(ConvertLogLevel(_configuration.MinimumLevel))
-                    .Enrich.FromLogContext()
-                    .Enrich.WithThreadId()
-                    .Enrich.WithProcessId()
-                    .Enrich.WithMachineName();
+                    .Enrich.FromLogContext();
 
                 // Add global properties
                 foreach (var property in _configuration.GlobalProperties)
