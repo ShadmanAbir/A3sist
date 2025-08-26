@@ -53,7 +53,8 @@ namespace A3sist.Core.Agents.Core.Dispatcher
             
             // Start load balancing timer (every 30 seconds)
             _loadBalancingTimer = new Timer(PerformLoadBalancing, null, 
-                TimeSpan.FromSeconds(30), TimeSpan.FromSeconds(30));
+    (int)TimeSpan.FromSeconds(30).TotalMilliseconds, 
+    (int)TimeSpan.FromSeconds(30).TotalMilliseconds);
         }
 
         protected override async Task<bool> CanHandleRequestAsync(AgentRequest request)
@@ -97,12 +98,12 @@ namespace A3sist.Core.Agents.Core.Dispatcher
             }
         }
 
-        protected override System.Threading.Tasks.Task InitializeAgentAsync()
+        protected override async Task InitializeAgentAsync()
         {
             Logger.LogInformation("Initializing Dispatcher agent");
             
             // Load configuration
-            var config = await Configuration.GetAgentConfigurationAsync(Name);
+            var config = await Configuration.GetAgentConfigurationAsync(Name).ConfigureAwait(true);
             if (config?.Settings?.ContainsKey("MaxConcurrentTasks") == true)
             {
                 if (int.TryParse(config.Settings["MaxConcurrentTasks"].ToString(), out var maxTasks))
@@ -115,10 +116,10 @@ namespace A3sist.Core.Agents.Core.Dispatcher
             Logger.LogInformation("Dispatcher agent initialized with max concurrent tasks: {MaxTasks}", _maxConcurrentTasks);
         }
 
-        protected override System.Threading.Tasks.Task ShutdownAgentAsync()
+        protected override async Task ShutdownAgentAsync()
         {
             Logger.LogInformation("Shutting down Dispatcher agent");
-            
+
             // Cancel all active executions
             var activeTasks = _activeExecutions.Values.ToList();
             foreach (var execution in activeTasks)
@@ -129,19 +130,18 @@ namespace A3sist.Core.Agents.Core.Dispatcher
             // Wait for active executions to complete (with timeout)
             var timeout = TimeSpan.FromSeconds(30);
             var completionTasks = activeTasks.Select(e => e.CompletionTask).ToArray();
-            
-            try
-            {
-                await Task.WhenAll(completionTasks).WaitAsync(timeout);
-            }
-            catch (TimeoutException)
+
+            var timeoutTask = Task.Delay(timeout);
+            var completedTask = await Task.WhenAny(Task.WhenAll(completionTasks), timeoutTask);
+
+            if (completedTask == timeoutTask)
             {
                 Logger.LogWarning("Some tasks did not complete within shutdown timeout");
             }
 
             _loadBalancingTimer?.Dispose();
             _executionSemaphore?.Dispose();
-            
+
             Logger.LogInformation("Dispatcher agent shutdown completed");
         }
 
@@ -206,7 +206,7 @@ namespace A3sist.Core.Agents.Core.Dispatcher
 
                 return workflowResult.Success
                     ? AgentResult.CreateSuccess("Workflow coordinated successfully", JsonSerializer.Serialize(result), Name)
-                    : AgentResult.CreateFailure($"Workflow coordination failed: {workflowResult.Result?.Message}", Name);
+                    : AgentResult.CreateFailure($"Workflow coordination failed: {workflowResult.Result?.Message}", workflowResult.Exception,Name);
             }
             catch (Exception ex)
             {
@@ -296,12 +296,12 @@ namespace A3sist.Core.Agents.Core.Dispatcher
                     }
                     else
                     {
-                        return AgentResult.CreateFailure($"Task {taskId} not found or already completed", Name);
+                        return AgentResult.CreateFailure($"Task {taskId} not found or already completed", null,Name);
                     }
                 }
                 else
                 {
-                    return AgentResult.CreateFailure("Invalid task ID provided", Name);
+                    return AgentResult.CreateFailure("Invalid task ID provided",null, Name);
                 }
             }
             catch (Exception ex)
@@ -390,7 +390,7 @@ namespace A3sist.Core.Agents.Core.Dispatcher
                 {
                     Logger.LogWarning("No suitable agent found for task {TaskId}", execution.Id);
                     execution.Status = TaskExecutionStatus.Failed;
-                    execution.Result = AgentResult.CreateFailure("No suitable agent found to handle the request", Name);
+                    execution.Result = AgentResult.CreateFailure("No suitable agent found to handle the request",null, Name);
                 }
             }
             catch (OperationCanceledException)
@@ -498,7 +498,9 @@ namespace A3sist.Core.Agents.Core.Dispatcher
             return "";
         }
 
-        private async void PerformLoadBalancing(object? state)
+        private async 
+        Task
+PerformLoadBalancing(object? state)
         {
             try
             {

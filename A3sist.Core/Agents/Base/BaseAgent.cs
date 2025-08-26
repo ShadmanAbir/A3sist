@@ -376,10 +376,10 @@ namespace A3sist.Core.Agents.Base
                     onRetry: (outcome, timespan, retryCount, context) =>
                     {
                         Logger.LogWarning("Retry attempt {RetryCount} for agent {AgentName} after {Delay}ms. Exception: {Exception}",
-                            retryCount, Name, timespan.TotalMilliseconds, outcome.Exception?.Message);
+                            retryCount, Name, timespan.TotalMilliseconds, outcome.InnerException?.Message);
                     });
 
-            return policyBuilder;
+            return (IAsyncPolicy<AgentResult>)policyBuilder;
         }
 
         /// <summary>

@@ -152,7 +152,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                 result.Add("");
             result.AddRange(otherLines);
 
-            return await Task.FromResult(string.Join('\n', result));
+            return await Task.FromResult(string.Join("\n", result));
         }
 
         /// <summary>

@@ -991,6 +991,7 @@ namespace A3sist.Core.Agents.TaskAgents.FailureTracker
         public string? StackTrace { get; set; }
         public Dictionary<string, object> Context { get; set; } = new();
         public string Component { get; set; } = "";
+        public object Category { get; internal set; }
     }
 
     public class PatternAnalysisResult

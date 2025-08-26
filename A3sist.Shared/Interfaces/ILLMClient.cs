@@ -1,3 +1,4 @@
+using A3sist.Shared.Models;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -61,5 +62,6 @@ namespace A3sist.Shared.Interfaces
         /// Disposes the LLM client resources
         /// </summary>
         Task DisposeAsync();
+        Task GetCompletionAsync(string ragPrompt,LLMOptions options);
     }
 }

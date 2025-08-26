@@ -7,6 +7,7 @@ using System.Threading.Channels;
 
 namespace A3sist.Orchastrator.Agents.Dispatcher
 {
+
     internal class TaskOrchestrator : IDisposable
     {
         private readonly ILogger<TaskOrchestrator> _logger;
@@ -77,25 +78,30 @@ namespace A3sist.Orchastrator.Agents.Dispatcher
 
         private async Task ProcessTasksAsync(CancellationToken cancellationToken)
         {
-            await foreach (var taskRequest in _taskReader.ReadAllAsync(cancellationToken))
+            while (!cancellationToken.IsCancellationRequested)
             {
                 try
                 {
+                    var taskRequest = await _taskReader.ReadAsync(cancellationToken);
+
                     var execution = new TaskExecution
                     {
                         Request = taskRequest,
                         StartTime = DateTime.UtcNow,
-                        CancellationTokenSource = new CancellationTokenSource()
+                        CancellationTokenSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken)
                     };
 
                     _activeTasks[taskRequest.Id] = execution;
-                    
-                    // Execute task in background
-                    _ = Task.Run(async () => await ExecuteTaskAsync(execution), cancellationToken);
+
+                    _ = Task.Run(() => ExecuteTaskAsync(execution), execution.CancellationTokenSource.Token);
+                }
+                catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
+                {
+                    break;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Error processing task {TaskId}", taskRequest.Id);
+                    _logger.LogError(ex, "Error processing task");
                 }
             }
         }

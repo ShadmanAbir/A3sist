@@ -374,8 +374,8 @@ namespace A3sist.Core.Services
 
             var analysis = new ErrorAnalysis
             {
-                StartTime = startTime ?? errorList.MinBy(e => e.Timestamp)?.Timestamp ?? DateTime.UtcNow,
-                EndTime = endTime ?? errorList.MaxBy(e => e.Timestamp)?.Timestamp ?? DateTime.UtcNow
+                StartTime = startTime ?? errorList.OrderBy(e => e.Timestamp).FirstOrDefault()?.Timestamp ?? DateTime.UtcNow,
+                EndTime = endTime ?? errorList.OrderByDescending(e => e.Timestamp).FirstOrDefault()?.Timestamp ?? DateTime.UtcNow
             };
 
             // Analyze patterns
@@ -407,7 +407,7 @@ namespace A3sist.Core.Services
                 RuntimeVersion = Environment.Version.ToString(),
                 WorkingDirectory = Environment.CurrentDirectory,
                 UserName = Environment.UserName,
-                ProcessId = Environment.ProcessId,
+                ProcessId = Process.GetCurrentProcess().Id,
                 ThreadId = Environment.CurrentManagedThreadId
             };
 
@@ -478,7 +478,8 @@ namespace A3sist.Core.Services
             
             using var sha256 = SHA256.Create();
             var hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(hashInput));
-            return Convert.ToHexString(hashBytes)[..16]; // Use first 16 characters
+            var hexString = BitConverter.ToString(hashBytes).Replace("-", "");
+            return hexString.Substring(0, Math.Min(16, hexString.Length)); // Use first 16 characters
         }
 
         private async Task ProcessQueuedErrorsAsync()
@@ -536,7 +537,7 @@ namespace A3sist.Core.Services
         {
             return new SystemDiagnostics
             {
-                SystemBootTime = DateTime.UtcNow - TimeSpan.FromMilliseconds(Environment.TickCount64)
+                SystemBootTime = DateTime.UtcNow - TimeSpan.FromMilliseconds(Environment.TickCount)
             };
         }
 

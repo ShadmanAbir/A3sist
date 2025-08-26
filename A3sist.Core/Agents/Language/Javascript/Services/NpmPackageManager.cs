@@ -125,7 +125,7 @@ namespace A3sist.Orchastrator.Agents.JavaScript.Services
                     return "No package.json found in the current directory";
                 }
 
-                var packageJsonContent = await File.ReadAllTextAsync(packageJsonPath);
+                var packageJsonContent = File.ReadAllText(packageJsonPath);
                 var packageInfo = JsonSerializer.Deserialize<JsonElement>(packageJsonContent);
 
                 var info = new List<string>

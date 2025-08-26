@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <AssemblyTitle>A3sist Chat Desktop</AssemblyTitle>
+    <AssemblyDescription>A3sist AI-Powered Coding Assistant - Desktop Chat Application</AssemblyDescription>
+    <AssemblyCompany>A3sist</AssemblyCompany>
+    <AssemblyProduct>A3sist Chat Desktop</AssemblyProduct>
+    <Copyright>Copyright © 2024 A3sist</Copyright>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DefineConstants>TRACE</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="9.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="9.0.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+  </ItemGroup>
+
+</Project>

@@ -135,7 +135,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                 var requirementsPath = Path.Combine(_workingDirectory, "requirements.txt");
                 if (File.Exists(requirementsPath))
                 {
-                    var requirements = await File.ReadAllLinesAsync(requirementsPath);
+                    var requirements =  File.ReadAllLines(requirementsPath);
                     info.Add($"Requirements.txt found with {requirements.Length} packages:");
                     foreach (var req in requirements.Take(10)) // Show first 10
                     {

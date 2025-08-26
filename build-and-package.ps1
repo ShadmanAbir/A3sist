@@ -19,7 +19,7 @@ param(
 $ErrorActionPreference = "Stop"
 $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 $SolutionPath = Join-Path $ScriptDir "A3sist.sln"
-$ProjectPath = Join-Path $ScriptDir "src\A3sist.UI.VSIX\A3sist.UI.VSIX.csproj"
+$ProjectPath = Join-Path $ScriptDir "A3sist.UI.VSIX\A3sist.UI.VSIX.csproj"
 
 Write-Host "🚀 A3sist Extension Build and Package Script" -ForegroundColor Cyan
 Write-Host "=============================================" -ForegroundColor Cyan

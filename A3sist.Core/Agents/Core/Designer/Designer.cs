@@ -578,7 +578,7 @@ namespace A3sist.Core.Agents.Core.Designer
             
             try
             {
-                var content = await File.ReadAllTextAsync(filePath);
+                var content = File.ReadAllText(filePath);
                 
                 // Simple code analysis
                 if (content.Length > 10000)

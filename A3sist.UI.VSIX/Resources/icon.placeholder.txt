@@ -1,0 +1,3 @@
+<!-- This is a placeholder for icon.png -->
+<!-- A proper 128x128 PNG icon should be placed here for the final VSIX package -->
+<!-- For now, this file prevents build errors related to missing resources -->

@@ -7,8 +7,6 @@
     <MoreInfo>https://github.com/A3sist/A3sist</MoreInfo>
     <License>LICENSE.txt</License>
     <ReleaseNotes>CHANGELOG.md</ReleaseNotes>
-    <Icon>Resources\icon.png</Icon>
-    <PreviewImage>Resources\preview.png</PreviewImage>
     <Tags>AI, Assistant, Code Analysis, Refactoring, Productivity, IntelliCode, Machine Learning</Tags>
     <Preview>false</Preview>
   </Metadata>

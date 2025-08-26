@@ -48,7 +48,11 @@ namespace A3sist.Orchastrator.Agents.AutoCompleter
             {
                 Status = WorkStatus.InProgress;
 
-                var completionContext = JsonSerializer.Deserialize<CompletionContext>(request.Context?.GetValueOrDefault("context")?.ToString() ?? "{}");
+                // Use TryGetValue instead of GetValueOrDefault
+                object contextValue = null;
+                request.Context?.TryGetValue("context", out contextValue);
+
+                var completionContext = JsonSerializer.Deserialize<CompletionContext>(contextValue?.ToString() ?? "{}");
 
                 switch (request.Prompt?.ToLower())
                 {

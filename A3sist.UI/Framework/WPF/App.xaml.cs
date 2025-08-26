@@ -3,6 +3,7 @@
 using System;
 using System.Threading.Tasks;
 using System.Windows;
+using Microsoft.Extensions.DependencyInjection;
 using A3sist.UI.Shared;
 
 namespace A3sist.UI.Framework.WPF
@@ -88,20 +89,25 @@ namespace A3sist.UI.Framework.WPF
         public MainWindow()
         {
             InitializeComponent();
-            Title = "A3sist - AI-Powered Coding Assistant";
-            Width = 1200;
-            Height = 800;
-            WindowStartupLocation = WindowStartupLocation.CenterScreen;
-
-            // Set up the main content
+            
+            // Set up the main content in the content border
+            var contentBorder = (Border)((Grid)Content).Children[1]; // Get the main content border
             var chatView = new Views.ChatView();
-            Content = chatView;
+            contentBorder.Child = chatView;
         }
 
         public void UpdateKnowledgeStatus(string status)
         {
             // Update UI with knowledge status
             Title = $"A3sist - {status}";
+            
+            // Update status in the title bar if needed
+            var grid = (Grid)Content;
+            var titleBar = (Border)grid.Children[0];
+            var titleGrid = (Grid)titleBar.Child;
+            var statusPanel = (StackPanel)titleGrid.Children[2];
+            var statusText = (TextBlock)statusPanel.Children[0];
+            statusText.Text = status;
         }
     }
 }

@@ -258,7 +258,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                     var pipResult = await ExecuteCommandAsync("pip", "list");
                     if (pipResult.Contains("pip list"))
                     {
-                        var lines = pipResult.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                        var lines = pipResult.Split('\n', (char)StringSplitOptions.RemoveEmptyEntries);
                         var packageCount = Math.Max(0, lines.Length - 3); // Subtract header and command lines
                         info.Add($"Installed packages: {packageCount}");
                     }

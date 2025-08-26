@@ -302,7 +302,7 @@ Respond with a JSON array of tool names that would be most useful.
         private string ExtractKeywords(string prompt)
         {
             // Simple keyword extraction - could be enhanced with NLP
-            var keywords = prompt.Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            var keywords = prompt.Split(' ', (char)StringSplitOptions.RemoveEmptyEntries)
                 .Where(word => word.Length > 3)
                 .Take(5);
             

@@ -1,4 +1,8 @@
-# Visual Studio
+# Visual Studio and IDE files
+.vs/
+.idea/
+.kiro/
+.qoder/
 *.user
 *.suo
 *.sln.docstates
@@ -48,10 +52,12 @@ obj/
 [Bb]in/
 [Oo]bj/
 
-# NuGet Packages
+# NuGet Packages and legacy directories
 packages/
 *.nupkg
 *.snupkg
+backup/
+*_backup/
 
 # Test results
 TestResults/

@@ -53,11 +53,11 @@ namespace A3sist.UI.VSIX
 
             try
             {
-                // Initialize core services with .NET 4.7.2 compatible dependencies
-                _serviceProvider = CreateServiceProvider();
+                // Initialize minimal services for .NET 4.7.2 compatibility
+                _serviceProvider = CreateMinimalServiceProvider();
                 _logger = _serviceProvider.GetService<ILogger<A3sistVSIXPackage>>();
                 
-                _logger?.LogInformation("Initializing A3sist VSIX Package");
+                _logger?.LogInformation("Initializing A3sist VSIX Package (Minimal Version)");
 
                 // Initialize commands
                 await InitializeCommandsAsync(cancellationToken);
@@ -65,7 +65,7 @@ namespace A3sist.UI.VSIX
                 // Initialize tool windows
                 await InitializeToolWindowsAsync(cancellationToken);
 
-                _logger?.LogInformation("A3sist VSIX Package initialized successfully");
+                _logger?.LogInformation("A3sist VSIX Package initialized successfully (Minimal Version)");
             }
             catch (Exception ex)
             {
@@ -111,9 +111,9 @@ namespace A3sist.UI.VSIX
         }
 
         /// <summary>
-        /// Creates a service provider compatible with .NET 4.7.2
+        /// Creates a minimal service provider compatible with .NET 4.7.2
         /// </summary>
-        private IServiceProvider CreateServiceProvider()
+        private IServiceProvider CreateMinimalServiceProvider()
         {
             var services = new ServiceCollection();
             
@@ -123,7 +123,7 @@ namespace A3sist.UI.VSIX
                 builder.SetMinimumLevel(LogLevel.Information);
             });
 
-            // Add VSIX-specific services
+            // Add minimal VSIX services
             services.AddSingleton<IVSIXHostService, VSIXHostService>();
             services.AddSingleton<IWebViewService, WebViewService>();
 

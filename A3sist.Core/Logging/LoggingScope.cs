@@ -16,7 +16,7 @@ namespace A3sist.Core.Logging
             {
                 ["AgentName"] = agentName,
                 ["RequestId"] = requestId,
-                ["OperationId"] = Guid.NewGuid().ToString("N")[..8]
+                ["OperationId"] = Guid.NewGuid().ToString("N").Substring(0, 8)
             });
         }
 
@@ -30,7 +30,7 @@ namespace A3sist.Core.Logging
                 ["Component"] = "Orchestrator",
                 ["RequestId"] = requestId,
                 ["Operation"] = operation,
-                ["OperationId"] = Guid.NewGuid().ToString("N")[..8]
+                ["OperationId"] = Guid.NewGuid().ToString("N").Substring(0, 8)
             });
         }
 
@@ -43,7 +43,7 @@ namespace A3sist.Core.Logging
             {
                 ["UserId"] = userId ?? "Anonymous",
                 ["SessionId"] = sessionId ?? "Unknown",
-                ["OperationId"] = Guid.NewGuid().ToString("N")[..8]
+                ["OperationId"] = Guid.NewGuid().ToString("N").Substring(0, 8)
             });
         }
 
@@ -56,7 +56,7 @@ namespace A3sist.Core.Logging
             {
                 ["PerformanceOperation"] = operationName,
                 ["StartTime"] = DateTimeOffset.UtcNow,
-                ["OperationId"] = Guid.NewGuid().ToString("N")[..8]
+                ["OperationId"] = Guid.NewGuid().ToString("N").Substring(0, 8)
             });
         }
 
@@ -69,7 +69,7 @@ namespace A3sist.Core.Logging
             {
                 ["ExternalService"] = serviceName,
                 ["ServiceOperation"] = operation,
-                ["CallId"] = Guid.NewGuid().ToString("N")[..8]
+                ["CallId"] = Guid.NewGuid().ToString("N").Substring(0, 8)
             });
         }
 
