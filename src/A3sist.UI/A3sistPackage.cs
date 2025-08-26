@@ -37,9 +37,11 @@ namespace A3sist.UI
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(A3ToolWindow))]
     [ProvideToolWindow(typeof(AgentStatusWindow))]
+    [ProvideToolWindow(typeof(ChatToolWindow))]
     [ProvideOptionPage(typeof(Options.GeneralOptionsPage), "A3sist", "General", 0, 0, true)]
     [ProvideOptionPage(typeof(Options.AgentOptionsPage), "A3sist", "Agents", 0, 0, true)]
     [ProvideOptionPage(typeof(Options.LLMOptionsPage), "A3sist", "LLM Settings", 0, 0, true)]
+    [ProvideOptionPage(typeof(Options.ChatOptionsPage), "A3sist", "Chat Settings", 0, 0, true)]
     public sealed class A3sistPackage : AsyncPackage
     {
         /// <summary>
@@ -122,6 +124,7 @@ namespace A3sist.UI
             await A3sistMainCommand.InitializeAsync(this);
             await ShowA3ToolWindowCommand.InitializeAsync(this);
             await ShowAgentStatusCommand.InitializeAsync(this);
+            await ShowChatWindowCommand.InitializeAsync(this);
             await AnalyzeCodeCommand.InitializeAsync(this);
             await RefactorCodeCommand.InitializeAsync(this);
             await FixCodeCommand.InitializeAsync(this);

@@ -1,0 +1,159 @@
+name: Build and Test A3sist Extension
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  release:
+    types: [ published ]
+
+env:
+  DOTNET_VERSION: '6.0.x'
+  VS_VERSION: '17.9'
+  BUILD_CONFIGURATION: 'Release'
+
+jobs:
+  build-and-test:
+    name: Build and Test
+    runs-on: windows-2022
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.3
+      with:
+        vs-version: ${{ env.VS_VERSION }}
+    
+    - name: Setup Node.js (for MCP servers)
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: 'mcp-servers/*/package-lock.json'
+    
+    - name: Install MCP server dependencies
+      run: |
+        Get-ChildItem -Path "mcp-servers" -Directory | ForEach-Object {
+          if (Test-Path "$($_.FullName)\package.json") {
+            Write-Host "Installing dependencies for $($_.Name)..."
+            Push-Location $_.FullName
+            npm ci
+            Pop-Location
+          }
+        }
+      shell: pwsh
+    
+    - name: Restore NuGet packages
+      run: dotnet restore A3sist.sln
+    
+    - name: Build solution
+      run: dotnet build A3sist.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-restore
+    
+    - name: Run unit tests
+      run: dotnet test A3sist.sln --configuration ${{ env.BUILD_CONFIGURATION }} --no-build --verbosity normal --logger trx --collect:"XPlat Code Coverage"
+    
+    - name: Test MCP servers
+      run: |
+        Get-ChildItem -Path "mcp-servers" -Directory | ForEach-Object {
+          if (Test-Path "$($_.FullName)\package.json") {
+            Write-Host "Testing MCP server: $($_.Name)..."
+            Push-Location $_.FullName
+            if (Get-Content package.json | ConvertFrom-Json | Select-Object -ExpandProperty scripts -ErrorAction SilentlyContinue | Select-Object -ExpandProperty test -ErrorAction SilentlyContinue) {
+              npm test
+            } else {
+              Write-Host "No tests found for $($_.Name)"
+            }
+            Pop-Location
+          }
+        }
+      shell: pwsh
+      continue-on-error: true
+    
+    - name: Upload test results
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: test-results
+        path: '**/TestResults/**/*.trx'
+        retention-days: 30
+    
+    - name: Upload code coverage
+      uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: code-coverage
+        path: '**/TestResults/**/coverage.cobertura.xml'
+        retention-days: 30
+  
+  build-vsix:
+    name: Build VSIX Package
+    runs-on: windows-2022
+    needs: build-and-test
+    if: github.event_name == 'push' || github.event_name == 'release'
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ env.DOTNET_VERSION }}
+    
+    - name: Setup MSBuild
+      uses: microsoft/setup-msbuild@v1.3
+      with:
+        vs-version: ${{ env.VS_VERSION }}
+    
+    - name: Build VSIX package
+      run: .\build-and-package.ps1 -Configuration ${{ env.BUILD_CONFIGURATION }} -SkipTests
+      shell: pwsh
+    
+    - name: Upload VSIX artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: a3sist-vsix
+        path: 'artifacts/*.vsix'
+        retention-days: 90
+    
+    - name: Create GitHub release asset
+      if: github.event_name == 'release'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ github.event.release.upload_url }}
+        asset_path: artifacts/A3sist-v*.vsix
+        asset_name: A3sist-${{ github.event.release.tag_name }}.vsix
+        asset_content_type: application/zip
+  
+  marketplace-deploy:
+    name: Deploy to VS Marketplace
+    runs-on: windows-2022
+    needs: build-vsix
+    if: github.event_name == 'release' && github.event.release.prerelease == false
+    environment: production
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Download VSIX artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: a3sist-vsix
+        path: artifacts/
+    
+    - name: Deploy to marketplace
+      run: .\scripts\deploy-to-marketplace.ps1 -AccessToken "${{ secrets.VS_MARKETPLACE_TOKEN }}" -Environment "prod" -SkipValidation
+      shell: pwsh

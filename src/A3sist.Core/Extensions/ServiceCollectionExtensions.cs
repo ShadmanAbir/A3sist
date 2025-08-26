@@ -45,6 +45,9 @@ public static class ServiceCollectionExtensions
         // Add enhanced services
         services.AddEnhancedServices(configuration);
 
+        // Add UI services
+        services.AddUIServices(configuration);
+
         return services;
     }
 
@@ -229,11 +232,21 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining</returns>
     public static IServiceCollection AddUIServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // UI services will be registered here in subsequent tasks
-        // This includes:
-        // - INotificationService
-        // - ISuggestionService
-        // - IEditorIntegrationService
+        // Chat services
+        services.AddSingleton<A3sist.UI.Services.Chat.IChatService, A3sist.UI.Services.Chat.ChatService>();
+        services.AddSingleton<A3sist.UI.Services.Chat.IChatHistoryService, A3sist.UI.Services.Chat.ChatHistoryService>();
+        services.AddSingleton<A3sist.UI.Services.Chat.IContextService, A3sist.UI.Services.Chat.ContextService>();
+        services.AddSingleton<A3sist.UI.Services.Chat.IContextAnalyzerService, A3sist.UI.Services.Chat.ContextAnalyzerService>();
+        services.AddSingleton<A3sist.UI.Services.Chat.IChatSettingsService, A3sist.UI.Services.Chat.ChatSettingsService>();
+        
+        // Chat ViewModels
+        services.AddTransient<A3sist.UI.ViewModels.Chat.ChatInterfaceViewModel>();
+        
+        // Progress notification service
+        services.AddSingleton<A3sist.UI.Services.ProgressNotificationService>();
+        
+        // Editor service registration
+        services.AddSingleton<A3sist.UI.Services.EditorServiceRegistration>();
         
         return services;
     }
