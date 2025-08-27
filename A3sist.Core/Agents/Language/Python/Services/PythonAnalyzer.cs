@@ -440,7 +440,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
-                await process.WaitForExitAsync();
+                await Task.Run(() => process.WaitForExit());
 
                 var output = await outputTask;
                 var error = await errorTask;

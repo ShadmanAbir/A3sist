@@ -350,7 +350,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                     var pipResult = await ExecuteCommandInEnvironmentAsync(envName, "-m pip list");
                     if (pipResult.Success)
                     {
-                        var lines = pipResult.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                        var lines = pipResult.Output.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                         var packageCount = Math.Max(0, lines.Length - 2); // Subtract header lines
                         info.Add($"Installed packages: {packageCount}");
                         
@@ -470,7 +470,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
-                await process.WaitForExitAsync();
+                await Task.Run(() => process.WaitForExit());
 
                 var output = await outputTask;
                 var error = await errorTask;
@@ -507,7 +507,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
-                await process.WaitForExitAsync();
+                await Task.Run(() => process.WaitForExit());
 
                 var output = await outputTask;
                 var error = await errorTask;

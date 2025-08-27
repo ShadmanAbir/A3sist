@@ -132,7 +132,7 @@ public class FileConfigurationProvider : IConfigurationProvider, IDisposable
                 return new Dictionary<string, object>();
             }
 
-            var json = await File.ReadAllTextAsync(_filePath);
+            var json = File.ReadAllText(_filePath);
             if (string.IsNullOrWhiteSpace(json))
             {
                 return new Dictionary<string, object>();
@@ -182,7 +182,7 @@ public class FileConfigurationProvider : IConfigurationProvider, IDisposable
             };
 
             var json = JsonSerializer.Serialize(data, options);
-            await File.WriteAllTextAsync(_filePath, json);
+            File.WriteAllText(_filePath, json);
 
             _logger.LogInformation("Saved {Count} configuration values to {FilePath}", data.Count, _filePath);
         }
@@ -207,7 +207,7 @@ public class FileConfigurationProvider : IConfigurationProvider, IDisposable
             }
 
             // Try to parse the JSON
-            var json = await File.ReadAllTextAsync(_filePath);
+            var json = File.ReadAllText(_filePath);
             if (string.IsNullOrWhiteSpace(json))
             {
                 result.AddWarning("Content", "Configuration file is empty");

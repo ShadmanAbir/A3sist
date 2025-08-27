@@ -166,7 +166,9 @@ namespace A3sist.Core.Services
                     }
                 };
 
-                var response = await _httpClient.PostAsJsonAsync("http://localhost:3003/mcp", mcpRequest);
+                var json = JsonSerializer.Serialize(mcpRequest);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("http://localhost:3003/mcp", content);
                 var content = await response.Content.ReadAsStringAsync();
                 var mcpResult = JsonSerializer.Deserialize<MCPResponse>(content);
 
@@ -205,7 +207,9 @@ namespace A3sist.Core.Services
                     }
                 };
 
-                var response = await _httpClient.PostAsJsonAsync("http://localhost:3003/mcp", examplesRequest);
+                var json = JsonSerializer.Serialize(examplesRequest);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("http://localhost:3003/mcp", content);
                 var content = await response.Content.ReadAsStringAsync();
                 var mcpResult = JsonSerializer.Deserialize<MCPResponse>(content);
 
@@ -284,7 +288,7 @@ namespace A3sist.Core.Services
         {
             // Simple pattern extraction - could be enhanced with NLP
             var patterns = new[] { "async", "await", "interface", "class", "method", "property", "enum" };
-            return patterns.FirstOrDefault(p => prompt.Contains(p, StringComparison.OrdinalIgnoreCase)) ?? "general";
+            return patterns.FirstOrDefault(p => prompt.ToLowerInvariant().Contains(p.ToLowerInvariant())) ?? "general";
         }
 
         private string GenerateCacheKey(AgentRequest request)

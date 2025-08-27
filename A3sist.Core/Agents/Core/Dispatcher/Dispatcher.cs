@@ -445,7 +445,7 @@ namespace A3sist.Core.Agents.Core.Dispatcher
         private double GetEstimatedWaitTime(TaskPriority priority)
         {
             // Simple estimation based on priority and current queue size
-            var weight = _priorityWeights.GetValueOrDefault(priority, 50);
+            var weight = _priorityWeights.TryGetValue(priority, out var priorityWeight) ? priorityWeight : 50;
             var queueSize = _activeExecutions.Count;
             
             return Math.Max(1, queueSize * (100.0 / weight));

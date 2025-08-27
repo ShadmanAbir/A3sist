@@ -82,7 +82,7 @@ namespace A3sist.Core.Services
 
             try
             {
-                var language = DetermineLanguage(parameters?.GetValueOrDefault("filePath")?.ToString() ?? "");
+                var language = DetermineLanguage(parameters?.TryGetValue("filePath", out var filePathObj) ? filePathObj?.ToString() ?? "" : "");
                 
                 // Try language-specific provider first
                 if (_languageProviders.TryGetValue(language, out var provider) && provider.CanHandleRefactoring(refactoringType))

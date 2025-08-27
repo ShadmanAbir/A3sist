@@ -268,7 +268,7 @@ namespace A3sist.Core.Agents.TaskAgents.Refactor
             try
             {
                 var originalCode = request.Content;
-                var refactoredCode = request.Context?.GetValueOrDefault("refactoredCode")?.ToString();
+                var refactoredCode = request.Context?.TryGetValue("refactoredCode", out var refactoredCodeObj) ? refactoredCodeObj?.ToString() : null;
 
                 if (string.IsNullOrEmpty(originalCode) || string.IsNullOrEmpty(refactoredCode))
                 {
@@ -454,9 +454,9 @@ namespace A3sist.Core.Agents.TaskAgents.Refactor
                 var parameters = new Dictionary<string, object>
                 {
                     ["extractionType"] = extractionType,
-                    ["startLine"] = request.Context?.GetValueOrDefault("startLine"),
-                    ["endLine"] = request.Context?.GetValueOrDefault("endLine"),
-                    ["newName"] = request.Context?.GetValueOrDefault("newName") ?? "ExtractedElement"
+                    ["startLine"] = request.Context?.TryGetValue("startLine", out var startLineObj) ? startLineObj : null,
+                    ["endLine"] = request.Context?.TryGetValue("endLine", out var endLineObj) ? endLineObj : null,
+                    ["newName"] = request.Context?.TryGetValue("newName", out var newNameObj) ? newNameObj : "ExtractedElement"
                 };
 
                 var refactoringType = extractionType switch
@@ -518,9 +518,9 @@ namespace A3sist.Core.Agents.TaskAgents.Refactor
                 var parameters = new Dictionary<string, object>
                 {
                     ["inlineType"] = inlineType,
-                    ["targetName"] = request.Context?.GetValueOrDefault("targetName"),
-                    ["startLine"] = request.Context?.GetValueOrDefault("startLine"),
-                    ["endLine"] = request.Context?.GetValueOrDefault("endLine")
+                    ["targetName"] = request.Context?.TryGetValue("targetName", out var targetNameObj) ? targetNameObj : null,
+                    ["startLine"] = request.Context?.TryGetValue("startLine", out var startLineObj2) ? startLineObj2 : null,
+                    ["endLine"] = request.Context?.TryGetValue("endLine", out var endLineObj2) ? endLineObj2 : null
                 };
 
                 var refactoringType = inlineType switch
@@ -575,8 +575,8 @@ namespace A3sist.Core.Agents.TaskAgents.Refactor
             try
             {
                 var codeInfo = ExtractCodeInfoFromRequest(request);
-                var oldName = request.Context?.GetValueOrDefault("oldName")?.ToString();
-                var newName = request.Context?.GetValueOrDefault("newName")?.ToString();
+                var oldName = request.Context?.TryGetValue("oldName", out var oldNameObj) ? oldNameObj?.ToString() : null;
+                var newName = request.Context?.TryGetValue("newName", out var newNameObj2) ? newNameObj2?.ToString() : null;
 
                 if (string.IsNullOrEmpty(oldName) || string.IsNullOrEmpty(newName))
                 {
@@ -639,7 +639,7 @@ namespace A3sist.Core.Agents.TaskAgents.Refactor
             {
                 var codeInfo = ExtractCodeInfoFromRequest(request);
                 var moveType = DetermineMoveType(request);
-                var targetLocation = request.Context?.GetValueOrDefault("targetLocation")?.ToString();
+                var targetLocation = request.Context?.TryGetValue("targetLocation", out var targetLocationObj) ? targetLocationObj?.ToString() : null;
 
                 if (string.IsNullOrEmpty(targetLocation))
                 {
@@ -652,7 +652,7 @@ namespace A3sist.Core.Agents.TaskAgents.Refactor
                 {
                     ["moveType"] = moveType,
                     ["targetLocation"] = targetLocation,
-                    ["elementName"] = request.Context?.GetValueOrDefault("elementName")
+                    ["elementName"] = request.Context?.TryGetValue("elementName", out var elementNameObj) ? elementNameObj : null
                 };
 
                 var refactoringType = moveType switch

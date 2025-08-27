@@ -198,8 +198,8 @@ namespace A3sist.Orchastrator.Agents.JavaScript
         {
             try
             {
-                var command = request.Context?.GetValueOrDefault("npmCommand")?.ToString() ?? "list";
-                var packageName = request.Context?.GetValueOrDefault("packageName")?.ToString();
+                var command = request.Context?.TryGetValue("npmCommand", out var npmCommandObj) == true ? npmCommandObj?.ToString() : null ?? "list";
+                var packageName = request.Context?.TryGetValue("packageName", out var packageNameObj) == true ? packageNameObj?.ToString() : null;
                 
                 var result = await _packageManager.ExecuteCommandAsync(command, packageName);
                 
@@ -276,7 +276,7 @@ namespace A3sist.Orchastrator.Agents.JavaScript
         {
             try
             {
-                var testPattern = request.Context?.GetValueOrDefault("testPattern")?.ToString() ?? "**/*.test.js";
+                var testPattern = request.Context?.TryGetValue("testPattern", out var testPatternObj) == true ? testPatternObj?.ToString() : null ?? "**/*.test.js";
                 var testResult = await _packageManager.RunTestsAsync(testPattern);
                 
                 var metadata = new Dictionary<string, object>

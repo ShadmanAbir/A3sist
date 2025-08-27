@@ -198,8 +198,8 @@ namespace A3sist.Core.Agents.Language.Python
         {
             try
             {
-                var command = request.Context?.GetValueOrDefault("pipCommand")?.ToString() ?? "list";
-                var packageName = request.Context?.GetValueOrDefault("packageName")?.ToString();
+                var command = request.Context?.TryGetValue("pipCommand", out var pipCommandObj) == true ? pipCommandObj?.ToString() : null ?? "list";
+                var packageName = request.Context?.TryGetValue("packageName", out var packageNameObj) == true ? packageNameObj?.ToString() : null;
                 
                 var result = await _packageManager.ExecuteCommandAsync(command, packageName);
                 
@@ -223,8 +223,8 @@ namespace A3sist.Core.Agents.Language.Python
         {
             try
             {
-                var command = request.Context?.GetValueOrDefault("venvCommand")?.ToString() ?? "status";
-                var envName = request.Context?.GetValueOrDefault("envName")?.ToString();
+                var command = request.Context?.TryGetValue("venvCommand", out var venvCommandObj) == true ? venvCommandObj?.ToString() : null ?? "status";
+                var envName = request.Context?.TryGetValue("envName", out var envNameObj) == true ? envNameObj?.ToString() : null;
                 
                 var result = await _venvManager.ExecuteCommandAsync(command, envName);
                 
@@ -301,7 +301,7 @@ namespace A3sist.Core.Agents.Language.Python
         {
             try
             {
-                var testPattern = request.Context?.GetValueOrDefault("testPattern")?.ToString() ?? "test_*.py";
+                var testPattern = request.Context?.TryGetValue("testPattern", out var testPatternObj) == true ? testPatternObj?.ToString() : null ?? "test_*.py";
                 var testResult = await _packageManager.RunTestsAsync(testPattern);
                 
                 var metadata = new Dictionary<string, object>

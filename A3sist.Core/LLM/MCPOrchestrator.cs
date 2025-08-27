@@ -422,7 +422,7 @@ namespace A3sist.Core.LLM
             if (string.IsNullOrEmpty(prompt)) return "";
             
             // Simple extraction - could be enhanced with NLP
-            var words = prompt.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            var words = prompt.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             return string.Join(" ", words.Take(5));
         }
 

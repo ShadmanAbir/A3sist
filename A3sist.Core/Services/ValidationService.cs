@@ -285,7 +285,7 @@ namespace A3sist.Core.Services
 
             foreach (var pattern in harmfulPatterns)
             {
-                if (prompt.Contains(pattern, StringComparison.OrdinalIgnoreCase))
+                if (prompt.ToLowerInvariant().Contains(pattern.ToLowerInvariant()))
                 {
                     result.Errors.Add($"Potentially harmful instruction detected: {pattern}");
                 }
@@ -298,7 +298,7 @@ namespace A3sist.Core.Services
             }
 
             result.Metadata["PromptLength"] = prompt.Length;
-            result.Metadata["WordCount"] = prompt.Split(' ', StringSplitOptions.RemoveEmptyEntries).Length;
+            result.Metadata["WordCount"] = prompt.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries).Length;
 
             result.IsValid = !result.Errors.Any();
             return result;
@@ -310,7 +310,7 @@ namespace A3sist.Core.Services
         private bool ContainsDangerousPatterns(string text)
         {
             return DangerousPatterns.Any(pattern => 
-                text.Contains(pattern, StringComparison.OrdinalIgnoreCase));
+                text.ToLowerInvariant().Contains(pattern.ToLowerInvariant()));
         }
 
         /// <summary>
