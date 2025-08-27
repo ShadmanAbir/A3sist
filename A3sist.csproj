@@ -76,6 +76,10 @@
     <Compile Include="UI\RefactoringWindow.xaml.cs">
       <DependentUpon>RefactoringWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\A3sistToolWindow.xaml.cs">
+      <DependentUpon>A3sistToolWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\A3sistToolWindowPane.cs" />
   </ItemGroup>
   <ItemGroup>
     <Page Include="UI\ChatWindow.xaml">
@@ -95,6 +99,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\RefactoringWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\A3sistToolWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

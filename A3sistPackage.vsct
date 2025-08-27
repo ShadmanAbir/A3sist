@@ -19,6 +19,9 @@
       <Group guid="guidA3sistPackageCmdSet" id="A3sistMenuGroup" priority="0x0600">
         <Parent guid="guidA3sistPackageCmdSet" id="A3sistMenu"/>
       </Group>
+      <Group guid="guidA3sistPackageCmdSet" id="A3sistViewMenuGroup" priority="0x0600">
+        <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_VIEW"/>
+      </Group>
     </Groups>
 
     <Buttons>
@@ -51,6 +54,22 @@
           <ButtonText>Refactor with AI</ButtonText>
         </Strings>
       </Button>
+
+      <Button guid="guidA3sistPackageCmdSet" id="ShowA3sistToolWindowCommandId" priority="0x0104" type="Button">
+        <Parent guid="guidA3sistPackageCmdSet" id="A3sistMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <ButtonText>Show A3sist Panel</ButtonText>
+        </Strings>
+      </Button>
+
+      <Button guid="guidA3sistPackageCmdSet" id="ShowA3sistToolWindowViewCommandId" priority="0x0200" type="Button">
+        <Parent guid="guidA3sistPackageCmdSet" id="A3sistViewMenuGroup" />
+        <Icon guid="guidImages" id="bmpPic1" />
+        <Strings>
+          <ButtonText>A3sist AI Assistant</ButtonText>
+        </Strings>
+      </Button>
     </Buttons>
 
     <Bitmaps>
@@ -64,10 +83,13 @@
     <GuidSymbol name="guidA3sistPackageCmdSet" value="{12345678-1234-1234-1234-123456789123}">
       <IDSymbol name="A3sistMenu" value="0x1021" />
       <IDSymbol name="A3sistMenuGroup" value="0x1020" />
+      <IDSymbol name="A3sistViewMenuGroup" value="0x1022" />
       <IDSymbol name="OpenChatCommandId" value="0x0100" />
       <IDSymbol name="ConfigureA3sistCommandId" value="0x0101" />
       <IDSymbol name="ToggleAutoCompleteCommandId" value="0x0102" />
       <IDSymbol name="RefactorCodeCommandId" value="0x0103" />
+      <IDSymbol name="ShowA3sistToolWindowCommandId" value="0x0104" />
+      <IDSymbol name="ShowA3sistToolWindowViewCommandId" value="0x0105" />
     </GuidSymbol>
 
     <GuidSymbol name="guidImages" value="{12345678-1234-1234-1234-123456789124}">

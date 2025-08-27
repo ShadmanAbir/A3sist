@@ -31,6 +31,7 @@ namespace A3sist
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(A3sistPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
+    [ProvideToolWindow(typeof(A3sist.UI.A3sistToolWindowPane), Style = VsDockStyle.Tabbed, Window = "3ae79031-e1bc-11d0-8f78-00a0c9110057")]
     [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideService(typeof(IA3sistConfigurationService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IModelManagementService), IsAsyncQueryable = true)]
@@ -433,6 +434,26 @@ namespace A3sist
                     catch (Exception ex)
                     {
                         System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing RefactorCodeCommand: {ex.Message}");
+                    }
+
+                    try
+                    {
+                        ShowA3sistToolWindowCommand.Initialize(this, commandService);
+                        System.Diagnostics.Debug.WriteLine("A3sist: ShowA3sistToolWindowCommand initialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ShowA3sistToolWindowCommand: {ex.Message}");
+                    }
+
+                    try
+                    {
+                        ShowA3sistToolWindowViewCommand.Initialize(this, commandService);
+                        System.Diagnostics.Debug.WriteLine("A3sist: ShowA3sistToolWindowViewCommand initialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ShowA3sistToolWindowViewCommand: {ex.Message}");
                     }
                     
                     System.Diagnostics.Debug.WriteLine("A3sist: Command initialization completed");

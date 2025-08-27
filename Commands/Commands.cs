@@ -377,4 +377,132 @@ namespace A3sist.Commands
             Instance = new RefactorCodeCommand(package, commandService);
         }
     }
+
+    /// <summary>
+    /// Command handler for showing the A3sist tool window
+    /// </summary>
+    internal sealed class ShowA3sistToolWindowCommand
+    {
+        public const int CommandId = 0x0104;
+        public static readonly Guid CommandSet = new Guid("12345678-1234-1234-1234-123456789123");
+        private readonly AsyncPackage package;
+
+        private ShowA3sistToolWindowCommand(AsyncPackage package, OleMenuCommandService commandService)
+        {
+            this.package = package ?? throw new ArgumentNullException(nameof(package));
+            commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+
+            var menuCommandID = new CommandID(CommandSet, CommandId);
+            var menuItem = new MenuCommand(this.Execute, menuCommandID);
+            commandService.AddCommand(menuItem);
+        }
+
+        public static ShowA3sistToolWindowCommand Instance { get; private set; }
+
+        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => this.package;
+
+        public static async Task InitializeAsync(AsyncPackage package)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+            Instance = new ShowA3sistToolWindowCommand(package, commandService);
+        }
+
+        private async void Execute(object sender, EventArgs e)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            try
+            {
+                // Get the instance of the tool window created when package was initialized
+                var window = await this.package.FindToolWindowAsync(typeof(A3sist.UI.A3sistToolWindowPane), 0, true, this.package.DisposalToken);
+                if ((null == window) || (null == window.Frame))
+                {
+                    throw new NotSupportedException("Cannot create tool window");
+                }
+
+                var windowFrame = (IVsWindowFrame)window.Frame;
+                Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+            }
+            catch (Exception ex)
+            {
+                VsShellUtilities.ShowMessageBox(
+                    this.package,
+                    $"Error opening A3sist tool window: {ex.Message}",
+                    "A3sist Error",
+                    OLEMSGICON.OLEMSGICON_CRITICAL,
+                    OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            }
+        }
+
+        public static void Initialize(A3sistPackage package, OleMenuCommandService commandService)
+        {
+            Instance = new ShowA3sistToolWindowCommand(package, commandService);
+        }
+    }
+
+    /// <summary>
+    /// Command handler for showing the A3sist tool window from View menu
+    /// </summary>
+    internal sealed class ShowA3sistToolWindowViewCommand
+    {
+        public const int CommandId = 0x0105;
+        public static readonly Guid CommandSet = new Guid("12345678-1234-1234-1234-123456789123");
+        private readonly AsyncPackage package;
+
+        private ShowA3sistToolWindowViewCommand(AsyncPackage package, OleMenuCommandService commandService)
+        {
+            this.package = package ?? throw new ArgumentNullException(nameof(package));
+            commandService = commandService ?? throw new ArgumentNullException(nameof(commandService));
+
+            var menuCommandID = new CommandID(CommandSet, CommandId);
+            var menuItem = new MenuCommand(this.Execute, menuCommandID);
+            commandService.AddCommand(menuItem);
+        }
+
+        public static ShowA3sistToolWindowViewCommand Instance { get; private set; }
+
+        private Microsoft.VisualStudio.Shell.IAsyncServiceProvider ServiceProvider => this.package;
+
+        public static async Task InitializeAsync(AsyncPackage package)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync(package.DisposalToken);
+            OleMenuCommandService commandService = await package.GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+            Instance = new ShowA3sistToolWindowViewCommand(package, commandService);
+        }
+
+        private async void Execute(object sender, EventArgs e)
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            try
+            {
+                // Get the instance of the tool window created when package was initialized
+                var window = await this.package.FindToolWindowAsync(typeof(A3sist.UI.A3sistToolWindowPane), 0, true, this.package.DisposalToken);
+                if ((null == window) || (null == window.Frame))
+                {
+                    throw new NotSupportedException("Cannot create tool window");
+                }
+
+                var windowFrame = (IVsWindowFrame)window.Frame;
+                Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+            }
+            catch (Exception ex)
+            {
+                VsShellUtilities.ShowMessageBox(
+                    this.package,
+                    $"Error opening A3sist tool window: {ex.Message}",
+                    "A3sist Error",
+                    OLEMSGICON.OLEMSGICON_CRITICAL,
+                    OLEMSGBUTTON.OLEMSGBUTTON_OK,
+                    OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
+            }
+        }
+
+        public static void Initialize(A3sistPackage package, OleMenuCommandService commandService)
+        {
+            Instance = new ShowA3sistToolWindowViewCommand(package, commandService);
+        }
+    }
 }
