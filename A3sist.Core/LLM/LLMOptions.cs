@@ -1,6 +1,9 @@
-﻿public class LLMOptions
+﻿namespace A3sist.Core.LLM
 {
-    public object MaxTokens { get; internal set; }
-    public object Temperature { get; internal set; }
-    public object Stop { get; internal set; }
+    public class LLMOptions
+    {
+        public int MaxTokens { get; set; } = 1000;
+        public double Temperature { get; set; } = 0.7;
+        public string[]? Stop { get; set; }
+    }
 }
