@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace A3sist.UI.VSIX
+namespace A3sist.UI.Services
 {
     /// <summary>
     /// Implementation of WebView service for managing WebView2 controls

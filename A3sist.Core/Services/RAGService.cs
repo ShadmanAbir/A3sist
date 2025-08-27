@@ -166,9 +166,11 @@ namespace A3sist.Core.Services
                     }
                 };
 
-                var response = await _httpClient.PostAsJsonAsync("http://localhost:3003/mcp", mcpRequest);
-                var content = await response.Content.ReadAsStringAsync();
-                var mcpResult = JsonSerializer.Deserialize<MCPResponse>(content);
+                var json = JsonSerializer.Serialize(mcpRequest);
+                var contentRequest = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("http://localhost:3003/mcp", contentRequest);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var mcpResult = JsonSerializer.Deserialize<MCPResponse>(responseContent);
 
                 return mcpResult?.Result?.Results?.Select(r => new KnowledgeEntry
                 {
@@ -205,9 +207,11 @@ namespace A3sist.Core.Services
                     }
                 };
 
-                var response = await _httpClient.PostAsJsonAsync("http://localhost:3003/mcp", examplesRequest);
-                var content = await response.Content.ReadAsStringAsync();
-                var mcpResult = JsonSerializer.Deserialize<MCPResponse>(content);
+                var json = JsonSerializer.Serialize(examplesRequest);
+                var contentRequest = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("http://localhost:3003/mcp", contentRequest);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var mcpResult = JsonSerializer.Deserialize<MCPResponse>(responseContent);
 
                 return mcpResult?.Result?.Examples?.Select(e => new KnowledgeEntry
                 {
@@ -284,7 +288,7 @@ namespace A3sist.Core.Services
         {
             // Simple pattern extraction - could be enhanced with NLP
             var patterns = new[] { "async", "await", "interface", "class", "method", "property", "enum" };
-            return patterns.FirstOrDefault(p => prompt.Contains(p, StringComparison.OrdinalIgnoreCase)) ?? "general";
+            return patterns.FirstOrDefault(p => prompt.ToLowerInvariant().Contains(p.ToLowerInvariant())) ?? "general";
         }
 
         private string GenerateCacheKey(AgentRequest request)

@@ -445,7 +445,7 @@ namespace A3sist.Core.Agents.Core.Dispatcher
         private double GetEstimatedWaitTime(TaskPriority priority)
         {
             // Simple estimation based on priority and current queue size
-            var weight = _priorityWeights.GetValueOrDefault(priority, 50);
+            var weight = _priorityWeights.TryGetValue(priority, out var priorityWeight) ? priorityWeight : 50;
             var queueSize = _activeExecutions.Count;
             
             return Math.Max(1, queueSize * (100.0 / weight));
@@ -498,43 +498,45 @@ namespace A3sist.Core.Agents.Core.Dispatcher
             return "";
         }
 
-        private async 
-        Task
-PerformLoadBalancing(object? state)
+        private void PerformLoadBalancing(object? state)
         {
-            try
+            // Run the async method in the background
+            _ = Task.Run(async () =>
             {
-                Logger.LogTrace("Performing load balancing check");
-                
-                var queueStats = await _taskQueueService.GetStatisticsAsync();
-                var currentLoad = _maxConcurrentTasks - _executionSemaphore.CurrentCount;
-                
-                // Adjust concurrent task limit based on system performance
-                if (queueStats.ThroughputPerMinute > 0)
+                try
                 {
-                    var targetThroughput = 60.0; // Target: 1 task per second
-                    var currentThroughput = queueStats.ThroughputPerMinute;
+                    Logger.LogTrace("Performing load balancing check");
                     
-                    if (currentThroughput < targetThroughput * 0.8 && _maxConcurrentTasks < Environment.ProcessorCount * 4)
+                    var queueStats = await _taskQueueService.GetStatisticsAsync();
+                    var currentLoad = _maxConcurrentTasks - _executionSemaphore.CurrentCount;
+                    
+                    // Adjust concurrent task limit based on system performance
+                    if (queueStats.ThroughputPerMinute > 0)
                     {
-                        // Increase concurrency if throughput is low
-                        _maxConcurrentTasks++;
-                        _executionSemaphore.Release();
-                        Logger.LogDebug("Increased max concurrent tasks to {MaxTasks}", _maxConcurrentTasks);
-                    }
-                    else if (currentThroughput > targetThroughput * 1.2 && _maxConcurrentTasks > Environment.ProcessorCount)
-                    {
-                        // Decrease concurrency if throughput is too high (might indicate resource contention)
-                        _maxConcurrentTasks--;
-                        await _executionSemaphore.WaitAsync(TimeSpan.FromMilliseconds(100));
-                        Logger.LogDebug("Decreased max concurrent tasks to {MaxTasks}", _maxConcurrentTasks);
+                        var targetThroughput = 60.0; // Target: 1 task per second
+                        var currentThroughput = queueStats.ThroughputPerMinute;
+                        
+                        if (currentThroughput < targetThroughput * 0.8 && _maxConcurrentTasks < Environment.ProcessorCount * 4)
+                        {
+                            // Increase concurrency if throughput is low
+                            _maxConcurrentTasks++;
+                            _executionSemaphore.Release();
+                            Logger.LogDebug("Increased max concurrent tasks to {MaxTasks}", _maxConcurrentTasks);
+                        }
+                        else if (currentThroughput > targetThroughput * 1.2 && _maxConcurrentTasks > Environment.ProcessorCount)
+                        {
+                            // Decrease concurrency if throughput is too high (might indicate resource contention)
+                            _maxConcurrentTasks--;
+                            await _executionSemaphore.WaitAsync(TimeSpan.FromMilliseconds(100));
+                            Logger.LogDebug("Decreased max concurrent tasks to {MaxTasks}", _maxConcurrentTasks);
+                        }
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                Logger.LogError(ex, "Error during load balancing");
-            }
+                catch (Exception ex)
+                {
+                    Logger.LogError(ex, "Error during load balancing");
+                }
+            });
         }
 
         public override void Dispose()

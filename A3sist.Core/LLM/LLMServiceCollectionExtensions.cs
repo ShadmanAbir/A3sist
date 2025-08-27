@@ -1,3 +1,5 @@
+using A3sist.Core.LLM;
+using A3sist.Shared.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 

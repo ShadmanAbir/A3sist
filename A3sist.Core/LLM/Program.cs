@@ -1,4 +1,5 @@
-using A3sist.Orchastrator.Agents;
+using A3sist.Core.LLM;
+using A3sist.Shared.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using System;
@@ -27,19 +28,19 @@ namespace A3sist.Orchastrator.LLM
 
                 // Register services
                 services.AddHttpClient<ILLMClient, CodestralLLMClient>();
-                //services.AddTransient<FixerAgent>();
+
 
                 // Build the service provider
                 var serviceProvider = services.BuildServiceProvider();
 
-                // Get the FixerAgent service
-                var fixerAgent = serviceProvider.GetRequiredService<FileEditorAgent>();
 
-                // Fix code example
-                var fixedCode = await fixerAgent.FixCodeAsync("public class Broken { public void Method() { } }");
+                var llmClient = serviceProvider.GetRequiredService<ILLMClient>();
 
-                // Output the fixed code
-                Console.WriteLine(fixedCode);
+                // Example LLM usage
+                var response = await llmClient.CompleteAsync("Analyze this code: public class Broken { public void Method() { } }");
+
+                // Output the response
+                Console.WriteLine(response);
             }
             catch (Exception ex)
             {

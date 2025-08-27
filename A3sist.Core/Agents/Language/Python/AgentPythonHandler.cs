@@ -198,8 +198,8 @@ namespace A3sist.Core.Agents.Language.Python
         {
             try
             {
-                var command = request.Context?.GetValueOrDefault("pipCommand")?.ToString() ?? "list";
-                var packageName = request.Context?.GetValueOrDefault("packageName")?.ToString();
+                var command = request.Context?.TryGetValue("pipCommand", out var pipCommandObj) == true ? pipCommandObj?.ToString() : null ?? "list";
+                var packageName = request.Context?.TryGetValue("packageName", out var packageNameObj) == true ? packageNameObj?.ToString() : null;
                 
                 var result = await _packageManager.ExecuteCommandAsync(command, packageName);
                 
@@ -210,7 +210,9 @@ namespace A3sist.Core.Agents.Language.Python
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(result, metadata, Name);
+                var agentResult = AgentResult.CreateSuccess("Pip package management completed successfully", result, Name);
+                agentResult.Metadata = metadata;
+                return agentResult;
             }
             catch (Exception ex)
             {
@@ -223,8 +225,8 @@ namespace A3sist.Core.Agents.Language.Python
         {
             try
             {
-                var command = request.Context?.GetValueOrDefault("venvCommand")?.ToString() ?? "status";
-                var envName = request.Context?.GetValueOrDefault("envName")?.ToString();
+                var command = request.Context?.TryGetValue("venvCommand", out var venvCommandObj) == true ? venvCommandObj?.ToString() : null ?? "status";
+                var envName = request.Context?.TryGetValue("envName", out var envNameObj) == true ? envNameObj?.ToString() : null;
                 
                 var result = await _venvManager.ExecuteCommandAsync(command, envName);
                 
@@ -235,7 +237,9 @@ namespace A3sist.Core.Agents.Language.Python
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(result, metadata, Name);
+                var agentResult = AgentResult.CreateSuccess("Virtual environment management completed successfully", result, Name);
+                agentResult.Metadata = metadata;
+                return agentResult;
             }
             catch (Exception ex)
             {
@@ -261,7 +265,9 @@ namespace A3sist.Core.Agents.Language.Python
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(lintResult, metadata, Name);
+                var result = AgentResult.CreateSuccess("Python code linting completed successfully", lintResult, Name);
+                result.Metadata = metadata;
+                return result;
             }
             catch (Exception ex)
             {
@@ -288,7 +294,9 @@ namespace A3sist.Core.Agents.Language.Python
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(formattedCode, metadata, Name);
+                var result = AgentResult.CreateSuccess("Python code formatting completed successfully", formattedCode, Name);
+                result.Metadata = metadata;
+                return result;
             }
             catch (Exception ex)
             {
@@ -301,7 +309,7 @@ namespace A3sist.Core.Agents.Language.Python
         {
             try
             {
-                var testPattern = request.Context?.GetValueOrDefault("testPattern")?.ToString() ?? "test_*.py";
+                var testPattern = request.Context?.TryGetValue("testPattern", out var testPatternObj) == true ? testPatternObj?.ToString() : null ?? "test_*.py";
                 var testResult = await _packageManager.RunTestsAsync(testPattern);
                 
                 var metadata = new Dictionary<string, object>
@@ -310,7 +318,9 @@ namespace A3sist.Core.Agents.Language.Python
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(testResult, metadata, Name);
+                var result = AgentResult.CreateSuccess("Python tests executed successfully", testResult, Name);
+                result.Metadata = metadata;
+                return result;
             }
             catch (Exception ex)
             {

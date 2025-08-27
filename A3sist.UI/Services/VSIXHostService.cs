@@ -4,7 +4,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 
-namespace A3sist.UI.VSIX
+namespace A3sist.UI.Services
 {
     /// <summary>
     /// Implementation of VSIX host service for hosting MAUI content

@@ -1,9 +1,15 @@
+<<<<<<< HEAD
 using A3sist.Core.LLM;
+=======
+>>>>>>> d9292da76b3bf2140ff68335ee93fce5bcd201a3
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Models;
 using System;
 using System.Collections.Generic;
+<<<<<<< HEAD
 using System.Linq;
+=======
+>>>>>>> d9292da76b3bf2140ff68335ee93fce5bcd201a3
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
@@ -18,12 +24,11 @@ namespace A3sist.Core.LLM
 
         public CodestralLLMClient(HttpClient httpClient)
         {
-            _httpClient = httpClient ?? throw new ArgumentNullException(nameof(httpClient));
+            _httpClient = httpClient;
         }
 
         public string CurrentModel => "codestral";
-
-        public bool IsAvailable { get; private set; } = true;
+        public bool IsAvailable => true;
 
         public async Task<string> CompleteAsync(string prompt, CancellationToken cancellationToken = default)
         {
@@ -35,17 +40,18 @@ namespace A3sist.Core.LLM
             var llmOptions = new LLMOptions();
             if (options != null)
             {
-                if (options.TryGetValue("max_tokens", out var maxTokens)) llmOptions.MaxTokens = Convert.ToInt32(maxTokens);
-                if (options.TryGetValue("temperature", out var temperature)) llmOptions.Temperature = Convert.ToDouble(temperature);
-                if (options.TryGetValue("stop", out var stop)) llmOptions.Stop = stop as string[];
+                if (options.TryGetValue("MaxTokens", out var maxTokens) && maxTokens is int mt)
+                    llmOptions.MaxTokens = mt;
+                if (options.TryGetValue("Temperature", out var temperature) && temperature is double temp)
+                    llmOptions.Temperature = temp;
             }
             return await GetCompletionAsync(prompt, llmOptions);
         }
 
         public async Task CompleteStreamAsync(string prompt, Action<string> onChunk, CancellationToken cancellationToken = default)
         {
-            var result = await GetCompletionAsync(prompt, new LLMOptions());
-            onChunk(result);
+            var response = await GetCompletionAsync(prompt, new LLMOptions());
+            onChunk(response);
         }
 
         public async Task<IEnumerable<string>> GetAvailableModelsAsync()
@@ -55,7 +61,6 @@ namespace A3sist.Core.LLM
 
         public async Task InitializeAsync()
         {
-            IsAvailable = true;
             await Task.CompletedTask;
         }
 
@@ -65,13 +70,13 @@ namespace A3sist.Core.LLM
             await Task.CompletedTask;
         }
 
-        public async Task<string> GetCompletionAsync(string prompt, LLMOptions? options = null)
+        public async Task<string> GetCompletionAsync(string ragPrompt, LLMOptions options)
         {
             options ??= new LLMOptions();
 
             var requestBody = new
             {
-                prompt,
+                prompt = ragPrompt,
                 max_tokens = options.MaxTokens,
                 temperature = options.Temperature,
                 stop = options.Stop
@@ -89,24 +94,6 @@ namespace A3sist.Core.LLM
             var responseObject = JsonSerializer.Deserialize<JsonElement>(responseContent);
 
             return responseObject.GetProperty("completion").GetString() ?? string.Empty;
-        }
-
-        public async Task<string> GetCompletionAsync(string ragPrompt, LLMOptions options)
-        {
-            return await GetCompletionAsync(ragPrompt, options);
-        }
-
-        public async Task<string> GetResponseAsync(string prompt)
-        {
-            try
-            {
-                // Use the existing GetCompletionAsync method
-                return await GetCompletionAsync(prompt, new LLMOptions());
-            }
-            catch (Exception)
-            {
-                return string.Empty;
-            }
         }
     }
 }

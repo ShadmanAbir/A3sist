@@ -93,7 +93,7 @@ namespace A3sist.Core.Services
 
             var stopwatch = Stopwatch.StartNew();
             _logger.LogInformation("Processing request {RequestId} with prompt: {Prompt}", 
-                request.Id, request.Prompt?.Substring(0, Math.Min(100, request.Prompt.Length ?? 0)));
+                request.Id, request.Prompt?.Substring(0, Math.Min(100, request.Prompt?.Length ?? 0)));
 
             try
             {
@@ -322,7 +322,7 @@ namespace A3sist.Core.Services
 
                 // Use load balancing to select the least loaded capable agent
                 var selectedAgent = capableAgents
-                    .OrderBy(a => _agentLoadBalancer.GetValueOrDefault(a.Name, 0))
+                    .OrderBy(a => _agentLoadBalancer.TryGetValue(a.Name, out var load) ? load : 0)
                     .First();
 
                 _logger.LogDebug("Selected agent {AgentName} via load balancing", selectedAgent.Name);
@@ -347,7 +347,7 @@ namespace A3sist.Core.Services
                 _logger.LogDebug("Processing request {RequestId} with agent {AgentName}", request.Id, agent.Name);
 
                 // Increment load counter
-                _agentLoadBalancer[agent.Name] = _agentLoadBalancer.GetValueOrDefault(agent.Name, 0) + 1;
+                _agentLoadBalancer[agent.Name] = (_agentLoadBalancer.TryGetValue(agent.Name, out var currentLoad) ? currentLoad : 0) + 1;
 
                 // Process the request
                 var result = await agent.HandleAsync(request, cancellationToken);
@@ -403,8 +403,8 @@ namespace A3sist.Core.Services
         {
             // Use workflow for complex requests that might need multiple agents
             return request.Context?.ContainsKey("UseWorkflow") == true ||
-                   request.Prompt?.Contains("workflow", StringComparison.OrdinalIgnoreCase) == true ||
-                   request.Prompt?.Contains("multi-step", StringComparison.OrdinalIgnoreCase) == true;
+                   request.Prompt?.ToLowerInvariant().Contains("workflow") == true ||
+                   request.Prompt?.ToLowerInvariant().Contains("multi-step") == true;
         }
 
         /// <summary>
@@ -467,7 +467,7 @@ namespace A3sist.Core.Services
             var circuitBreakerThreshold = 5; // Default circuit breaker threshold
 
             // Check circuit breaker
-            var failureCount = _agentFailureCount.GetValueOrDefault(agent.Name, 0);
+            var failureCount = _agentFailureCount.TryGetValue(agent.Name, out var count) ? count : 0;
             if (failureCount >= circuitBreakerThreshold)
             {
                 _logger.LogWarning("Circuit breaker open for agent {AgentName} (failures: {FailureCount})", 
@@ -567,13 +567,13 @@ namespace A3sist.Core.Services
 
                 // Try to find a fallback agent
                 var availableAgents = await _agentManager.GetAgentsAsync();
-                var workingAgents = availableAgents.Where(a => _agentFailureCount.GetValueOrDefault(a.Name, 0) < 3).ToList();
+                var workingAgents = availableAgents.Where(a => (_agentFailureCount.TryGetValue(a.Name, out var failures) ? failures : 0) < 3).ToList();
                 
                 if (workingAgents.Any())
                 {
                     // Try with the least loaded working agent
                     var fallbackAgent = workingAgents
-                        .OrderBy(a => _agentLoadBalancer.GetValueOrDefault(a.Name, 0))
+                        .OrderBy(a => _agentLoadBalancer.TryGetValue(a.Name, out var load) ? load : 0)
                         .First();
 
                     _logger.LogInformation("Attempting recovery with fallback agent {AgentName} for request {RequestId}", 
@@ -631,11 +631,11 @@ namespace A3sist.Core.Services
             else
             {
                 // Increment failure count
-                _agentFailureCount[agentName] = _agentFailureCount.GetValueOrDefault(agentName, 0) + 1;
+                _agentFailureCount[agentName] = (_agentFailureCount.TryGetValue(agentName, out var failures) ? failures : 0) + 1;
             }
 
             _logger.LogTrace("Updated metrics for agent {AgentName}: success={Success}, processingTime={ProcessingTimeMs}ms, failures={FailureCount}", 
-                agentName, success, processingTime.TotalMilliseconds, _agentFailureCount.GetValueOrDefault(agentName, 0));
+                agentName, success, processingTime.TotalMilliseconds, _agentFailureCount.TryGetValue(agentName, out var logFailures) ? logFailures : 0);
         }
 
         /// <summary>
@@ -655,8 +655,8 @@ namespace A3sist.Core.Services
 
                 foreach (var agent in agents)
                 {
-                    var lastActivity = _agentLastActivity.GetValueOrDefault(agent.Name, DateTime.MinValue);
-                    var failureCount = _agentFailureCount.GetValueOrDefault(agent.Name, 0);
+                    var lastActivity = _agentLastActivity.TryGetValue(agent.Name, out var activity) ? activity : DateTime.MinValue;
+                    var failureCount = _agentFailureCount.TryGetValue(agent.Name, out var failures) ? failures : 0;
                     var timeSinceLastActivity = DateTime.UtcNow - lastActivity;
 
                     // Consider agent unhealthy if it hasn't been active for 10 minutes and has failures

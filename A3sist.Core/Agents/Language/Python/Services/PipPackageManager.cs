@@ -165,7 +165,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                 var pipListResult = await ExecutePipCommandAsync("list");
                 if (pipListResult.Success)
                 {
-                    var lines = pipListResult.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                    var lines = pipListResult.Output.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                     var packageCount = lines.Length - 2; // Subtract header lines
                     info.Add($"Installed packages: {Math.Max(0, packageCount)}");
                 }
@@ -216,9 +216,9 @@ namespace A3sist.Core.Agents.Language.Python.Services
                 if (result.Success)
                 {
                     var requirementsPath = Path.Combine(_workingDirectory, "requirements.txt");
-                    await File.WriteAllTextAsync(requirementsPath, result.Output);
+                    File.WriteAllText(requirementsPath, result.Output);
                     
-                    var packageCount = result.Output.Split('\n', StringSplitOptions.RemoveEmptyEntries).Length;
+                    var packageCount = result.Output.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries).Length;
                     return $"Requirements.txt created with {packageCount} packages";
                 }
                 else
@@ -256,7 +256,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
-                await process.WaitForExitAsync();
+                await Task.Run(() => process.WaitForExit());
 
                 var output = await outputTask;
                 var error = await errorTask;
@@ -293,7 +293,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
-                await process.WaitForExitAsync();
+                await Task.Run(() => process.WaitForExit());
 
                 var output = await outputTask;
                 var error = await errorTask;
@@ -323,7 +323,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
             else
             {
                 // Clean up common pip output formatting
-                var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                var lines = output.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var line in lines)
                 {
                     var cleanLine = line.Trim();

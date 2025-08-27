@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.Extensions.Logging;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
+using A3sist.Shared.Models;
 using A3sist.Core.Services;
 
 namespace A3sist.Core.Agents.Core
@@ -109,7 +110,7 @@ namespace A3sist.Core.Agents.Core
                 if (ragContext?.KnowledgeEntries.Any() == true)
                 {
                     var ragPrompt = BuildRAGAnalysisPrompt(code, analysisResult, ragContext);
-                    var enhancedAnalysis = await _llmClient.GetCompletionAsync(ragPrompt);
+                    var enhancedAnalysis = await _llmClient.GetCompletionAsync(ragPrompt, new LLMOptions());
 
                     return AgentResult.CreateSuccess(enhancedAnalysis.Response, new Dictionary<string, object>
                     {
@@ -150,7 +151,7 @@ namespace A3sist.Core.Agents.Core
             try
             {
                 var refactoringPrompt = BuildRAGRefactoringPrompt(code, ragContext);
-                var refactoredResponse = await _llmClient.GetCompletionAsync(refactoringPrompt);
+                var refactoredResponse = await _llmClient.GetCompletionAsync(refactoringPrompt, new LLMOptions());
 
                 return AgentResult.CreateSuccess(refactoredResponse.Response, new Dictionary<string, object>
                 {
@@ -197,7 +198,7 @@ namespace A3sist.Core.Agents.Core
                 }
 
                 var fixPrompt = BuildRAGFixPrompt(code, diagnostics, ragContext);
-                var fixResponse = await _llmClient.GetCompletionAsync(fixPrompt);
+                var fixResponse = await _llmClient.GetCompletionAsync(fixPrompt, new LLMOptions());
 
                 return AgentResult.CreateSuccess(fixResponse.Response, new Dictionary<string, object>
                 {
@@ -274,7 +275,7 @@ namespace A3sist.Core.Agents.Core
             try
             {
                 var generationPrompt = BuildRAGGenerationPrompt(prompt, ragContext);
-                var generatedResponse = await _llmClient.GetCompletionAsync(generationPrompt);
+                var generatedResponse = await _llmClient.GetCompletionAsync(generationPrompt, new LLMOptions());
 
                 return AgentResult.CreateSuccess(generatedResponse.Response, new Dictionary<string, object>
                 {
@@ -299,7 +300,7 @@ namespace A3sist.Core.Agents.Core
             try
             {
                 var responsePrompt = BuildRAGResponsePrompt(prompt, code, ragContext);
-                var response = await _llmClient.GetCompletionAsync(responsePrompt);
+                var response = await _llmClient.GetCompletionAsync(responsePrompt, new LLMOptions());
 
                 return AgentResult.CreateSuccess(response.Response, new Dictionary<string, object>
                 {

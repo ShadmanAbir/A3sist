@@ -3,6 +3,7 @@ using A3sist.Shared.Interfaces;
 using A3sist.Shared.Models;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using System.Security;
 
 namespace A3sist.Core.Extensions
 {

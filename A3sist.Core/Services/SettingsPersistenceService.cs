@@ -65,7 +65,7 @@ public class SettingsPersistenceService : ISettingsPersistenceService
             };
 
             var json = JsonSerializer.Serialize(settingsData, options);
-            await File.WriteAllTextAsync(_settingsFilePath, json);
+            File.WriteAllText(_settingsFilePath, json);
 
             _logger.LogInformation("Settings saved successfully to {FilePath}", _settingsFilePath);
         }
@@ -89,7 +89,7 @@ public class SettingsPersistenceService : ISettingsPersistenceService
                 return new Dictionary<string, object>();
             }
 
-            var json = await File.ReadAllTextAsync(_settingsFilePath);
+            var json = File.ReadAllText(_settingsFilePath);
             if (string.IsNullOrWhiteSpace(json))
             {
                 _logger.LogWarning("Settings file is empty");
@@ -158,7 +158,7 @@ public class SettingsPersistenceService : ISettingsPersistenceService
             var backupFileName = $"settings_backup_{timestamp}.json";
             var backupFilePath = Path.Combine(_backupDirectory, backupFileName);
 
-            await File.CopyToAsync(_settingsFilePath, backupFilePath);
+            File.Copy(_settingsFilePath, backupFilePath);
 
             // Clean up old backups (keep only last 10)
             await CleanupOldBackupsAsync();
@@ -193,7 +193,7 @@ public class SettingsPersistenceService : ISettingsPersistenceService
             await CreateBackupAsync();
 
             // Copy backup file to settings location
-            await File.CopyToAsync(backupFilePath, _settingsFilePath, overwrite: true);
+            File.Copy(backupFilePath, _settingsFilePath, overwrite: true);
 
             _logger.LogInformation("Settings restored from backup: {BackupPath}", backupFilePath);
             return true;
@@ -228,7 +228,7 @@ public class SettingsPersistenceService : ISettingsPersistenceService
                 try
                 {
                     var fileInfo = new FileInfo(backupFile);
-                    var json = await File.ReadAllTextAsync(backupFile);
+                    var json = File.ReadAllText(backupFile);
                     
                     var options = new JsonSerializerOptions
                     {
@@ -277,7 +277,7 @@ public class SettingsPersistenceService : ISettingsPersistenceService
                 return result;
             }
 
-            var json = await File.ReadAllTextAsync(_settingsFilePath);
+            var json = File.ReadAllText(_settingsFilePath);
             if (string.IsNullOrWhiteSpace(json))
             {
                 result.AddError("Content", "Settings file is empty");
@@ -433,7 +433,7 @@ public class SettingsPersistenceService : ISettingsPersistenceService
             {
                 _logger.LogInformation("Attempting to restore from latest backup: {BackupPath}", latestBackup.FilePath);
                 
-                var json = await File.ReadAllTextAsync(latestBackup.FilePath);
+                var json = File.ReadAllText(latestBackup.FilePath);
                 var options = new JsonSerializerOptions
                 {
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,

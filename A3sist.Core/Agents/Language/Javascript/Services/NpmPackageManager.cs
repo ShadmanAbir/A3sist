@@ -225,7 +225,7 @@ namespace A3sist.Orchastrator.Agents.JavaScript.Services
                 var outputTask = process.StandardOutput.ReadToEndAsync();
                 var errorTask = process.StandardError.ReadToEndAsync();
 
-                await process.WaitForExitAsync();
+                await Task.Run(() => process.WaitForExit());
 
                 var output = await outputTask;
                 var error = await errorTask;
@@ -255,7 +255,7 @@ namespace A3sist.Orchastrator.Agents.JavaScript.Services
             else
             {
                 // Clean up common npm output formatting
-                var lines = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
+                var lines = output.Split(new[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
                 foreach (var line in lines)
                 {
                     var cleanLine = line.Trim();

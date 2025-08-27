@@ -62,7 +62,9 @@ namespace A3sist.Core.LLM
 
                 var mcpRequest = BuildMCPRequest(request, ragContext, analysisType);
 
-                var response = await _httpClient.PostAsJsonAsync(serverEndpoint, mcpRequest);
+                var json = JsonSerializer.Serialize(mcpRequest);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync(serverEndpoint, content);
                 
                 if (response.IsSuccessStatusCode)
                 {
@@ -109,7 +111,7 @@ namespace A3sist.Core.LLM
                     ? BuildRAGEnhancedPrompt(request.Prompt, request.Content, ragContext)
                     : BuildSimplePrompt(request.Prompt, request.Content);
 
-                var response = await _llmClient.GetCompletionAsync(prompt);
+                var response = await _llmClient.GetCompletionAsync(prompt, new LLMOptions());
 
                 return AgentResult.CreateSuccess(response.Response, new Dictionary<string, object>
                 {
@@ -139,7 +141,9 @@ namespace A3sist.Core.LLM
                 try
                 {
                     var healthRequest = new { method = "ping" };
-                    var response = await _httpClient.PostAsJsonAsync(kvp.Value, healthRequest);
+                    var json = JsonSerializer.Serialize(healthRequest);
+                    var content = new StringContent(json, Encoding.UTF8, "application/json");
+                    var response = await _httpClient.PostAsync(kvp.Value, content);
                     
                     return new KeyValuePair<string, ServerHealth>(kvp.Key, new ServerHealth
                     {

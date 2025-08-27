@@ -1,8 +1,14 @@
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Models;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace A3sist.Core.Services
 {
@@ -268,7 +274,7 @@ namespace A3sist.Core.Services
                 healthMetrics.Application.Gen0Collections = GC.CollectionCount(0);
                 healthMetrics.Application.Gen1Collections = GC.CollectionCount(1);
                 healthMetrics.Application.Gen2Collections = GC.CollectionCount(2);
-                healthMetrics.Application.TotalAllocatedBytes = GC.GetTotalAllocatedBytes();
+                healthMetrics.Application.TotalAllocatedBytes = GC.GetTotalMemory(false);
 
                 // Calculate memory usage percentage
                 if (healthMetrics.Memory.AvailableBytes > 0)

@@ -240,7 +240,7 @@ namespace A3sist.UI.Services
             try
             {
                 // Get suggestions from different agent types
-                var agentTypes = new[] { AgentType.Fixer, AgentType.Refactor, AgentType.Validator };
+                var agentTypes = new[] { AgentType.Analyzer, AgentType.Refactor, AgentType.Validator };
 
                 foreach (var agentType in agentTypes)
                 {
@@ -382,7 +382,7 @@ namespace A3sist.UI.Services
                 // Fallback to reading from file system
                 if (System.IO.File.Exists(filePath))
                 {
-                    return await System.IO.File.ReadAllTextAsync(filePath);
+                    return System.IO.File.ReadAllText(filePath);
                 }
 
                 return null;

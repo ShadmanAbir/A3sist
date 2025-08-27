@@ -232,7 +232,7 @@ namespace A3sist.Orchastrator.Agents.JavaScript.Services
             // Remove trailing whitespace
             var lines = code.Split('\n');
             lines = lines.Select(line => line.TrimEnd()).ToArray();
-            code = string.Join('\n', lines);
+            code = string.Join("\n", lines);
 
             // Remove multiple consecutive empty lines
             code = Regex.Replace(code, @"\n\s*\n\s*\n", "\n\n");

@@ -47,7 +47,7 @@ namespace A3sist.Core.Services
             _statistics = new QueueStatistics();
 
             // Initialize priority queues
-            foreach (TaskPriority priority in Enum.GetValues<TaskPriority>())
+            foreach (TaskPriority priority in Enum.GetValues(typeof(TaskPriority)))
             {
                 _queues[priority] = new ConcurrentQueue<QueueItem>();
             }
@@ -107,7 +107,8 @@ namespace A3sist.Core.Services
                 await _queueSemaphore.WaitAsync(cancellationToken);
 
                 // Try to dequeue from highest priority queue first
-                var priorities = Enum.GetValues<TaskPriority>()
+                var priorities = Enum.GetValues(typeof(TaskPriority))
+                    .Cast<TaskPriority>()
                     .OrderByDescending(p => (int)p);
 
                 foreach (var priority in priorities)
