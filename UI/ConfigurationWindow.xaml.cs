@@ -356,11 +356,11 @@ namespace A3sist.UI
         // RAG Events
         private void BrowseIndexPathButton_Click(object sender, RoutedEventArgs e)
         {
-            var dialog = new System.Windows.Forms.FolderBrowserDialog();
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
-            {
-                IndexPathTextBox.Text = dialog.SelectedPath;
-            }
+            //var dialog = new System.Windows.Forms.FolderBrowserDialog();
+            //if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            //{
+            //    IndexPathTextBox.Text = dialog.SelectedPath;
+            //}
         }
 
         private async void IndexWorkspaceButton_Click(object sender, RoutedEventArgs e)

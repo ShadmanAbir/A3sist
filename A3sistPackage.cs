@@ -63,98 +63,455 @@ namespace A3sist
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
-            // Set the static instance
-            Instance = this;
-            
-            // When initialized asynchronously, the current thread may be a background thread at this point.
-            // Do any initialization that requires the UI thread after switching to the UI thread.
-            await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
+            try
+            {
+                // Set the static instance
+                Instance = this;
+                
+                System.Diagnostics.Debug.WriteLine("A3sist: Starting package initialization...");
+                
+                // When initialized asynchronously, the current thread may be a background thread at this point.
+                // Do any initialization that requires the UI thread after switching to the UI thread.
+                await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-            // Initialize dependency injection
-            await InitializeServicesAsync();
+                // Initialize dependency injection with error handling
+                await InitializeServicesAsync();
 
-            // Initialize commands
-            await InitializeCommandsAsync();
+                // Initialize commands with error handling
+                await InitializeCommandsAsync();
 
-            await base.InitializeAsync(cancellationToken, progress);
+                await base.InitializeAsync(cancellationToken, progress);
+                
+                System.Diagnostics.Debug.WriteLine("A3sist: Package initialization completed successfully.");
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't throw to prevent VS from failing to load the package
+                System.Diagnostics.Debug.WriteLine($"A3sist package initialization error: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                try
+                {
+                    // Try to continue with base initialization even if our services fail
+                    await base.InitializeAsync(cancellationToken, progress);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Base package initialization completed despite errors.");
+                }
+                catch (Exception baseEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Base package initialization error: {baseEx.Message}");
+                    // Still don't throw - let VS continue
+                }
+            }
         }
 
         private async Task InitializeServicesAsync()
         {
-            var services = new ServiceCollection();
-
-            // Register core services
-            services.AddSingleton<IA3sistConfigurationService, A3sistConfigurationService>();
-            services.AddSingleton<IModelManagementService, ModelManagementService>();
-            services.AddSingleton<IMCPClientService, MCPClientService>();
-            services.AddSingleton<IRAGEngineService, RAGEngineService>();
-            services.AddSingleton<ICodeAnalysisService, CodeAnalysisService>();
-            services.AddSingleton<IChatService, ChatService>();
-            services.AddSingleton<IRefactoringService, RefactoringService>();
-            services.AddSingleton<IAutoCompleteService, AutoCompleteService>();
-            services.AddSingleton<A3sist.Agent.IAgentModeService, A3sist.Agent.AgentModeService>();
-
-            _serviceProvider = services.BuildServiceProvider();
-
-            // Register services with VS Shell
-            AddService(typeof(IA3sistConfigurationService), async (container, ct, type) =>
+            try
             {
-                return _serviceProvider.GetService<IA3sistConfigurationService>();
-            }, true);
+                System.Diagnostics.Debug.WriteLine("A3sist: Initializing services...");
+                
+                var services = new ServiceCollection();
 
-            AddService(typeof(IModelManagementService), async (container, ct, type) =>
-            {
-                return _serviceProvider.GetService<IModelManagementService>();
-            }, true);
+                // Register core services with individual error handling
+                try
+                {
+                    services.AddSingleton<IA3sistConfigurationService, A3sistConfigurationService>();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IA3sistConfigurationService");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IA3sistConfigurationService: {ex.Message}");
+                }
 
-            AddService(typeof(IMCPClientService), async (container, ct, type) =>
-            {
-                return _serviceProvider.GetService<IMCPClientService>();
-            }, true);
+                try
+                {
+                    services.AddSingleton<IModelManagementService, ModelManagementService>();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IModelManagementService");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IModelManagementService: {ex.Message}");
+                }
 
-            AddService(typeof(IRAGEngineService), async (container, ct, type) =>
-            {
-                return _serviceProvider.GetService<IRAGEngineService>();
-            }, true);
+                try
+                {
+                    services.AddSingleton<IMCPClientService, MCPClientService>();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IMCPClientService");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IMCPClientService: {ex.Message}");
+                }
 
-            AddService(typeof(ICodeAnalysisService), async (container, ct, type) =>
-            {
-                return _serviceProvider.GetService<ICodeAnalysisService>();
-            }, true);
+                try
+                {
+                    services.AddSingleton<IRAGEngineService, RAGEngineService>();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IRAGEngineService");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IRAGEngineService: {ex.Message}");
+                }
 
-            AddService(typeof(IChatService), async (container, ct, type) =>
+                try
+                {
+                    services.AddSingleton<ICodeAnalysisService, CodeAnalysisService>();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered ICodeAnalysisService");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register ICodeAnalysisService: {ex.Message}");
+                }
+
+                try
+                {
+                    services.AddSingleton<IChatService, ChatService>();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IChatService");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IChatService: {ex.Message}");
+                }
+
+                try
+                {
+                    services.AddSingleton<IRefactoringService, RefactoringService>();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IRefactoringService");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IRefactoringService: {ex.Message}");
+                }
+
+                try
+                {
+                    services.AddSingleton<IAutoCompleteService, AutoCompleteService>();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IAutoCompleteService");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IAutoCompleteService: {ex.Message}");
+                }
+
+                try
+                {
+                    services.AddSingleton<A3sist.Agent.IAgentModeService, A3sist.Agent.AgentModeService>();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IAgentModeService");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IAgentModeService: {ex.Message}");
+                }
+
+                // Build service provider with error handling
+                try
+                {
+                    _serviceProvider = services.BuildServiceProvider();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Service provider built successfully");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to build service provider: {ex.Message}");
+                    // Create a minimal service provider as fallback
+                    var fallbackServices = new ServiceCollection();
+                    _serviceProvider = fallbackServices.BuildServiceProvider();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Created fallback service provider");
+                }
+
+                // Register services with VS Shell with individual error handling
+                await RegisterVSShellServicesAsync();
+                
+                System.Diagnostics.Debug.WriteLine("A3sist: Services initialization completed");
+            }
+            catch (Exception ex)
             {
-                return _serviceProvider.GetService<IChatService>();
-            }, true);
+                System.Diagnostics.Debug.WriteLine($"A3sist: Critical error in service initialization: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+                
+                // Create a minimal service provider to prevent null reference exceptions
+                try
+                {
+                    var emergencyServices = new ServiceCollection();
+                    _serviceProvider = emergencyServices.BuildServiceProvider();
+                    System.Diagnostics.Debug.WriteLine("A3sist: Emergency service provider created");
+                }
+                catch (Exception fallbackEx)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Even fallback service provider failed: {fallbackEx.Message}");
+                }
+            }
+        }
+
+        private async Task RegisterVSShellServicesAsync()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("A3sist: Registering services with VS Shell...");
+
+                // Register services with VS Shell with individual error handling
+                try
+                {
+                    AddService(typeof(IA3sistConfigurationService), async (container, ct, type) =>
+                    {
+                        try
+                        {
+                            return _serviceProvider?.GetService<IA3sistConfigurationService>();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IA3sistConfigurationService: {ex.Message}");
+                            return null;
+                        }
+                    }, true);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IA3sistConfigurationService with VS Shell");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IA3sistConfigurationService with VS Shell: {ex.Message}");
+                }
+
+                try
+                {
+                    AddService(typeof(IModelManagementService), async (container, ct, type) =>
+                    {
+                        try
+                        {
+                            return _serviceProvider?.GetService<IModelManagementService>();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IModelManagementService: {ex.Message}");
+                            return null;
+                        }
+                    }, true);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IModelManagementService with VS Shell");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IModelManagementService with VS Shell: {ex.Message}");
+                }
+
+                try
+                {
+                    AddService(typeof(IMCPClientService), async (container, ct, type) =>
+                    {
+                        try
+                        {
+                            return _serviceProvider?.GetService<IMCPClientService>();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IMCPClientService: {ex.Message}");
+                            return null;
+                        }
+                    }, true);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IMCPClientService with VS Shell");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IMCPClientService with VS Shell: {ex.Message}");
+                }
+
+                try
+                {
+                    AddService(typeof(IRAGEngineService), async (container, ct, type) =>
+                    {
+                        try
+                        {
+                            return _serviceProvider?.GetService<IRAGEngineService>();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IRAGEngineService: {ex.Message}");
+                            return null;
+                        }
+                    }, true);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IRAGEngineService with VS Shell");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IRAGEngineService with VS Shell: {ex.Message}");
+                }
+
+                try
+                {
+                    AddService(typeof(ICodeAnalysisService), async (container, ct, type) =>
+                    {
+                        try
+                        {
+                            return _serviceProvider?.GetService<ICodeAnalysisService>();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating ICodeAnalysisService: {ex.Message}");
+                            return null;
+                        }
+                    }, true);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered ICodeAnalysisService with VS Shell");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register ICodeAnalysisService with VS Shell: {ex.Message}");
+                }
+
+                try
+                {
+                    AddService(typeof(IChatService), async (container, ct, type) =>
+                    {
+                        try
+                        {
+                            return _serviceProvider?.GetService<IChatService>();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IChatService: {ex.Message}");
+                            return null;
+                        }
+                    }, true);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IChatService with VS Shell");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IChatService with VS Shell: {ex.Message}");
+                }
+                
+                System.Diagnostics.Debug.WriteLine("A3sist: VS Shell service registration completed");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Critical error in VS Shell service registration: {ex.Message}");
+            }
         }
 
         private async Task InitializeCommandsAsync()
         {
-            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-            OleMenuCommandService commandService = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-            if (commandService != null)
+            try
             {
-                // Initialize commands
-                OpenChatCommand.Initialize(this, commandService);
-                ConfigureA3sistCommand.Initialize(this, commandService);
-                ToggleAutoCompleteCommand.Initialize(this, commandService);
-                RefactorCodeCommand.Initialize(this, commandService);
+                System.Diagnostics.Debug.WriteLine("A3sist: Initializing commands...");
+                
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                OleMenuCommandService commandService = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+                if (commandService != null)
+                {
+                    // Initialize commands with individual error handling
+                    try
+                    {
+                        OpenChatCommand.Initialize(this, commandService);
+                        System.Diagnostics.Debug.WriteLine("A3sist: OpenChatCommand initialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing OpenChatCommand: {ex.Message}");
+                    }
+
+                    try
+                    {
+                        ConfigureA3sistCommand.Initialize(this, commandService);
+                        System.Diagnostics.Debug.WriteLine("A3sist: ConfigureA3sistCommand initialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ConfigureA3sistCommand: {ex.Message}");
+                    }
+
+                    try
+                    {
+                        ToggleAutoCompleteCommand.Initialize(this, commandService);
+                        System.Diagnostics.Debug.WriteLine("A3sist: ToggleAutoCompleteCommand initialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ToggleAutoCompleteCommand: {ex.Message}");
+                    }
+
+                    try
+                    {
+                        RefactorCodeCommand.Initialize(this, commandService);
+                        System.Diagnostics.Debug.WriteLine("A3sist: RefactorCodeCommand initialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing RefactorCodeCommand: {ex.Message}");
+                    }
+                    
+                    System.Diagnostics.Debug.WriteLine("A3sist: Command initialization completed");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("A3sist: CommandService is null, commands will not be available");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing commands: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
             }
         }
 
         public T GetService<T>() where T : class
         {
-            return _serviceProvider?.GetService<T>();
+            try
+            {
+                if (_serviceProvider == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Service provider is null when requesting {typeof(T).Name}");
+                    return null;
+                }
+                
+                var service = _serviceProvider.GetService<T>();
+                if (service == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Service {typeof(T).Name} not found in service provider");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Successfully retrieved service {typeof(T).Name}");
+                }
+                
+                return service;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error getting service {typeof(T).Name}: {ex.Message}");
+                return null;
+            }
         }
 
         protected override void Dispose(bool disposing)
         {
             if (disposing)
             {
-                _serviceProvider?.Dispose();
+                try
+                {
+                    System.Diagnostics.Debug.WriteLine("A3sist: Disposing package...");
+                    
+                    if (_serviceProvider != null)
+                    {
+                        _serviceProvider.Dispose();
+                        _serviceProvider = null;
+                        System.Diagnostics.Debug.WriteLine("A3sist: Service provider disposed");
+                    }
+                    
+                    // Clear static instance
+                    Instance = null;
+                    
+                    System.Diagnostics.Debug.WriteLine("A3sist: Package disposal completed");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Error during disposal: {ex.Message}");
+                }
             }
-            base.Dispose(disposing);
+            
+            try
+            {
+                base.Dispose(disposing);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error in base disposal: {ex.Message}");
+            }
         }
 
         #endregion
