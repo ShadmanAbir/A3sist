@@ -8,6 +8,7 @@ using A3sist.Shared.Interfaces;
 using A3sist.Core.Services;
 using A3sist.Core.Services.WorkflowSteps;
 using A3sist.Core.Configuration;
+using A3sist.Core.LLM;
 using System.IO;
 
 namespace A3sist.Core.Extensions;
@@ -232,21 +233,21 @@ public static class ServiceCollectionExtensions
     /// <returns>The service collection for chaining</returns>
     public static IServiceCollection AddUIServices(this IServiceCollection services, IConfiguration configuration)
     {
-        // Chat services
-        services.AddSingleton<A3sist.UI.Services.Chat.IChatService, A3sist.UI.Services.Chat.ChatService>();
-        services.AddSingleton<A3sist.UI.Services.Chat.IChatHistoryService, A3sist.UI.Services.Chat.ChatHistoryService>();
-        services.AddSingleton<A3sist.UI.Services.Chat.IContextService, A3sist.UI.Services.Chat.ContextService>();
-        services.AddSingleton<A3sist.UI.Services.Chat.IContextAnalyzerService, A3sist.UI.Services.Chat.ContextAnalyzerService>();
-        services.AddSingleton<A3sist.UI.Services.Chat.IChatSettingsService, A3sist.UI.Services.Chat.ChatSettingsService>();
+        // Chat services - temporarily commented out due to namespace issues
+        // services.AddSingleton<A3sist.UI.Services.Chat.IChatService, A3sist.UI.Services.Chat.ChatService>();
+        // services.AddSingleton<A3sist.UI.Services.Chat.IChatHistoryService, A3sist.UI.Services.Chat.ChatHistoryService>();
+        // services.AddSingleton<A3sist.UI.Services.Chat.IContextService, A3sist.UI.Services.Chat.ContextService>();
+        // services.AddSingleton<A3sist.UI.Services.Chat.IContextAnalyzerService, A3sist.UI.Services.Chat.ContextAnalyzerService>();
+        // services.AddSingleton<A3sist.UI.Services.Chat.IChatSettingsService, A3sist.UI.Services.Chat.ChatSettingsService>();
         
-        // Chat ViewModels
-        services.AddTransient<A3sist.UI.ViewModels.Chat.ChatInterfaceViewModel>();
+        // Chat ViewModels - temporarily commented out due to namespace issues
+        // services.AddTransient<A3sist.UI.ViewModels.Chat.ChatInterfaceViewModel>();
         
-        // Progress notification service
-        services.AddSingleton<A3sist.UI.Services.ProgressNotificationService>();
+        // Progress notification service - temporarily commented out due to namespace issues
+        // services.AddSingleton<A3sist.UI.Services.ProgressNotificationService>();
         
-        // Editor service registration
-        services.AddSingleton<A3sist.UI.Services.EditorServiceRegistration>();
+        // Editor service registration - temporarily commented out due to namespace issues
+        // services.AddSingleton<A3sist.UI.Services.EditorServiceRegistration>();
         
         return services;
     }

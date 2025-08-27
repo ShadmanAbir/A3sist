@@ -120,29 +120,29 @@ namespace A3sist.Core.Services
                 Interlocked.Increment(ref _failedRequests);
 
             _agentMetrics.AddOrUpdate(agentName, 
-                new AgentMetrics
-                {
-                    Name = agentName,
-                    TasksProcessed = 1,
-                    TasksSucceeded = success ? 1 : 0,
-                    TasksFailed = success ? 0 : 1,
-                    TotalExecutionTime = duration,
-                    MinExecutionTime = duration,
-                    MaxExecutionTime = duration,
-                    LastActivity = DateTime.UtcNow
+                () => {
+                    var metrics = new AgentMetrics { Name = agentName };
+                    metrics.IncrementTasksProcessed();
+                    if (success)
+                        metrics.IncrementTasksSucceeded();
+                    else
+                        metrics.IncrementTasksFailed();
+                    metrics.TotalExecutionTime = duration;
+                    metrics.MinExecutionTime = duration;
+                    metrics.MaxExecutionTime = duration;
+                    return metrics;
                 },
                 (key, existing) =>
                 {
-                    existing.TasksProcessed++;
+                    existing.IncrementTasksProcessed();
                     if (success)
-                        existing.TasksSucceeded++;
+                        existing.IncrementTasksSucceeded();
                     else
-                        existing.TasksFailed++;
+                        existing.IncrementTasksFailed();
                     
                     existing.TotalExecutionTime = existing.TotalExecutionTime.Add(duration);
                     existing.MinExecutionTime = duration < existing.MinExecutionTime ? duration : existing.MinExecutionTime;
                     existing.MaxExecutionTime = duration > existing.MaxExecutionTime ? duration : existing.MaxExecutionTime;
-                    existing.LastActivity = DateTime.UtcNow;
                     return existing;
                 });
 
@@ -395,7 +395,7 @@ namespace A3sist.Core.Services
         public async Task RecordTimingAsync(string name, TimeSpan duration, Dictionary<string, string>? tags = null)
         {
             await Task.CompletedTask;
-            RecordAgentExecution(tags?.GetValueOrDefault("agent") ?? "System", duration, true);
+            RecordAgentExecution(tags != null && tags.TryGetValue("agent", out var agent) ? agent : "System", duration, true);
         }
 
         public IDisposable StartTimer(string name, Dictionary<string, string>? tags = null)

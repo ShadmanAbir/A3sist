@@ -1,4 +1,4 @@
-﻿using Microsoft.VisualStudio.Extensibility.UI;
+﻿﻿using Microsoft.VisualStudio.Extensibility.UI;
 using System.Runtime.Serialization;
 using System.Collections.ObjectModel;
 using A3sist.Shared.Models;
@@ -196,7 +196,7 @@ namespace A3sist.UI
                 var simulatedAgents = new[]
                 {
                     new AgentStatusViewModel { Name = "CSharpAgent", Type = AgentType.Language, Status = WorkStatus.Completed, Health = HealthStatus.Healthy },
-                    new AgentStatusViewModel { Name = "FixerAgent", Type = AgentType.Fixer, Status = WorkStatus.Pending, Health = HealthStatus.Healthy },
+                    new AgentStatusViewModel { Name = "AnalyzerAgent", Type = AgentType.Analyzer, Status = WorkStatus.Pending, Health = HealthStatus.Healthy },
                     new AgentStatusViewModel { Name = "RefactorAgent", Type = AgentType.Refactor, Status = WorkStatus.InProgress, Health = HealthStatus.Warning },
                     new AgentStatusViewModel { Name = "DesignerAgent", Type = AgentType.Designer, Status = WorkStatus.Completed, Health = HealthStatus.Healthy }
                 };

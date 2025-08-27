@@ -1,7 +1,7 @@
 using System;
 using System.Threading.Tasks;
 
-namespace A3sist.UI.VSIX
+namespace A3sist.UI.Services
 {
     /// <summary>
     /// Service interface for managing WebView2 controls

@@ -133,78 +133,8 @@ namespace A3sist.Core.Services
         /// </summary>
         private void InitializeDefaultRules()
         {
-            // Rule for fixing errors
-            var fixErrorRule = new RoutingRule
-            {
-                Name = "Fix Error Intent",
-                Description = "Routes error fixing requests to FixerAgent",
-                Priority = 100,
-                TargetAgentType = Shared.Enums.AgentType.Fixer,
-                ConfidenceBoost = 0.1,
-                Conditions = new List<RoutingCondition>
-                {
-                    new() { Field = "Intent", Operator = ConditionOperator.Equals, Value = "fix_error" }
-                }
-            };
-
-            // Rule for refactoring
-            var refactorRule = new RoutingRule
-            {
-                Name = "Refactor Intent",
-                Description = "Routes refactoring requests to RefactorAgent",
-                Priority = 100,
-                TargetAgentType = Shared.Enums.AgentType.Refactor,
-                ConfidenceBoost = 0.1,
-                Conditions = new List<RoutingCondition>
-                {
-                    new() { Field = "Intent", Operator = ConditionOperator.Equals, Value = "refactor" }
-                }
-            };
-
-            // Rule for C# files
-            var csharpRule = new RoutingRule
-            {
-                Name = "C# Language",
-                Description = "Routes C# requests to CSharpAgent",
-                Priority = 80,
-                TargetAgentType = Shared.Enums.AgentType.CSharp,
-                ConfidenceBoost = 0.05,
-                Conditions = new List<RoutingCondition>
-                {
-                    new() { Field = "Language", Operator = ConditionOperator.In, Value = "csharp,c#" }
-                }
-            };
-
-            // Rule for JavaScript/TypeScript files
-            var jsRule = new RoutingRule
-            {
-                Name = "JavaScript Language",
-                Description = "Routes JavaScript/TypeScript requests to JavaScriptAgent",
-                Priority = 80,
-                TargetAgentType = Shared.Enums.AgentType.JavaScript,
-                ConfidenceBoost = 0.05,
-                Conditions = new List<RoutingCondition>
-                {
-                    new() { Field = "Language", Operator = ConditionOperator.In, Value = "javascript,typescript,js,ts" }
-                }
-            };
-
-            // Rule for Python files
-            var pythonRule = new RoutingRule
-            {
-                Name = "Python Language",
-                Description = "Routes Python requests to PythonAgent",
-                Priority = 80,
-                TargetAgentType = Shared.Enums.AgentType.Python,
-                ConfidenceBoost = 0.05,
-                Conditions = new List<RoutingCondition>
-                {
-                    new() { Field = "Language", Operator = ConditionOperator.In, Value = "python,py" }
-                }
-            };
-
             // Add all default rules
-            var defaultRules = new[] { fixErrorRule, refactorRule, csharpRule, jsRule, pythonRule };
+            var defaultRules = new[] { refactorRule, csharpRule, jsRule, pythonRule };
             foreach (var rule in defaultRules)
             {
                 _rules.TryAdd(rule.Id, rule);

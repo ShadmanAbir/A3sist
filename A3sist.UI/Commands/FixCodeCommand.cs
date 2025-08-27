@@ -208,7 +208,7 @@ namespace A3sist.UI.Commands
                     Prompt = $"Fix the following code errors and issues:\n{string.Join("\n", errors)}",
                     Content = codeToFix,
                     FilePath = GetActiveDocumentPath(),
-                    PreferredAgentType = AgentType.Fixer,
+                    PreferredAgentType = AgentType.Analyzer,
                     CreatedAt = DateTime.UtcNow,
                     Context = new System.Collections.Generic.Dictionary<string, object>
                     {

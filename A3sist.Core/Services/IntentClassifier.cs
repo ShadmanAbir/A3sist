@@ -62,7 +62,7 @@ namespace A3sist.Core.Services
                     {
                         intentScores[pattern.Intent] = score;
                         matchedKeywords.AddRange(pattern.Keywords.Where(k => 
-                            prompt.Contains(k, StringComparison.OrdinalIgnoreCase)));
+                            prompt.IndexOf(k, StringComparison.OrdinalIgnoreCase) >= 0));
                     }
                 }
 
@@ -137,15 +137,6 @@ namespace A3sist.Core.Services
         /// </summary>
         private void InitializeIntentPatterns()
         {
-            // Code fixing intents
-            _intentPatterns["fix_error"] = new IntentPattern
-            {
-                Intent = "fix_error",
-                Keywords = new[] { "fix", "error", "bug", "issue", "problem", "broken", "exception", "crash" },
-                Patterns = new[] { @"\bfix\b.*\berror\b", @"\bbug\b", @"\bissue\b", @"\bproblem\b" },
-                Weight = 1.0
-            };
-
             _intentPatterns["refactor"] = new IntentPattern
             {
                 Intent = "refactor",
@@ -218,7 +209,7 @@ namespace A3sist.Core.Services
 
             // Score based on keyword matches
             var keywordMatches = pattern.Keywords.Count(keyword => 
-                prompt.Contains(keyword, StringComparison.OrdinalIgnoreCase));
+                prompt.IndexOf(keyword, StringComparison.OrdinalIgnoreCase) >= 0);
             
             if (keywordMatches > 0)
             {
@@ -330,7 +321,6 @@ namespace A3sist.Core.Services
         {
             return intent switch
             {
-                "fix_error" => AgentType.Fixer,
                 "refactor" => AgentType.Refactor,
                 "generate_code" => AgentType.CSharp, // Default to C# for now
                 "add_feature" => AgentType.CSharp,

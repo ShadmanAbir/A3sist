@@ -184,7 +184,7 @@ public static class ConfigurationImportExport
                 CSharpAnalysisLevel = agentOptions.CSharpAnalysisLevel,
                 EnableJavaScriptAgent = agentOptions.EnableJavaScriptAgent,
                 EnablePythonAgent = agentOptions.EnablePythonAgent,
-                EnableFixerAgent = agentOptions.EnableFixerAgent,
+
                 EnableRefactorAgent = agentOptions.EnableRefactorAgent,
                 EnableValidatorAgent = agentOptions.EnableValidatorAgent,
                 EnableKnowledgeAgent = agentOptions.EnableKnowledgeAgent,
@@ -262,7 +262,7 @@ public static class ConfigurationImportExport
             agentOptions.CSharpAnalysisLevel = configuration.Agents.CSharpAnalysisLevel;
             agentOptions.EnableJavaScriptAgent = configuration.Agents.EnableJavaScriptAgent;
             agentOptions.EnablePythonAgent = configuration.Agents.EnablePythonAgent;
-            agentOptions.EnableFixerAgent = configuration.Agents.EnableFixerAgent;
+
             agentOptions.EnableRefactorAgent = configuration.Agents.EnableRefactorAgent;
             agentOptions.EnableValidatorAgent = configuration.Agents.EnableValidatorAgent;
             agentOptions.EnableKnowledgeAgent = configuration.Agents.EnableKnowledgeAgent;
@@ -369,7 +369,7 @@ public class AgentConfigurationExport
     public string CSharpAnalysisLevel { get; set; }
     public bool EnableJavaScriptAgent { get; set; }
     public bool EnablePythonAgent { get; set; }
-    public bool EnableFixerAgent { get; set; }
+
     public bool EnableRefactorAgent { get; set; }
     public bool EnableValidatorAgent { get; set; }
     public bool EnableKnowledgeAgent { get; set; }

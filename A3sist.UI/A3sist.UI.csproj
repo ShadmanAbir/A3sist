@@ -18,6 +18,10 @@
     <StartAction Condition="'$(TargetFramework)' == 'net472'">Program</StartAction>
     <StartProgram Condition="'$(DevEnvDir)' != '' And '$(TargetFramework)' == 'net472'">$(DevEnvDir)devenv.exe</StartProgram>
     <StartArguments Condition="'$(TargetFramework)' == 'net472'">/rootsuffix Exp</StartArguments>
+    <!-- Additional VSIX properties -->
+    <GenerateVSIXFiles Condition="'$(TargetFramework)' == 'net472'">true</GenerateVSIXFiles>
+    <VSIXType Condition="'$(TargetFramework)' == 'net472'">v3</VSIXType>
+    <CreateVsixContainer Condition="'$(TargetFramework)' == 'net472'">true</CreateVsixContainer>
     <!-- WPF-specific properties (.NET 9) -->
     <OutputType Condition="'$(TargetFramework)' == 'net9.0-windows'">WinExe</OutputType>
     <AssemblyName>A3sist.UI</AssemblyName>
@@ -58,6 +62,7 @@
     <PackageReference Include="Microsoft.VisualStudio.Text.Logic" Version="17.14.249" />
     <PackageReference Include="Microsoft.VisualStudio.CoreUtility" Version="17.14.249" />
     <PackageReference Include="Microsoft.VisualStudio.Imaging" Version="17.14.40264" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.2849.39" />
     <Reference Include="System.Design" />
     <Reference Include="System.Windows.Forms" />
   </ItemGroup>

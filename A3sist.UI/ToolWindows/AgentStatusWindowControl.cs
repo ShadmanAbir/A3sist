@@ -312,8 +312,8 @@ namespace A3sist.UI.ToolWindows
                     },
                     new AgentStatusDisplayModel
                     {
-                        Name = "FixerAgent",
-                        Type = AgentType.Fixer,
+                        Name = "AnalyzerAgent",
+                        Type = AgentType.Analyzer,
                         Status = WorkStatus.InProgress,
                         Health = HealthStatus.Healthy,
                         TasksProcessed = 23,

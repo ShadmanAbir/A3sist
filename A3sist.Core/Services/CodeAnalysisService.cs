@@ -644,7 +644,7 @@ namespace A3sist.Core.Services
             // Simplified maintainability index calculation
             if (linesOfCode == 0) return 100.0;
             
-            var volume = linesOfCode * Math.Log2(numberOfMethods + 1);
+            var volume = linesOfCode * (Math.Log(numberOfMethods + 1) / Math.Log(2)); // Math.Log2 equivalent for .NET Framework
             var maintainabilityIndex = 171 - 5.2 * Math.Log(volume) - 0.23 * cyclomaticComplexity - 16.2 * Math.Log(linesOfCode);
             
             return Math.Max(0.0, Math.Min(100.0, maintainabilityIndex));

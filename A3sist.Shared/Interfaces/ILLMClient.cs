@@ -62,6 +62,6 @@ namespace A3sist.Shared.Interfaces
         /// Disposes the LLM client resources
         /// </summary>
         Task DisposeAsync();
-        Task GetCompletionAsync(string ragPrompt,LLMOptions options);
+        Task<string> GetCompletionAsync(string ragPrompt, LLMOptions options);
     }
 }

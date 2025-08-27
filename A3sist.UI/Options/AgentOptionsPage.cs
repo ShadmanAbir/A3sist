@@ -52,7 +52,7 @@ public class AgentOptionsPage : BaseOptionsPage
     [Category("Task Agents")]
     [DisplayName("Enable Fixer Agent")]
     [Description("Enable the code fixing agent")]
-    public bool EnableFixerAgent { get; set; } = true;
+
 
     [Category("Task Agents")]
     [DisplayName("Enable Refactor Agent")]
@@ -148,7 +148,7 @@ public class AgentOptionsPage : BaseOptionsPage
         CSharpAnalysisLevel = "Full";
         EnableJavaScriptAgent = true;
         EnablePythonAgent = true;
-        EnableFixerAgent = true;
+
         EnableRefactorAgent = true;
         EnableValidatorAgent = true;
         EnableKnowledgeAgent = true;

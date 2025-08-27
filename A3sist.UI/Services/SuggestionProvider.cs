@@ -240,7 +240,7 @@ namespace A3sist.UI.Services
             try
             {
                 // Get suggestions from different agent types
-                var agentTypes = new[] { AgentType.Fixer, AgentType.Refactor, AgentType.Validator };
+                var agentTypes = new[] { AgentType.Analyzer, AgentType.Refactor, AgentType.Validator };
 
                 foreach (var agentType in agentTypes)
                 {

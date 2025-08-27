@@ -319,11 +319,11 @@ namespace A3sist.Core.LLM
             await Task.CompletedTask;
         }
 
-        public async Task GetCompletionAsync(string ragPrompt, LLMOptions options)
+        public async Task<string> GetCompletionAsync(string ragPrompt, A3sist.Shared.Models.LLMOptions options)
         {
             // Implementation for GetCompletionAsync with LLMOptions
             // For now, delegate to existing GetResponseAsync method
-            await GetResponseAsync(ragPrompt);
+            return await GetResponseAsync(ragPrompt);
         }
 
         public void Dispose()

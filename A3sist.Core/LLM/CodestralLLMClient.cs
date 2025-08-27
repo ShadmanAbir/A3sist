@@ -1,72 +1,91 @@
-using A3sist.Orchastrator.LLM;
+using A3sist.Shared.Interfaces;
+using A3sist.Shared.Models;
 using System;
+using System.Collections.Generic;
 using System.Net.Http;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
-public class CodestralLLMClient : ILLMClient
+namespace A3sist.Core.LLM
 {
-    private readonly HttpClient _httpClient;
-
-    public CodestralLLMClient(HttpClient httpClient)
+    public class CodestralLLMClient : ILLMClient
     {
-        _httpClient = httpClient;
-    }
+        private readonly HttpClient _httpClient;
 
-    public async Task<string> GetCompletionAsync(string prompt, LLMOptions options = null)
-    {
-        options ??= new LLMOptions();
-
-        var requestBody = new
+        public CodestralLLMClient(HttpClient httpClient)
         {
-            prompt,
-            max_tokens = options.MaxTokens,
-            temperature = options.Temperature,
-            stop = options.Stop
-        };
-
-        var content = new StringContent(
-            JsonSerializer.Serialize(requestBody),
-            Encoding.UTF8,
-            "application/json");
-
-        var response = await _httpClient.PostAsync("http://localhost:11434/api/generate", content);
-        response.EnsureSuccessStatusCode();
-
-        var responseContent = await response.Content.ReadAsStringAsync();
-        var responseObject = JsonSerializer.Deserialize<JsonElement>(responseContent);
-
-        return responseObject.GetProperty("completion").GetString();
-    }
-
-    public async Task<bool> GetCompletionAsync(object prompt, object lLMOptions)
-    {
-        try
-        {
-            if (prompt == null)
-                return false;
-
-            var promptString = prompt.ToString();
-            var response = await GetCompletionAsync(promptString, lLMOptions as LLMOptions);
-            return !string.IsNullOrEmpty(response);
+            _httpClient = httpClient;
         }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
 
-    public async Task<string> GetResponseAsync(string prompt)
-    {
-        try
+        public string CurrentModel => "codestral";
+        public bool IsAvailable => true;
+
+        public async Task<string> CompleteAsync(string prompt, CancellationToken cancellationToken = default)
         {
-            // Use the existing GetCompletionAsync method
             return await GetCompletionAsync(prompt, new LLMOptions());
         }
-        catch (Exception)
+
+        public async Task<string> CompleteAsync(string prompt, Dictionary<string, object>? options = null, CancellationToken cancellationToken = default)
         {
-            return string.Empty;
+            var llmOptions = new LLMOptions();
+            if (options != null)
+            {
+                if (options.TryGetValue("MaxTokens", out var maxTokens) && maxTokens is int mt)
+                    llmOptions.MaxTokens = mt;
+                if (options.TryGetValue("Temperature", out var temperature) && temperature is double temp)
+                    llmOptions.Temperature = temp;
+            }
+            return await GetCompletionAsync(prompt, llmOptions);
+        }
+
+        public async Task CompleteStreamAsync(string prompt, Action<string> onChunk, CancellationToken cancellationToken = default)
+        {
+            var response = await GetCompletionAsync(prompt, new LLMOptions());
+            onChunk(response);
+        }
+
+        public async Task<IEnumerable<string>> GetAvailableModelsAsync()
+        {
+            return new[] { "codestral" };
+        }
+
+        public async Task InitializeAsync()
+        {
+            await Task.CompletedTask;
+        }
+
+        public async Task DisposeAsync()
+        {
+            _httpClient?.Dispose();
+            await Task.CompletedTask;
+        }
+
+        public async Task<string> GetCompletionAsync(string ragPrompt, LLMOptions options)
+        {
+            options ??= new LLMOptions();
+
+            var requestBody = new
+            {
+                prompt = ragPrompt,
+                max_tokens = options.MaxTokens,
+                temperature = options.Temperature,
+                stop = options.Stop
+            };
+
+            var content = new StringContent(
+                JsonSerializer.Serialize(requestBody),
+                Encoding.UTF8,
+                "application/json");
+
+            var response = await _httpClient.PostAsync("http://localhost:11434/api/generate", content);
+            response.EnsureSuccessStatusCode();
+
+            var responseContent = await response.Content.ReadAsStringAsync();
+            var responseObject = JsonSerializer.Deserialize<JsonElement>(responseContent);
+
+            return responseObject.GetProperty("completion").GetString() ?? string.Empty;
         }
     }
 }

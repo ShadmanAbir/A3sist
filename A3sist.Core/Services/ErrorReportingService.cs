@@ -150,8 +150,8 @@ namespace A3sist.Core.Services
 
             var stats = new ErrorStatistics
             {
-                StartTime = startTime ?? errorList.MinBy(e => e.Timestamp)?.Timestamp ?? DateTime.UtcNow,
-                EndTime = endTime ?? errorList.MaxBy(e => e.Timestamp)?.Timestamp ?? DateTime.UtcNow,
+                StartTime = startTime ?? errorList.OrderBy(e => e.Timestamp).FirstOrDefault()?.Timestamp ?? DateTime.UtcNow,
+                EndTime = endTime ?? errorList.OrderByDescending(e => e.Timestamp).FirstOrDefault()?.Timestamp ?? DateTime.UtcNow,
                 TotalErrors = errorList.Count
             };
 
