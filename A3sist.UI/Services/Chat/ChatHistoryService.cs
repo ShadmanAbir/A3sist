@@ -64,7 +64,7 @@ namespace A3sist.UI.Services.Chat
                 var filePath = GetConversationFilePath(conversation.Id);
                 var json = JsonSerializer.Serialize(conversation, _jsonOptions);
                 
-                await File.WriteAllTextAsync(filePath, json);
+                File.WriteAllText(filePath, json);
                 
                 _logger.LogDebug("Saved conversation {ConversationId} to {FilePath}", 
                     conversation.Id, filePath);
@@ -97,7 +97,7 @@ namespace A3sist.UI.Services.Chat
                     return null;
                 }
 
-                var json = await File.ReadAllTextAsync(filePath);
+                var json = File.ReadAllText(filePath);
                 var conversation = JsonSerializer.Deserialize<ChatConversation>(json, _jsonOptions);
                 
                 _logger.LogDebug("Loaded conversation {ConversationId} from {FilePath}", 
@@ -132,7 +132,7 @@ namespace A3sist.UI.Services.Chat
                 {
                     try
                     {
-                        var json = await File.ReadAllTextAsync(file);
+                        var json = File.ReadAllText(file);
                         var conversation = JsonSerializer.Deserialize<ChatConversation>(json, _jsonOptions);
                         
                         if (conversation != null)
@@ -243,7 +243,7 @@ namespace A3sist.UI.Services.Chat
                 };
 
                 var json = JsonSerializer.Serialize(export, _jsonOptions);
-                await File.WriteAllTextAsync(filePath, json);
+                File.WriteAllText(filePath, json);
                 
                 _logger.LogInformation("Exported conversation {ConversationId} to {FilePath}", 
                     conversationId, filePath);
@@ -267,7 +267,7 @@ namespace A3sist.UI.Services.Chat
                     throw new FileNotFoundException($"Import file not found: {filePath}");
                 }
 
-                var json = await File.ReadAllTextAsync(filePath);
+                var json = File.ReadAllText(filePath);
                 
                 // Try to deserialize as export format first
                 try

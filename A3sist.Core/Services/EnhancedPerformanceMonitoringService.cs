@@ -120,8 +120,8 @@ namespace A3sist.Core.Services
                 Interlocked.Increment(ref _failedRequests);
 
             _agentMetrics.AddOrUpdate(agentName, 
-                () => {
-                    var metrics = new AgentMetrics { Name = agentName };
+                (key) => {
+                    var metrics = new AgentMetrics { Name = key };
                     metrics.IncrementTasksProcessed();
                     if (success)
                         metrics.IncrementTasksSucceeded();

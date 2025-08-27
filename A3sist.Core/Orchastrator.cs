@@ -93,7 +93,7 @@ namespace A3sist.Core.Services
 
             var stopwatch = Stopwatch.StartNew();
             _logger.LogInformation("Processing request {RequestId} with prompt: {Prompt}", 
-                request.Id, request.Prompt?.Substring(0, Math.Min(100, request.Prompt.Length ?? 0)));
+                request.Id, request.Prompt?.Substring(0, Math.Min(100, request.Prompt?.Length ?? 0)));
 
             try
             {

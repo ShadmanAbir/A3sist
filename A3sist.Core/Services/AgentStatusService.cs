@@ -78,7 +78,12 @@ namespace A3sist.Core.Services
             // Raise event if status changed
             if (previousStatus != status.Status)
             {
-                AgentStatusChanged?.Invoke(this, new AgentStatusChangedEventArgs(agentName, previousStatus, status.Status));
+                AgentStatusChanged?.Invoke(this, new AgentStatusChangedEventArgs(
+                    agentName, 
+                    previousStatus, 
+                    status.Status,
+                    HealthStatus.Unknown,
+                    HealthStatus.Unknown));
             }
 
             await Task.CompletedTask;

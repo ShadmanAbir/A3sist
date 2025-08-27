@@ -382,7 +382,7 @@ namespace A3sist.UI.Services
                 // Fallback to reading from file system
                 if (System.IO.File.Exists(filePath))
                 {
-                    return await System.IO.File.ReadAllTextAsync(filePath);
+                    return System.IO.File.ReadAllText(filePath);
                 }
 
                 return null;

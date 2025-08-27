@@ -158,7 +158,9 @@ namespace A3sist.Orchastrator.Agents.JavaScript
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(analysisResult, metadata, Name);
+                var result = AgentResult.CreateSuccess("JavaScript code analysis completed successfully", analysisResult, Name);
+                result.Metadata = metadata;
+                return result;
             }
             catch (Exception ex)
             {
@@ -185,7 +187,9 @@ namespace A3sist.Orchastrator.Agents.JavaScript
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(refactoredCode, metadata, Name);
+                var result = AgentResult.CreateSuccess("JavaScript code refactoring completed successfully", refactoredCode, Name);
+                result.Metadata = metadata;
+                return result;
             }
             catch (Exception ex)
             {
@@ -210,7 +214,9 @@ namespace A3sist.Orchastrator.Agents.JavaScript
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(result, metadata, Name);
+                var result = AgentResult.CreateSuccess("NPM package management completed successfully", result, Name);
+                result.Metadata = metadata;
+                return result;
             }
             catch (Exception ex)
             {
@@ -236,7 +242,9 @@ namespace A3sist.Orchastrator.Agents.JavaScript
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(lintResult, metadata, Name);
+                var result = AgentResult.CreateSuccess("JavaScript code linting completed successfully", lintResult, Name);
+                result.Metadata = metadata;
+                return result;
             }
             catch (Exception ex)
             {
@@ -263,7 +271,9 @@ namespace A3sist.Orchastrator.Agents.JavaScript
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(formattedCode, metadata, Name);
+                var result = AgentResult.CreateSuccess("JavaScript code formatting completed successfully", formattedCode, Name);
+                result.Metadata = metadata;
+                return result;
             }
             catch (Exception ex)
             {
@@ -285,7 +295,9 @@ namespace A3sist.Orchastrator.Agents.JavaScript
                     ["timestamp"] = DateTime.UtcNow
                 };
 
-                return AgentResult.CreateSuccess(testResult, metadata, Name);
+                var result = AgentResult.CreateSuccess("JavaScript tests executed successfully", testResult, Name);
+                result.Metadata = metadata;
+                return result;
             }
             catch (Exception ex)
             {

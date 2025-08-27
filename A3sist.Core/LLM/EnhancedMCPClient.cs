@@ -111,7 +111,7 @@ namespace A3sist.Core.LLM
                     ? BuildRAGEnhancedPrompt(request.Prompt, request.Content, ragContext)
                     : BuildSimplePrompt(request.Prompt, request.Content);
 
-                var response = await _llmClient.GetCompletionAsync(prompt);
+                var response = await _llmClient.GetCompletionAsync(prompt, new LLMOptions());
 
                 return AgentResult.CreateSuccess(response.Response, new Dictionary<string, object>
                 {

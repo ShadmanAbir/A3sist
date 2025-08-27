@@ -158,7 +158,7 @@ public class SettingsPersistenceService : ISettingsPersistenceService
             var backupFileName = $"settings_backup_{timestamp}.json";
             var backupFilePath = Path.Combine(_backupDirectory, backupFileName);
 
-            await File.CopyToAsync(_settingsFilePath, backupFilePath);
+            File.Copy(_settingsFilePath, backupFilePath);
 
             // Clean up old backups (keep only last 10)
             await CleanupOldBackupsAsync();
@@ -193,7 +193,7 @@ public class SettingsPersistenceService : ISettingsPersistenceService
             await CreateBackupAsync();
 
             // Copy backup file to settings location
-            await File.CopyToAsync(backupFilePath, _settingsFilePath, overwrite: true);
+            File.Copy(backupFilePath, _settingsFilePath, overwrite: true);
 
             _logger.LogInformation("Settings restored from backup: {BackupPath}", backupFilePath);
             return true;

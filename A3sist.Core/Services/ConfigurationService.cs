@@ -33,7 +33,7 @@ public class ConfigurationService : IConfigurationService, IDisposable
     {
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        _configurationProviders = configurationProviders?.ToArray() ?? Array.Empty<IConfigurationProvider>();
+        _configurationProviders = configurationProviders?.ToArray() ?? Array.Empty<A3sist.Shared.Interfaces.IConfigurationProvider>();
         _configurationCache = new ConcurrentDictionary<string, object>();
         
         // Initialize configuration

@@ -206,7 +206,7 @@ namespace A3sist.UI.Services.Chat
                     WriteIndented = true
                 });
                 
-                await File.WriteAllTextAsync(_settingsPath, json);
+                File.WriteAllText(_settingsPath, json);
                 _logger.LogDebug("Saved chat settings to file");
                 
                 // Also save to VS options page if available

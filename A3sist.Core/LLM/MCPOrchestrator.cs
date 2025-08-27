@@ -308,7 +308,7 @@ namespace A3sist.Core.LLM
             var httpResponse = await _httpClient.SendAsync(httpRequest, cancellationToken);
             httpResponse.EnsureSuccessStatusCode();
 
-            var responseJson = await httpResponse.Content.ReadAsStringAsync(cancellationToken);
+            var responseJson = await httpResponse.Content.ReadAsStringAsync();
             var response = JsonSerializer.Deserialize<JsonElement>(responseJson);
 
             return response.GetProperty("result").GetString() ?? "";

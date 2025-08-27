@@ -51,7 +51,21 @@ namespace A3sist.Core.Services
 
                 // Step 2: Augment the prompt with retrieved knowledge
                 var augmentedPrompt = _ragService.AugmentPrompt(request.Prompt, ragContext);
-                var enhancedRequest = request with { Prompt = augmentedPrompt };
+                var enhancedRequest = new AgentRequest
+                {
+                    Id = request.Id,
+                    Prompt = augmentedPrompt,
+                    FilePath = request.FilePath,
+                    Content = request.Content,
+                    Context = request.Context,
+                    PreferredAgentType = request.PreferredAgentType,
+                    LLMOptions = request.LLMOptions,
+                    CreatedAt = request.CreatedAt,
+                    UserId = request.UserId,
+                    Priority = request.Priority,
+                    Timeout = request.Timeout,
+                    Metadata = request.Metadata
+                };
 
                 // Step 3: Route based on language and context with intelligent fallback
                 var language = DetectLanguage(request.FilePath, request.Content);

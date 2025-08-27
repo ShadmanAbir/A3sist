@@ -167,10 +167,10 @@ namespace A3sist.Core.Services
                 };
 
                 var json = JsonSerializer.Serialize(mcpRequest);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync("http://localhost:3003/mcp", content);
-                var content = await response.Content.ReadAsStringAsync();
-                var mcpResult = JsonSerializer.Deserialize<MCPResponse>(content);
+                var contentRequest = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("http://localhost:3003/mcp", contentRequest);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var mcpResult = JsonSerializer.Deserialize<MCPResponse>(responseContent);
 
                 return mcpResult?.Result?.Results?.Select(r => new KnowledgeEntry
                 {
@@ -208,10 +208,10 @@ namespace A3sist.Core.Services
                 };
 
                 var json = JsonSerializer.Serialize(examplesRequest);
-                var content = new StringContent(json, Encoding.UTF8, "application/json");
-                var response = await _httpClient.PostAsync("http://localhost:3003/mcp", content);
-                var content = await response.Content.ReadAsStringAsync();
-                var mcpResult = JsonSerializer.Deserialize<MCPResponse>(content);
+                var contentRequest = new StringContent(json, Encoding.UTF8, "application/json");
+                var response = await _httpClient.PostAsync("http://localhost:3003/mcp", contentRequest);
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var mcpResult = JsonSerializer.Deserialize<MCPResponse>(responseContent);
 
                 return mcpResult?.Result?.Examples?.Select(e => new KnowledgeEntry
                 {
