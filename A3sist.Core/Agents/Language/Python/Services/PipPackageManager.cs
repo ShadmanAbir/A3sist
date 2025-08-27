@@ -17,7 +17,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         private bool _disposed = false;
         private string _workingDirectory;
 
-        public PipPackageManager(string workingDirectory = null)
+        public PipPackageManager(string? workingDirectory = null)
         {
             _workingDirectory = workingDirectory ?? Directory.GetCurrentDirectory();
         }
@@ -48,7 +48,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <param name="command">The pip command to execute</param>
         /// <param name="packageName">Optional package name for package-specific commands</param>
         /// <returns>The command execution result</returns>
-        public async System.Threading.Tasks.Task<string> ExecuteCommandAsync(string command, string packageName = null)
+        public async System.Threading.Tasks.Task<string> ExecuteCommandAsync(string command, string? packageName = null)
         {
             try
             {
@@ -90,7 +90,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// </summary>
         /// <param name="testPattern">Optional test pattern to run specific tests</param>
         /// <returns>Test execution results</returns>
-        public async System.Threading.Tasks.Task<string> RunTestsAsync(string testPattern = null)
+        public async System.Threading.Tasks.Task<string> RunTestsAsync(string? testPattern = null)
         {
             try
             {

@@ -262,7 +262,7 @@ namespace A3sist.Core.Agents.Core.Dispatcher
         {
             try
             {
-                await PerformLoadBalancing(null);
+                PerformLoadBalancing(null);
                 return AgentResult.CreateSuccess("Load balancing performed successfully", Name);
             }
             catch (Exception ex)

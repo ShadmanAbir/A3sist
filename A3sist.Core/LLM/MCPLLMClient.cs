@@ -319,11 +319,7 @@ namespace A3sist.Core.LLM
             await Task.CompletedTask;
         }
 
-<<<<<<< HEAD
-        public async Task<string> GetCompletionAsync(string ragPrompt, LLMOptions options)
-=======
         public async Task<string> GetCompletionAsync(string ragPrompt, A3sist.Shared.Models.LLMOptions options)
->>>>>>> d9292da76b3bf2140ff68335ee93fce5bcd201a3
         {
             // Implementation for GetCompletionAsync with LLMOptions
             // For now, delegate to existing GetResponseAsync method

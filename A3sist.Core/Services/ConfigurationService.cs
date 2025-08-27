@@ -21,7 +21,7 @@ public class ConfigurationService : IConfigurationService, IDisposable
     private readonly ConcurrentDictionary<string, object> _configurationCache;
     private readonly Timer _reloadTimer;
     private readonly object _lockObject = new object();
-    private A3sistConfiguration _a3sistConfig;
+    private A3sistConfiguration _a3sistConfig = new();
     private bool _disposed;
 
     public event EventHandler<ConfigurationChangedEventArgs>? ConfigurationChanged;
@@ -29,7 +29,7 @@ public class ConfigurationService : IConfigurationService, IDisposable
     public ConfigurationService(
         IConfiguration configuration,
         ILogger<ConfigurationService> logger,
-        IEnumerable<A3sist.Shared.Interfaces.IConfigurationProvider> configurationProviders = null)
+        IEnumerable<A3sist.Shared.Interfaces.IConfigurationProvider>? configurationProviders = null)
     {
         _configuration = configuration ?? throw new ArgumentNullException(nameof(configuration));
         _logger = logger ?? throw new ArgumentNullException(nameof(logger));

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using A3sist.Shared.Interfaces;
 using A3sist.Shared.Messaging;
+using A3sist.Shared.Models;
 using A3sist.Core.Services;
 
 namespace A3sist.Core.LLM
@@ -113,12 +114,10 @@ namespace A3sist.Core.LLM
 
                 var response = await _llmClient.GetCompletionAsync(prompt, new LLMOptions());
 
-                return AgentResult.CreateSuccess(response.Response, new Dictionary<string, object>
+                return AgentResult.CreateSuccess(response, new Dictionary<string, object>
                 {
                     ["ProcessingType"] = "Direct LLM",
                     ["RAGEnhanced"] = ragContext != null,
-                    ["ProcessingTime"] = response.ProcessingTime,
-                    ["TokensUsed"] = response.TokensUsed,
                     ["Language"] = DetectLanguage(request.FilePath)
                 });
             }

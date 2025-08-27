@@ -16,7 +16,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         private bool _disposed = false;
         private string _workingDirectory;
 
-        public VirtualEnvironmentManager(string workingDirectory = null)
+        public VirtualEnvironmentManager(string? workingDirectory = null)
         {
             _workingDirectory = workingDirectory ?? Directory.GetCurrentDirectory();
         }
@@ -47,7 +47,7 @@ namespace A3sist.Core.Agents.Language.Python.Services
         /// <param name="command">The venv command to execute</param>
         /// <param name="envName">Optional environment name</param>
         /// <returns>The command execution result</returns>
-        public async System.Threading.Tasks.Task<string> ExecuteCommandAsync(string command, string envName = null)
+        public async System.Threading.Tasks.Task<string> ExecuteCommandAsync(string command, string? envName = null)
         {
             try
             {
