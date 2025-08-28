@@ -1,242 +1,137 @@
-# A3sist - AI-Powered Code Assistant for Visual Studio
+# A3sist - AI Code Assistant for Visual Studio
 
-A3sist is a comprehensive Visual Studio extension that provides intelligent code assistance through AI-powered features including chat, autocomplete, refactoring, and code suggestions. The extension offers flexible integration with both local and remote Language Learning Models (LLMs) through Model Control Protocol (MCP) and hybrid Retrieval-Augmented Generation (RAG) capabilities.
+A3sist is an AI-powered development assistant for Visual Studio that provides intelligent chat, code analysis, refactoring suggestions, and context-aware assistance with support for local and remote AI models.
 
-## Features
+## 🚀 Quick Start
 
-### Core Capabilities
-- **Hybrid AI Integration**: Support for both local LLMs (Ollama, LM Studio) and remote APIs (OpenAI, Anthropic, etc.)
-- **Multi-Model Support**: Use multiple local models simultaneously with smart routing and model switching
-- **Intelligent Model Selection**: One model at a time with optional multi-model toggle for advanced users
-- **Advanced Refactoring Engine**: AI-powered code refactoring with preview and rollback capabilities
-- **Code Cleanup Tools**: Automated code formatting, optimization, and best practice enforcement
-- **Flexible RAG Options**: Local knowledge bases and/or remote vector databases
-- **Intelligent Code Completion**: Context-aware autocomplete functionality
-- **Chat Interface**: Interactive AI chat for development assistance with model switching
-- **IntelliSense Integration**: Bulb-like quick fix and suggestion interface
-- **Multi-Language Support**: Primary focus on C#/.NET with extensible language detection
-- **Privacy Control**: Users choose between local privacy or remote capabilities
+### Building and Installing
 
-### UI Components
-- **Chat Window**: Interactive chat interface with model selection and history
-- **Configuration Hub**: Comprehensive settings for models, MCP servers, and RAG configuration
-- **Model Management**: Easy setup and testing of local and remote AI models
-- **MCP Configuration**: Setup and management of Model Control Protocol servers
-- **RAG Configuration**: Local and remote knowledge base configuration
+1. **Build the Extension**:
+   - Run `build_and_install.bat` (recommended) 
+   - OR manually build using Visual Studio 2022 with the solution file `A3sist.sln`
 
-## Installation
+2. **Install the Extension**:
+   - Close all Visual Studio instances
+   - Double-click the generated `A3sist.vsix` file (usually in `bin\Debug\`)
+   - Follow the installation prompts
 
-### Prerequisites
-- Visual Studio 2022 (Community, Professional, or Enterprise)
-- .NET Framework 4.7.2 or later
-- For local models: Ollama, LM Studio, or compatible local AI server
+3. **Access the Sidebar Panel**:
+   - Open Visual Studio
+   - Go to **View** → **A3sist AI Assistant** 
+   - OR go to **Tools** → **A3sist** → **Show A3sist Panel**
 
-### Building from Source
-1. Clone the repository
-2. Open `A3sist.csproj` in Visual Studio 2022
-3. Restore NuGet packages
-4. Build the solution
-5. The VSIX package will be generated in the output directory
+## 📍 Finding the A3sist Sidebar Panel
 
-### Installation
-1. Download the latest A3sist.vsix from releases
-2. Close all Visual Studio instances
-3. Double-click the .vsix file to install
-4. Restart Visual Studio
-5. Find A3sist menu in Tools > A3sist
+### Method 1: View Menu (Recommended)
+1. Open Visual Studio
+2. Click **View** in the top menu
+3. Look for **"A3sist AI Assistant"**
+4. Click to open the sidebar panel
 
-## Configuration
+### Method 2: Tools Menu  
+1. Open Visual Studio
+2. Click **Tools** in the top menu
+3. Look for **"A3sist"** submenu
+4. Click **"Show A3sist Panel"**
 
-### Setting Up Local Models
+### Troubleshooting Panel Visibility
+- Ensure the extension is enabled in **Extensions** → **Manage Extensions**
+- Try restarting Visual Studio completely
+- Check **View** → **Output** for any error messages
+- Reset window layout: **Window** → **Reset Window Layout**
 
-#### Ollama
-1. Install Ollama from https://ollama.ai/
-2. Download a model: `ollama pull codellama`
-3. Start Ollama service
-4. In A3sist Configuration > Models, add:
-   - Name: CodeLlama
-   - Provider: Ollama
-   - Endpoint: http://localhost:11434
-   - Model Name: codellama
+## 🎯 Features
 
-#### LM Studio
-1. Install LM Studio
-2. Download and load a model
-3. Start the local server
-4. In A3sist Configuration > Models, add:
-   - Name: Local Model
-   - Provider: LM Studio
-   - Endpoint: http://localhost:1234
-   - Model Name: (your loaded model)
+The A3sist sidebar panel provides:
 
-### Setting Up Remote Models
+### Quick Actions
+- **💬 Open Chat Assistant**: Launch AI-powered code chat
+- **🔧 Refactor Selected Code**: AI-assisted code refactoring  
+- **⚙️ Configure A3sist**: Extension settings and model configuration
 
-#### OpenAI
-1. Get API key from OpenAI
-2. In A3sist Configuration > Models, add:
-   - Name: GPT-4
-   - Provider: OpenAI
-   - Endpoint: https://api.openai.com
-   - API Key: your-api-key
-   - Model Name: gpt-4
+### Agent Mode
+- **Autonomous Analysis**: Let AI analyze your codebase automatically
+- **Progress Tracking**: Visual feedback for ongoing AI operations
+- **Start/Stop Control**: Manual control over agent activities
 
-### MCP Server Configuration
-Model Control Protocol servers provide extended capabilities:
+### Model Management
+- **Active Model Display**: See which AI model is currently selected
+- **Model Switching**: Change between configured AI models
+- **Status Indicators**: Visual feedback for model availability
 
-1. Local MCP Server: Configure local tools and integrations
-2. Remote MCP Server: Connect to cloud-based MCP services
-3. Auto-discovery: Automatically find local MCP servers
+### Feature Toggles
+- **AI AutoComplete**: Toggle intelligent code completion
+- **Real-time Analysis**: Enable/disable live code analysis
+- **Knowledge Base (RAG)**: Control retrieval-augmented generation features
 
-### RAG Configuration
-Configure knowledge bases for contextual AI responses:
+## 🔧 Configuration
 
-#### Local RAG
-- Vector Store: Choose between Simple Text, SQLite Vector, or Chroma
-- Index Path: Specify workspace to index
-- Auto-indexing: Enable automatic indexing of workspace changes
+### AI Models
+1. Click **"Configure A3sist"** in the sidebar
+2. Go to the **Models** tab
+3. Add your AI models (OpenAI, Anthropic, local models via Ollama, etc.)
+4. Configure API keys and endpoints
 
-#### Remote RAG
-- Provider: Pinecone, Qdrant, Weaviate, or custom
-- API Configuration: Endpoint and API key
-- Index synchronization with local knowledge base
+### MCP Servers  
+- Set up Model Context Protocol servers for enhanced capabilities
+- Configure tools and resources for specific development workflows
 
-## Usage
+### RAG Engine
+- Enable knowledge base functionality
+- Configure document indexing and retrieval settings
 
-### Chat Assistant
-1. Open chat: Tools > A3sist > Open Chat Assistant
-2. Select active model from dropdown
-3. Type questions or paste code for assistance
-4. Use Ctrl+Enter for multi-line input
+## 💡 Usage Tips
 
-### Code Refactoring
-1. Select code in editor
-2. Right-click > A3sist > Refactor with AI
-3. Review suggestions and apply changes
+1. **First Time Setup**: Configure at least one AI model before using features
+2. **Docking**: The sidebar can be docked anywhere in Visual Studio
+3. **Multiple Instances**: The panel is designed as a singleton - only one instance
+4. **Solution Context**: Some features work better with an open solution/project
 
-### AutoComplete
-- Enable/disable: Tools > A3sist > Toggle AutoComplete
-- Automatic suggestions while typing
-- AI-powered context-aware completions
+## 🔍 Technical Details
 
-### Configuration
-- Access: Tools > A3sist > Configure A3sist
-- Configure models, MCP servers, and RAG settings
-- Test connections and manage settings
+- **Target Framework**: .NET Framework 4.7.2
+- **Visual Studio**: 2022 (Community, Professional, Enterprise)
+- **Architecture**: Modular service-based design with dependency injection
+- **UI Framework**: WPF/XAML for Visual Studio integration
 
-## Architecture
+## 📁 Project Structure
 
-### Core Components
-- **A3sistPackage**: Main extension package and entry point
-- **Service Layer**: Modular services for different capabilities
-- **Model Management**: Handle local and remote AI models
-- **MCP Client**: Model Control Protocol integration
-- **RAG Engine**: Retrieval-Augmented Generation system
-- **Code Analysis**: Language detection and code analysis
-- **UI Components**: WPF-based user interfaces
-
-### Service Architecture
-```
-A3sistPackage
-├── ModelManagementService
-├── MCPClientService
-├── RAGEngineService
-├── CodeAnalysisService
-├── ChatService
-├── AutoCompleteService
-├── RefactoringService
-└── ConfigurationService
-```
-
-## Development
-
-### Project Structure
 ```
 A3sist/
-├── A3sist.csproj              # Main project file
-├── A3sistPackage.cs           # Extension package
-├── Services/                  # Core services
-│   ├── Interfaces.cs          # Service interfaces
-│   ├── ModelManagementService.cs
-│   ├── MCPClientService.cs
-│   ├── RAGEngineService.cs
-│   ├── CodeAnalysisService.cs
-│   ├── ChatService.cs
-│   └── A3sistConfigurationService.cs
-├── Commands/                  # VS command handlers
-│   └── Commands.cs
-├── UI/                        # WPF user interfaces
-│   ├── ChatWindow.xaml
-│   ├── ChatWindow.xaml.cs
-│   ├── ConfigurationWindow.xaml
-│   └── ConfigurationWindow.xaml.cs
-├── A3sistPackage.vsct        # VS command table
-└── source.extension.vsixmanifest
+├── Commands/           # Visual Studio command handlers
+├── Services/          # Core AI and analysis services  
+├── UI/               # User interface components
+├── Models/           # Data models and configuration
+├── Agent/            # Autonomous analysis capabilities
+└── Resources/        # Icons and other assets
 ```
 
-### Contributing
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+## 🐛 Troubleshooting
 
-## Troubleshooting
+### Extension Not Loading
+- Check Visual Studio Output window (General/Extensions channels)
+- Verify extension is enabled in Extensions Manager
+- Try safe mode: `devenv /safemode`
 
-### Common Issues
+### Sidebar Not Appearing
+- Use **View** → **A3sist AI Assistant** 
+- Check for the panel in other dock locations
+- Reset Visual Studio window layout
 
-#### Models Not Connecting
-- Check if local AI server is running
-- Verify endpoint URLs and API keys
-- Test connection in configuration dialog
+### Build Issues
+- Ensure Visual Studio 2022 with VS SDK is installed
+- Use the provided `build_and_install.bat` script
+- Check for NuGet package restore issues
 
-#### AutoComplete Not Working
-- Ensure AutoComplete is enabled
-- Check if active model is available
-- Verify workspace is indexed for RAG
+## 🆘 Support
 
-#### RAG Not Finding Results
-- Index workspace in RAG configuration
-- Check similarity threshold settings
-- Verify indexed document count
+If you're having trouble finding or using the sidebar panel:
 
-### Log Files
-A3sist logs are stored in:
-- Windows: `%APPDATA%\A3sist\logs\`
-- Configuration: `%APPDATA%\A3sist\config.json`
+1. Check the [HOW_TO_FIND_SIDEBAR.md](HOW_TO_FIND_SIDEBAR.md) guide
+2. Look for error messages in **View** → **Output** 
+3. Try the troubleshooting steps above
+4. Ensure you have an active solution open
 
-## Roadmap
+## 📄 License
 
-### Planned Features
-- [ ] Agent Mode for autonomous code analysis
-- [ ] IntelliSense bulb integration
-- [ ] Additional language support
-- [ ] Plugin system for extensibility
-- [ ] Advanced code metrics and analysis
-- [ ] Integration with Git for commit messages
-- [ ] Code review assistance
-- [ ] Documentation generation
-
-### Version History
-- v1.0.0: Initial release with core features
-  - Chat interface with model selection
-  - Local and remote model support
-  - Basic MCP integration
-  - Local RAG implementation
-  - Configuration management
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details.
-
-## Support
-
-For support, bug reports, and feature requests:
-- GitHub Issues: https://github.com/a3sist/a3sist/issues
-- Documentation: https://github.com/a3sist/a3sist/wiki
-
-## Acknowledgments
-
-- Visual Studio SDK team for the excellent extension framework
-- Ollama team for local AI model hosting
-- OpenAI for API access and model development
-- Microsoft CodeAnalysis (Roslyn) team for code analysis capabilities
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

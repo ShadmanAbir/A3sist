@@ -31,8 +31,8 @@ namespace A3sist
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(A3sistPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(A3sist.UI.A3sistToolWindowPane), Style = VsDockStyle.Tabbed, Window = "3ae79031-e1bc-11d0-8f78-00a0c9110057")]
-    [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideToolWindow(typeof(A3sist.UI.A3sistToolWindowPane), Style = VsDockStyle.Float, Window = ToolWindowGuids80.SolutionExplorer)]
+    [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideService(typeof(IA3sistConfigurationService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IModelManagementService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IMCPClientService), IsAsyncQueryable = true)]
@@ -44,7 +44,7 @@ namespace A3sist
         /// <summary>
         /// A3sistPackage GUID string.
         /// </summary>
-        public const string PackageGuidString = "12345678-1234-1234-1234-123456789012";
+        public const string PackageGuidString = "285cd009-b086-4f05-a305-35790de8f3d1";
 
         private Microsoft.Extensions.DependencyInjection.ServiceProvider _serviceProvider;
         
@@ -467,6 +467,34 @@ namespace A3sist
             {
                 System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing commands: {ex.Message}");
                 System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
+            }
+        }
+
+        private async Task ShowToolWindowAsync()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("A3sist: Attempting to show tool window...");
+                
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                
+                // Get the instance of the tool window created when package was initialized
+                var window = await this.FindToolWindowAsync(typeof(A3sist.UI.A3sistToolWindowPane), 0, true, this.DisposalToken);
+                if ((null != window) && (null != window.Frame))
+                {
+                    var windowFrame = (IVsWindowFrame)window.Frame;
+                    Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+                    System.Diagnostics.Debug.WriteLine("A3sist: Tool window shown successfully");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("A3sist: Failed to create or show tool window - window or frame is null");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error showing tool window: {ex.Message}");
+                // Don't throw - this is not critical for package loading
             }
         }
 
