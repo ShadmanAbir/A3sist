@@ -31,17 +31,10 @@ namespace A3sist
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(A3sistPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(A3sist.UI.A3sistToolWindowPane), Style = VsDockStyle.Tabbed, Window = ToolWindowGuids80.SolutionExplorer)]
-    [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideToolWindow(typeof(A3sist.UI.A3sistToolWindowPane), Style = VsDockStyle.Float, Window = ToolWindowGuids80.SolutionExplorer)]
+    [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideService(typeof(IA3sistConfigurationService), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IModelManagementService), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IMCPClientService), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IRAGEngineService), IsAsyncQueryable = true)]
-    [ProvideService(typeof(ICodeAnalysisService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IChatService), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IRefactoringService), IsAsyncQueryable = true)]
-    [ProvideService(typeof(IAutoCompleteService), IsAsyncQueryable = true)]
-    [ProvideService(typeof(A3sist.Agent.IAgentModeService), IsAsyncQueryable = true)]
     public class A3sistPackage : AsyncPackage
     {
         /// <summary>
@@ -72,30 +65,24 @@ namespace A3sist
                 // Set the static instance
                 Instance = this;
                 
-                System.Diagnostics.Debug.WriteLine("A3sist: Starting package initialization...");
+                System.Diagnostics.Debug.WriteLine("A3sist: Starting minimal package initialization...");
                 
-                // When initialized asynchronously, the current thread may be a background thread at this point.
-                // Do any initialization that requires the UI thread after switching to the UI thread.
+                // Initialize only the absolute minimum required for Visual Studio
                 await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
-                await ShowToolWindowAsync();
-                // Initialize dependency injection with error handling
-                await InitializeServicesAsync();
-
-                // Initialize commands with error handling
+                // Initialize only commands - defer everything else
                 await InitializeCommandsAsync();
 
-                
-
                 await base.InitializeAsync(cancellationToken, progress);
-                
-                System.Diagnostics.Debug.WriteLine("A3sist: Package initialization completed successfully.");
+
+                await ShowToolWindowAsync();
+
+                System.Diagnostics.Debug.WriteLine("A3sist: Minimal package initialization completed.");
             }
             catch (Exception ex)
             {
                 // Log the error but don't throw to prevent VS from failing to load the package
                 System.Diagnostics.Debug.WriteLine($"A3sist package initialization error: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
                 
                 try
                 {
@@ -115,11 +102,11 @@ namespace A3sist
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("A3sist: Initializing services...");
+                System.Diagnostics.Debug.WriteLine("A3sist: Initializing minimal services for startup...");
                 
                 var services = new ServiceCollection();
 
-                // Register core services with individual error handling
+                // Register only essential services during startup to prevent freezing
                 try
                 {
                     services.AddSingleton<IA3sistConfigurationService, A3sistConfigurationService>();
@@ -130,46 +117,9 @@ namespace A3sist
                     System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IA3sistConfigurationService: {ex.Message}");
                 }
 
-                try
-                {
-                    services.AddSingleton<IModelManagementService, ModelManagementService>();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IModelManagementService");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IModelManagementService: {ex.Message}");
-                }
-
-                try
-                {
-                    services.AddSingleton<IMCPClientService, MCPClientService>();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IMCPClientService");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IMCPClientService: {ex.Message}");
-                }
-
-                try
-                {
-                    services.AddSingleton<IRAGEngineService, RAGEngineService>();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IRAGEngineService");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IRAGEngineService: {ex.Message}");
-                }
-
-                try
-                {
-                    services.AddSingleton<ICodeAnalysisService, CodeAnalysisService>();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered ICodeAnalysisService");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register ICodeAnalysisService: {ex.Message}");
-                }
-
+                // Defer heavy services like ModelManagement, RAG, CodeAnalysis until actually needed
+                // This prevents startup freezing caused by heavy initialization
+                
                 try
                 {
                     services.AddSingleton<IChatService, ChatService>();
@@ -180,41 +130,11 @@ namespace A3sist
                     System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IChatService: {ex.Message}");
                 }
 
-                try
-                {
-                    services.AddSingleton<IRefactoringService, RefactoringService>();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IRefactoringService");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IRefactoringService: {ex.Message}");
-                }
-
-                try
-                {
-                    services.AddSingleton<IAutoCompleteService, AutoCompleteService>();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IAutoCompleteService");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IAutoCompleteService: {ex.Message}");
-                }
-
-                try
-                {
-                    services.AddSingleton<A3sist.Agent.IAgentModeService, A3sist.Agent.AgentModeService>();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IAgentModeService");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IAgentModeService: {ex.Message}");
-                }
-
                 // Build service provider with error handling
                 try
                 {
                     _serviceProvider = services.BuildServiceProvider();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Service provider built successfully");
+                    System.Diagnostics.Debug.WriteLine("A3sist: Minimal service provider built successfully");
                 }
                 catch (Exception ex)
                 {
@@ -225,10 +145,10 @@ namespace A3sist
                     System.Diagnostics.Debug.WriteLine("A3sist: Created fallback service provider");
                 }
 
-                // Register services with VS Shell with individual error handling
-                await RegisterVSShellServicesAsync();
+                // Register only essential services with VS Shell
+                await RegisterEssentialVSShellServicesAsync();
                 
-                System.Diagnostics.Debug.WriteLine("A3sist: Services initialization completed");
+                System.Diagnostics.Debug.WriteLine("A3sist: Essential services initialization completed");
             }
             catch (Exception ex)
             {
@@ -249,13 +169,13 @@ namespace A3sist
             }
         }
 
-        private async Task RegisterVSShellServicesAsync()
+        private async Task RegisterEssentialVSShellServicesAsync()
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("A3sist: Registering services with VS Shell...");
+                System.Diagnostics.Debug.WriteLine("A3sist: Registering essential services with VS Shell...");
 
-                // Register services with VS Shell with individual error handling
+                // Register only essential services during startup
                 try
                 {
                     AddService(typeof(IA3sistConfigurationService), async (container, ct, type) =>
@@ -279,90 +199,6 @@ namespace A3sist
 
                 try
                 {
-                    AddService(typeof(IModelManagementService), async (container, ct, type) =>
-                    {
-                        try
-                        {
-                            return _serviceProvider?.GetService<IModelManagementService>();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IModelManagementService: {ex.Message}");
-                            return null;
-                        }
-                    }, true);
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IModelManagementService with VS Shell");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IModelManagementService with VS Shell: {ex.Message}");
-                }
-
-                try
-                {
-                    AddService(typeof(IMCPClientService), async (container, ct, type) =>
-                    {
-                        try
-                        {
-                            return _serviceProvider?.GetService<IMCPClientService>();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IMCPClientService: {ex.Message}");
-                            return null;
-                        }
-                    }, true);
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IMCPClientService with VS Shell");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IMCPClientService with VS Shell: {ex.Message}");
-                }
-
-                try
-                {
-                    AddService(typeof(IRAGEngineService), async (container, ct, type) =>
-                    {
-                        try
-                        {
-                            return _serviceProvider?.GetService<IRAGEngineService>();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IRAGEngineService: {ex.Message}");
-                            return null;
-                        }
-                    }, true);
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IRAGEngineService with VS Shell");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IRAGEngineService with VS Shell: {ex.Message}");
-                }
-
-                try
-                {
-                    AddService(typeof(ICodeAnalysisService), async (container, ct, type) =>
-                    {
-                        try
-                        {
-                            return _serviceProvider?.GetService<ICodeAnalysisService>();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating ICodeAnalysisService: {ex.Message}");
-                            return null;
-                        }
-                    }, true);
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered ICodeAnalysisService with VS Shell");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register ICodeAnalysisService with VS Shell: {ex.Message}");
-                }
-
-                try
-                {
                     AddService(typeof(IChatService), async (container, ct, type) =>
                     {
                         try
@@ -381,77 +217,15 @@ namespace A3sist
                 {
                     System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IChatService with VS Shell: {ex.Message}");
                 }
-
-                try
-                {
-                    AddService(typeof(IRefactoringService), async (container, ct, type) =>
-                    {
-                        try
-                        {
-                            return _serviceProvider?.GetService<IRefactoringService>();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IRefactoringService: {ex.Message}");
-                            return null;
-                        }
-                    }, true);
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IRefactoringService with VS Shell");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IRefactoringService with VS Shell: {ex.Message}");
-                }
-
-                try
-                {
-                    AddService(typeof(IAutoCompleteService), async (container, ct, type) =>
-                    {
-                        try
-                        {
-                            return _serviceProvider?.GetService<IAutoCompleteService>();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IAutoCompleteService: {ex.Message}");
-                            return null;
-                        }
-                    }, true);
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IAutoCompleteService with VS Shell");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IAutoCompleteService with VS Shell: {ex.Message}");
-                }
-
-                try
-                {
-                    AddService(typeof(A3sist.Agent.IAgentModeService), async (container, ct, type) =>
-                    {
-                        try
-                        {
-                            return _serviceProvider?.GetService<A3sist.Agent.IAgentModeService>();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IAgentModeService: {ex.Message}");
-                            return null;
-                        }
-                    }, true);
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IAgentModeService with VS Shell");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IAgentModeService with VS Shell: {ex.Message}");
-                }
                 
-                System.Diagnostics.Debug.WriteLine("A3sist: VS Shell service registration completed");
+                System.Diagnostics.Debug.WriteLine("A3sist: Essential VS Shell service registration completed");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Critical error in VS Shell service registration: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"A3sist: Critical error in essential VS Shell service registration: {ex.Message}");
             }
         }
+
 
         private async Task InitializeCommandsAsync()
         {
@@ -464,7 +238,162 @@ namespace A3sist
                 OleMenuCommandService commandService = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
                 if (commandService != null)
                 {
-                    // Initialize commands with individual error handling
+                    // Initialize only essential commands to speed up installation
+                    try
+                    {
+                        ShowA3sistToolWindowCommand.Initialize(this, commandService);
+                        System.Diagnostics.Debug.WriteLine("A3sist: ShowA3sistToolWindowCommand initialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ShowA3sistToolWindowCommand: {ex.Message}");
+                    }
+
+                    try
+                    {
+                        ShowA3sistToolWindowViewCommand.Initialize(this, commandService);
+                        System.Diagnostics.Debug.WriteLine("A3sist: ShowA3sistToolWindowViewCommand initialized");
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ShowA3sistToolWindowViewCommand: {ex.Message}");
+                    }
+                    
+                    // Defer other commands until services are available
+                    System.Diagnostics.Debug.WriteLine("A3sist: Essential command initialization completed");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("A3sist: CommandService is null, commands will not be available");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing commands: {ex.Message}");
+            }
+        }
+
+        private async Task ShowToolWindowAsync()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("A3sist: Attempting to show tool window...");
+                
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                
+                // Get the instance of the tool window created when package was initialized
+                var window = await this.FindToolWindowAsync(typeof(A3sist.UI.A3sistToolWindowPane), 0, true, this.DisposalToken);
+                if ((null != window) && (null != window.Frame))
+                {
+                    var windowFrame = (IVsWindowFrame)window.Frame;
+                    Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
+                    System.Diagnostics.Debug.WriteLine("A3sist: Tool window shown successfully");
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine("A3sist: Failed to create or show tool window - window or frame is null");
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error showing tool window: {ex.Message}");
+                // Don't throw - this is not critical for package loading
+            }
+        }
+
+        public T GetService<T>() where T : class
+        {
+            try
+            {
+                // Initialize services on first access to avoid startup delays
+                if (_serviceProvider == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: First service request for {typeof(T).Name}, initializing services...");
+                    _ = Task.Run(async () => await InitializeServicesAsync());
+                    return null; // Return null for first call, services will be available on subsequent calls
+                }
+                
+                var service = _serviceProvider.GetService<T>();
+                if (service == null)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Service {typeof(T).Name} not found, attempting lazy initialization...");
+                    
+                    // Try to initialize remaining services if this is the first time a heavy service is requested
+                    _ = Task.Run(async () => await InitializeRemainingServicesAsync());
+                    
+                    return null;
+                }
+                else
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Successfully retrieved service {typeof(T).Name}");
+                }
+                
+                return service;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error getting service {typeof(T).Name}: {ex.Message}");
+                return null;
+            }
+        }
+
+        private async Task InitializeRemainingServicesAsync()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("A3sist: Initializing remaining services...");
+                
+                var services = new ServiceCollection();
+                
+                // Copy existing services
+                if (_serviceProvider != null)
+                {
+                    var existingConfig = _serviceProvider.GetService<IA3sistConfigurationService>();
+                    var existingChat = _serviceProvider.GetService<IChatService>();
+                    
+                    if (existingConfig != null)
+                        services.AddSingleton(existingConfig);
+                    if (existingChat != null)
+                        services.AddSingleton(existingChat);
+                }
+                
+                // Add the heavy services that were deferred
+                services.AddSingleton<IModelManagementService, ModelManagementService>();
+                services.AddSingleton<IMCPClientService, MCPClientService>();
+                services.AddSingleton<IRAGEngineService, RAGEngineService>();
+                services.AddSingleton<ICodeAnalysisService, CodeAnalysisService>();
+                services.AddSingleton<IRefactoringService, RefactoringService>();
+                services.AddSingleton<IAutoCompleteService, AutoCompleteService>();
+                services.AddSingleton<A3sist.Agent.IAgentModeService, A3sist.Agent.AgentModeService>();
+                
+                // Replace service provider
+                var oldProvider = _serviceProvider;
+                _serviceProvider = services.BuildServiceProvider();
+                oldProvider?.Dispose();
+                
+                // Initialize remaining commands now that services are available
+                await InitializeRemainingCommandsAsync();
+                
+                System.Diagnostics.Debug.WriteLine("A3sist: Remaining services initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing remaining services: {ex.Message}");
+            }
+        }
+
+        private async Task InitializeRemainingCommandsAsync()
+        {
+            try
+            {
+                System.Diagnostics.Debug.WriteLine("A3sist: Initializing remaining commands...");
+                
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+                OleMenuCommandService commandService = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
+                if (commandService != null)
+                {
+                    // Initialize commands that require services
                     try
                     {
                         OpenChatCommand.Initialize(this, commandService);
@@ -504,95 +433,13 @@ namespace A3sist
                     {
                         System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing RefactorCodeCommand: {ex.Message}");
                     }
-
-                    try
-                    {
-                        ShowA3sistToolWindowCommand.Initialize(this, commandService);
-                        System.Diagnostics.Debug.WriteLine("A3sist: ShowA3sistToolWindowCommand initialized");
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ShowA3sistToolWindowCommand: {ex.Message}");
-                    }
-
-                    try
-                    {
-                        ShowA3sistToolWindowViewCommand.Initialize(this, commandService);
-                        System.Diagnostics.Debug.WriteLine("A3sist: ShowA3sistToolWindowViewCommand initialized");
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ShowA3sistToolWindowViewCommand: {ex.Message}");
-                    }
                     
-                    System.Diagnostics.Debug.WriteLine("A3sist: Command initialization completed");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("A3sist: CommandService is null, commands will not be available");
+                    System.Diagnostics.Debug.WriteLine("A3sist: Remaining commands initialized");
                 }
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing commands: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-            }
-        }
-
-        private async Task ShowToolWindowAsync()
-        {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("A3sist: Attempting to show tool window...");
-                
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                
-                // Get the instance of the tool window created when package was initialized
-                var window = await this.FindToolWindowAsync(typeof(A3sist.UI.A3sistToolWindowPane), 0, true, this.DisposalToken);
-                if ((null != window) && (null != window.Frame))
-                {
-                    var windowFrame = (IVsWindowFrame)window.Frame;
-                    Microsoft.VisualStudio.ErrorHandler.ThrowOnFailure(windowFrame.Show());
-                    System.Diagnostics.Debug.WriteLine("A3sist: Tool window shown successfully");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine("A3sist: Failed to create or show tool window - window or frame is null");
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Error showing tool window: {ex.Message}");
-                // Don't throw - this is not critical for package loading
-            }
-        }
-
-        public T GetService<T>() where T : class
-        {
-            try
-            {
-                if (_serviceProvider == null)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Service provider is null when requesting {typeof(T).Name}");
-                    return null;
-                }
-                
-                var service = _serviceProvider.GetService<T>();
-                if (service == null)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Service {typeof(T).Name} not found in service provider");
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Successfully retrieved service {typeof(T).Name}");
-                }
-                
-                return service;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Error getting service {typeof(T).Name}: {ex.Message}");
-                return null;
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing remaining commands: {ex.Message}");
             }
         }
 
