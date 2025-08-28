@@ -10,6 +10,8 @@ using A3sist.Commands;
 using Task = System.Threading.Tasks.Task;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Collections.Concurrent;
+using System.Linq;
 
 namespace A3sist
 {
@@ -45,6 +47,8 @@ namespace A3sist
         public const string PackageGuidString = "285cd009-b086-4f05-a305-35790de8f3d1";
 
         private Microsoft.Extensions.DependencyInjection.ServiceProvider _serviceProvider;
+        private readonly IServiceCollection _services = new ServiceCollection();
+        private readonly object _serviceProviderLock = new object();
         
         /// <summary>
         /// Gets the current package instance
@@ -59,8 +63,28 @@ namespace A3sist
         /// <summary>
         /// Tracks which services are initialized
         /// </summary>
-        private readonly Dictionary<Type, bool> _serviceStatus = new Dictionary<Type, bool>();
-        private readonly object _serviceLock = new object();
+        private readonly ConcurrentDictionary<Type, ServiceStatus> _serviceStatus = new ConcurrentDictionary<Type, ServiceStatus>();
+        
+        /// <summary>
+        /// Tracks ongoing service loading tasks to prevent race conditions
+        /// </summary>
+        private readonly ConcurrentDictionary<Type, Task> _loadingTasks = new ConcurrentDictionary<Type, Task>();
+        
+        /// <summary>
+        /// Semaphores to prevent concurrent loading of the same service type
+        /// </summary>
+        private readonly ConcurrentDictionary<Type, SemaphoreSlim> _serviceSemaphores = new ConcurrentDictionary<Type, SemaphoreSlim>();
+        
+        /// <summary>
+        /// Service dependency mapping
+        /// </summary>
+        private readonly Dictionary<Type, Type[]> _serviceDependencies = new Dictionary<Type, Type[]>
+        {
+            [typeof(IChatService)] = new[] { typeof(IA3sistConfigurationService), typeof(IModelManagementService) },
+            [typeof(IRefactoringService)] = new[] { typeof(IA3sistConfigurationService), typeof(ICodeAnalysisService) },
+            [typeof(IAutoCompleteService)] = new[] { typeof(IA3sistConfigurationService), typeof(IModelManagementService) },
+            [typeof(A3sist.Agent.IAgentModeService)] = new[] { typeof(ICodeAnalysisService), typeof(IRefactoringService), typeof(IRAGEngineService), typeof(IModelManagementService) }
+        };
 
         /// <summary>
         /// Event fired when a specific service becomes ready
@@ -71,6 +95,32 @@ namespace A3sist
         /// Event fired when all services become ready
         /// </summary>
         public event EventHandler ServicesReady;
+
+        #region Service Status Tracking
+        
+        /// <summary>
+        /// Service status enumeration
+        /// </summary>
+        public enum ServiceStatus
+        {
+            NotLoaded,
+            Loading,
+            Ready,
+            Failed
+        }
+        
+        /// <summary>
+        /// Service health information
+        /// </summary>
+        public class ServiceHealth
+        {
+            public ServiceStatus Status { get; set; }
+            public DateTime? LoadedAt { get; set; }
+            public string Error { get; set; }
+            public TimeSpan? LoadTime { get; set; }
+        }
+        
+        #endregion
 
         #region Package Members
 
@@ -93,7 +143,10 @@ namespace A3sist
                 await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
                 await base.InitializeAsync(cancellationToken, progress);
 
-                // Initialize only tool window commands - NO services, NO background loading
+                // Initialize minimal configuration service only
+                await InitializeMinimalConfigurationAsync();
+
+                // Initialize only tool window commands - NO heavy services, NO background loading
                 await InitializeEssentialCommandsAsync();
 
                 // Tool window will be created but services load only on user interaction
@@ -115,131 +168,43 @@ namespace A3sist
             }
         }
 
-        private async Task InitializeServicesAsync()
+        private async Task InitializeMinimalConfigurationAsync()
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("A3sist: Initializing minimal services for startup...");
+                System.Diagnostics.Debug.WriteLine("A3sist: Initializing minimal configuration service...");
                 
-                var services = new ServiceCollection();
-
-                // Register only essential services during startup to prevent freezing
-                try
-                {
-                    services.AddSingleton<IA3sistConfigurationService, A3sistConfigurationService>();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IA3sistConfigurationService");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IA3sistConfigurationService: {ex.Message}");
-                }
-
-                // Defer heavy services like ModelManagement, RAG, CodeAnalysis until actually needed
-                // This prevents startup freezing caused by heavy initialization
+                // Only register configuration service initially
+                _services.AddSingleton<IA3sistConfigurationService, A3sistConfigurationService>();
                 
-                try
+                lock (_serviceProviderLock)
                 {
-                    services.AddSingleton<IChatService, ChatService>();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IChatService");
+                    _serviceProvider = _services.BuildServiceProvider();
                 }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IChatService: {ex.Message}");
-                }
-
-                // Build service provider with error handling
-                try
-                {
-                    _serviceProvider = services.BuildServiceProvider();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Minimal service provider built successfully");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to build service provider: {ex.Message}");
-                    // Create a minimal service provider as fallback
-                    var fallbackServices = new ServiceCollection();
-                    _serviceProvider = fallbackServices.BuildServiceProvider();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Created fallback service provider");
-                }
-
-                // Register only essential services with VS Shell
-                await RegisterEssentialVSShellServicesAsync();
                 
-                System.Diagnostics.Debug.WriteLine("A3sist: Essential services initialization completed");
+                // Register with VS Shell
+                AddService(typeof(IA3sistConfigurationService), async (container, ct, type) =>
+                {
+                    try
+                    {
+                        return _serviceProvider?.GetService<IA3sistConfigurationService>();
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IA3sistConfigurationService: {ex.Message}");
+                        return null;
+                    }
+                }, true);
+                
+                // Mark configuration service as ready
+                _serviceStatus[typeof(IA3sistConfigurationService)] = ServiceStatus.Ready;
+                
+                System.Diagnostics.Debug.WriteLine("A3sist: Minimal configuration initialized");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Critical error in service initialization: {ex.Message}");
-                System.Diagnostics.Debug.WriteLine($"Stack trace: {ex.StackTrace}");
-                
-                // Create a minimal service provider to prevent null reference exceptions
-                try
-                {
-                    var emergencyServices = new ServiceCollection();
-                    _serviceProvider = emergencyServices.BuildServiceProvider();
-                    System.Diagnostics.Debug.WriteLine("A3sist: Emergency service provider created");
-                }
-                catch (Exception fallbackEx)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Even fallback service provider failed: {fallbackEx.Message}");
-                }
-            }
-        }
-
-        private async Task RegisterEssentialVSShellServicesAsync()
-        {
-            try
-            {
-                System.Diagnostics.Debug.WriteLine("A3sist: Registering essential services with VS Shell...");
-
-                // Register only essential services during startup
-                try
-                {
-                    AddService(typeof(IA3sistConfigurationService), async (container, ct, type) =>
-                    {
-                        try
-                        {
-                            return _serviceProvider?.GetService<IA3sistConfigurationService>();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IA3sistConfigurationService: {ex.Message}");
-                            return null;
-                        }
-                    }, true);
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IA3sistConfigurationService with VS Shell");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IA3sistConfigurationService with VS Shell: {ex.Message}");
-                }
-
-                try
-                {
-                    AddService(typeof(IChatService), async (container, ct, type) =>
-                    {
-                        try
-                        {
-                            return _serviceProvider?.GetService<IChatService>();
-                        }
-                        catch (Exception ex)
-                        {
-                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IChatService: {ex.Message}");
-                            return null;
-                        }
-                    }, true);
-                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IChatService with VS Shell");
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IChatService with VS Shell: {ex.Message}");
-                }
-                
-                System.Diagnostics.Debug.WriteLine("A3sist: Essential VS Shell service registration completed");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Critical error in essential VS Shell service registration: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing minimal configuration: {ex.Message}");
+                _serviceStatus[typeof(IA3sistConfigurationService)] = ServiceStatus.Failed;
             }
         }
 
@@ -317,25 +282,60 @@ namespace A3sist
             }
         }
 
+        /// <summary>
+        /// Gets a service asynchronously with proper race condition prevention
+        /// </summary>
+        public async ValueTask<T> GetServiceAsync<T>() where T : class
+        {
+            var serviceType = typeof(T);
+            
+            // Check if service is already ready
+            if (_serviceStatus.TryGetValue(serviceType, out var status) && status == ServiceStatus.Ready)
+            {
+                lock (_serviceProviderLock)
+                {
+                    return _serviceProvider?.GetService<T>();
+                }
+            }
+            
+            // Check if service is currently loading
+            if (_loadingTasks.TryGetValue(serviceType, out var existingTask))
+            {
+                await existingTask;
+                lock (_serviceProviderLock)
+                {
+                    return _serviceProvider?.GetService<T>();
+                }
+            }
+            
+            // Start loading the service
+            return await LoadServiceOnDemandAsync<T>();
+        }
+
+        /// <summary>
+        /// Legacy synchronous method - returns null if service not ready, triggers async loading
+        /// </summary>
+        [Obsolete("Use GetServiceAsync<T>() instead for proper async service access")]
         public T GetService<T>() where T : class
         {
             try
             {
-                // Check if this specific service is already available
-                if (_serviceProvider != null)
+                var serviceType = typeof(T);
+                
+                // Check if service is already available
+                if (_serviceStatus.TryGetValue(serviceType, out var status) && status == ServiceStatus.Ready)
                 {
-                    var service = _serviceProvider.GetService<T>();
-                    if (service != null)
+                    lock (_serviceProviderLock)
                     {
-                        return service;
+                        return _serviceProvider?.GetService<T>();
                     }
                 }
 
                 // Service not available - trigger on-demand loading
-                System.Diagnostics.Debug.WriteLine($"A3sist: Service {typeof(T).Name} requested - triggering on-demand loading");
+                System.Diagnostics.Debug.WriteLine($"A3sist: Service {serviceType.Name} requested - triggering on-demand loading");
                 
-                // Start loading this specific service in background
-                _ = Task.Run(async () => await LoadServiceOnDemandAsync<T>());
+                // Start loading this specific service in background (fire-and-forget)
+                _ = LoadServiceOnDemandAsync<T>();
                 
                 return null; // Service will be available on next call
             }
@@ -345,169 +345,245 @@ namespace A3sist
                 return null;
             }
         }
+        
+        /// <summary>
+        /// Get service health information
+        /// </summary>
+        public ServiceHealth GetServiceHealth<T>()
+        {
+            var serviceType = typeof(T);
+            var status = _serviceStatus.GetValueOrDefault(serviceType, ServiceStatus.NotLoaded);
+            
+            return new ServiceHealth
+            {
+                Status = status,
+                LoadedAt = status == ServiceStatus.Ready ? DateTime.UtcNow : null, // Simplified for demo
+                Error = status == ServiceStatus.Failed ? "Service failed to load" : null
+            };
+        }
 
         /// <summary>
-        /// Load a specific service on-demand with multi-threading
+        /// Load a specific service on-demand with proper race condition prevention and dependency handling
         /// </summary>
         public async Task<T> LoadServiceOnDemandAsync<T>() where T : class
         {
+            var serviceType = typeof(T);
+            var semaphore = _serviceSemaphores.GetOrAdd(serviceType, _ => new SemaphoreSlim(1, 1));
+            
             try
             {
-                var serviceType = typeof(T);
+                await semaphore.WaitAsync();
                 
-                // Check if already loading or loaded
-                lock (_serviceLock)
+                // Double-check if service was loaded while waiting
+                if (_serviceStatus.TryGetValue(serviceType, out var currentStatus) && currentStatus == ServiceStatus.Ready)
                 {
-                    if (_serviceStatus.ContainsKey(serviceType))
+                    lock (_serviceProviderLock)
                     {
                         return _serviceProvider?.GetService<T>();
                     }
-                    _serviceStatus[serviceType] = false; // Mark as loading
                 }
-
-                System.Diagnostics.Debug.WriteLine($"A3sist: Loading service {serviceType.Name} on-demand...");
-
-                // Initialize minimal services if not done yet
-                if (_serviceProvider == null)
+                
+                // Check if already loading
+                if (currentStatus == ServiceStatus.Loading)
                 {
-                    await InitializeMinimalServicesAsync();
-                }
-
-                // Load specific service based on type
-                await LoadSpecificServiceAsync<T>();
-                
-                // Mark as ready and notify
-                lock (_serviceLock)
-                {
-                    _serviceStatus[serviceType] = true;
-                }
-
-                ServiceReady?.Invoke(this, new ServiceReadyEventArgs { ServiceType = serviceType });
-                System.Diagnostics.Debug.WriteLine($"A3sist: Service {serviceType.Name} loaded successfully");
-                
-                return _serviceProvider?.GetService<T>();
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Error loading service {typeof(T).Name}: {ex.Message}");
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Initialize only configuration service for basic functionality
-        /// </summary>
-        private async Task InitializeMinimalServicesAsync()
-        {
-            try
-            {
-                if (_serviceProvider != null) return; // Already initialized
-
-                System.Diagnostics.Debug.WriteLine("A3sist: Initializing minimal services (configuration only)...");
-                
-                var services = new ServiceCollection();
-                services.AddSingleton<IA3sistConfigurationService, A3sistConfigurationService>();
-                
-                _serviceProvider = services.BuildServiceProvider();
-                
-                // Register with VS Shell
-                AddService(typeof(IA3sistConfigurationService), async (container, ct, type) =>
-                {
-                    return _serviceProvider?.GetService<IA3sistConfigurationService>();
-                }, true);
-                
-                System.Diagnostics.Debug.WriteLine("A3sist: Minimal services initialized");
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing minimal services: {ex.Message}");
-            }
-        }
-
-        /// <summary>
-        /// Load a specific service type on-demand
-        /// </summary>
-        private async Task LoadSpecificServiceAsync<T>()
-        {
-            try
-            {
-                var serviceType = typeof(T);
-                var services = new ServiceCollection();
-                
-                // Copy existing services
-                if (_serviceProvider != null)
-                {
-                    foreach (var existingService in _serviceProvider.GetServices<object>())
+                    // Another thread is loading, wait for it
+                    if (_loadingTasks.TryGetValue(serviceType, out var loadingTask))
                     {
-                        if (existingService != null)
+                        await loadingTask;
+                        lock (_serviceProviderLock)
                         {
-                            services.AddSingleton(existingService.GetType(), existingService);
+                            return _serviceProvider?.GetService<T>();
                         }
                     }
                 }
-
-                // Add the specific requested service and its dependencies
-                if (serviceType == typeof(IChatService))
-                {
-                    services.AddSingleton<IChatService, ChatService>();
-                    
-                    // Chat might need model management
-                    if (!_serviceStatus.ContainsKey(typeof(IModelManagementService)))
-                    {
-                        _ = Task.Run(async () => await LoadServiceOnDemandAsync<IModelManagementService>());
-                    }
-                }
-                else if (serviceType == typeof(IModelManagementService))
-                {
-                    services.AddSingleton<IModelManagementService, ModelManagementService>();
-                }
-                else if (serviceType == typeof(IRefactoringService))
-                {
-                    services.AddSingleton<IRefactoringService, RefactoringService>();
-                    
-                    // Refactoring needs code analysis
-                    if (!_serviceStatus.ContainsKey(typeof(ICodeAnalysisService)))
-                    {
-                        _ = Task.Run(async () => await LoadServiceOnDemandAsync<ICodeAnalysisService>());
-                    }
-                }
-                else if (serviceType == typeof(ICodeAnalysisService))
-                {
-                    services.AddSingleton<ICodeAnalysisService, CodeAnalysisService>();
-                }
-                else if (serviceType == typeof(IAutoCompleteService))
-                {
-                    services.AddSingleton<IAutoCompleteService, AutoCompleteService>();
-                }
-                else if (serviceType == typeof(IRAGEngineService))
-                {
-                    services.AddSingleton<IRAGEngineService, RAGEngineService>();
-                }
-                else if (serviceType == typeof(IMCPClientService))
-                {
-                    services.AddSingleton<IMCPClientService, MCPClientService>();
-                }
-                else if (serviceType == typeof(A3sist.Agent.IAgentModeService))
-                {
-                    services.AddSingleton<A3sist.Agent.IAgentModeService, A3sist.Agent.AgentModeService>();
-                }
-
-                // Replace service provider
-                var oldProvider = _serviceProvider;
-                _serviceProvider = services.BuildServiceProvider();
-                oldProvider?.Dispose();
                 
-                // Register with VS Shell if needed
+                // Mark as loading
+                _serviceStatus[serviceType] = ServiceStatus.Loading;
+                System.Diagnostics.Debug.WriteLine($"A3sist: Loading service {serviceType.Name} on-demand...");
+                
+                var loadingTask = LoadSpecificServiceWithDependenciesAsync<T>();
+                _loadingTasks[serviceType] = loadingTask;
+                
+                try
+                {
+                    await loadingTask;
+                    
+                    // Mark as ready and notify
+                    _serviceStatus[serviceType] = ServiceStatus.Ready;
+                    ServiceReady?.Invoke(this, new ServiceReadyEventArgs { ServiceType = serviceType });
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Service {serviceType.Name} loaded successfully");
+                    
+                    lock (_serviceProviderLock)
+                    {
+                        return _serviceProvider?.GetService<T>();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _serviceStatus[serviceType] = ServiceStatus.Failed;
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to load service {serviceType.Name}: {ex.Message}");
+                    throw;
+                }
+                finally
+                {
+                    _loadingTasks.TryRemove(serviceType, out _);
+                }
+            }
+            finally
+            {
+                semaphore.Release();
+            }
+        }
+
+        /// <summary>
+        /// Load a specific service type with its dependencies, without rebuilding the entire service provider
+        /// </summary>
+        private async Task LoadSpecificServiceWithDependenciesAsync<T>()
+        {
+            var serviceType = typeof(T);
+            
+            try
+            {
+                // Check configuration to see if this service should be loaded
+                if (!await ShouldLoadServiceAsync<T>())
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Service {serviceType.Name} is disabled in configuration");
+                    return;
+                }
+                
+                // Load dependencies first
+                if (_serviceDependencies.TryGetValue(serviceType, out var dependencies))
+                {
+                    foreach (var dependencyType in dependencies)
+                    {
+                        await EnsureDependencyLoadedAsync(dependencyType);
+                    }
+                }
+
+                // Register the specific service
+                RegisterSpecificService<T>();
+                
+                // Rebuild service provider only if necessary
+                await RebuildServiceProviderIfNeededAsync();
+                
+                // Register with VS Shell
                 AddService(serviceType, async (container, ct, type) =>
                 {
-                    return _serviceProvider?.GetService(serviceType);
+                    lock (_serviceProviderLock)
+                    {
+                        return _serviceProvider?.GetService(serviceType);
+                    }
                 }, true);
                 
                 System.Diagnostics.Debug.WriteLine($"A3sist: Service {serviceType.Name} loaded and registered");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Error loading specific service {typeof(T).Name}: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error loading specific service {serviceType.Name}: {ex.Message}");
+                throw;
+            }
+        }
+        
+        /// <summary>
+        /// Check if a service should be loaded based on configuration
+        /// </summary>
+        private async Task<bool> ShouldLoadServiceAsync<T>()
+        {
+            try
+            {
+                // Get configuration service if available
+                var configService = _serviceProvider?.GetService<IA3sistConfigurationService>();
+                if (configService == null) return true; // Default to enabled if config not available
+                
+                var serviceType = typeof(T);
+                var configKey = $"services.{serviceType.Name}.enabled";
+                
+                return await configService.GetSettingAsync(configKey, true); // Default enabled
+            }
+            catch
+            {
+                return true; // Default to enabled on error
+            }
+        }
+        
+        /// <summary>
+        /// Ensure a dependency is loaded before loading the dependent service
+        /// </summary>
+        private async Task EnsureDependencyLoadedAsync(Type dependencyType)
+        {
+            if (_serviceStatus.TryGetValue(dependencyType, out var status) && status == ServiceStatus.Ready)
+            {
+                return; // Already loaded
+            }
+            
+            if (status == ServiceStatus.Loading)
+            {
+                // Wait for ongoing load
+                if (_loadingTasks.TryGetValue(dependencyType, out var loadingTask))
+                {
+                    await loadingTask;
+                }
+                return;
+            }
+            
+            // Load dependency using reflection to call generic method
+            var method = typeof(A3sistPackage).GetMethod(nameof(LoadServiceOnDemandAsync));
+            var genericMethod = method.MakeGenericMethod(dependencyType);
+            var task = (Task)genericMethod.Invoke(this, null);
+            await task;
+        }
+        
+        /// <summary>
+        /// Register a specific service type without rebuilding provider
+        /// </summary>
+        private void RegisterSpecificService<T>()
+        {
+            var serviceType = typeof(T);
+            
+            if (serviceType == typeof(IChatService))
+            {
+                _services.AddSingleton<IChatService, ChatService>();
+            }
+            else if (serviceType == typeof(IModelManagementService))
+            {
+                _services.AddSingleton<IModelManagementService, ModelManagementService>();
+            }
+            else if (serviceType == typeof(IRefactoringService))
+            {
+                _services.AddSingleton<IRefactoringService, RefactoringService>();
+            }
+            else if (serviceType == typeof(ICodeAnalysisService))
+            {
+                _services.AddSingleton<ICodeAnalysisService, CodeAnalysisService>();
+            }
+            else if (serviceType == typeof(IAutoCompleteService))
+            {
+                _services.AddSingleton<IAutoCompleteService, AutoCompleteService>();
+            }
+            else if (serviceType == typeof(IRAGEngineService))
+            {
+                _services.AddSingleton<IRAGEngineService, RAGEngineService>();
+            }
+            else if (serviceType == typeof(IMCPClientService))
+            {
+                _services.AddSingleton<IMCPClientService, MCPClientService>();
+            }
+            else if (serviceType == typeof(A3sist.Agent.IAgentModeService))
+            {
+                _services.AddSingleton<A3sist.Agent.IAgentModeService, A3sist.Agent.AgentModeService>();
+            }
+        }
+        
+        /// <summary>
+        /// Rebuild service provider only when necessary
+        /// </summary>
+        private async Task RebuildServiceProviderIfNeededAsync()
+        {
+            lock (_serviceProviderLock)
+            {
+                var oldProvider = _serviceProvider;
+                _serviceProvider = _services.BuildServiceProvider();
+                oldProvider?.Dispose();
             }
         }
 
@@ -517,7 +593,7 @@ namespace A3sist
         public async Task<IChatService> EnsureChatServiceAsync()
         {
             System.Diagnostics.Debug.WriteLine("A3sist: User requested chat - loading chat service...");
-            return await LoadServiceOnDemandAsync<IChatService>();
+            return await GetServiceAsync<IChatService>();
         }
 
         /// <summary>
@@ -526,7 +602,7 @@ namespace A3sist
         public async Task<IRefactoringService> EnsureRefactoringServiceAsync()
         {
             System.Diagnostics.Debug.WriteLine("A3sist: User requested refactoring - loading refactoring service...");
-            return await LoadServiceOnDemandAsync<IRefactoringService>();
+            return await GetServiceAsync<IRefactoringService>();
         }
 
         /// <summary>
@@ -535,7 +611,7 @@ namespace A3sist
         public async Task<IModelManagementService> EnsureModelServiceAsync()
         {
             System.Diagnostics.Debug.WriteLine("A3sist: User opened model config - loading model service...");
-            return await LoadServiceOnDemandAsync<IModelManagementService>();
+            return await GetServiceAsync<IModelManagementService>();
         }
 
         /// <summary>
@@ -544,7 +620,7 @@ namespace A3sist
         public async Task<ICodeAnalysisService> EnsureCodeAnalysisServiceAsync()
         {
             System.Diagnostics.Debug.WriteLine("A3sist: User requested code analysis - loading analysis service...");
-            return await LoadServiceOnDemandAsync<ICodeAnalysisService>();
+            return await GetServiceAsync<ICodeAnalysisService>();
         }
 
         /// <summary>
@@ -553,7 +629,25 @@ namespace A3sist
         public async Task<IAutoCompleteService> EnsureAutoCompleteServiceAsync()
         {
             System.Diagnostics.Debug.WriteLine("A3sist: User enabled autocomplete - loading autocomplete service...");
-            return await LoadServiceOnDemandAsync<IAutoCompleteService>();
+            return await GetServiceAsync<IAutoCompleteService>();
+        }
+
+        /// <summary>
+        /// Load RAG engine when user uses knowledge features
+        /// </summary>
+        public async Task<IRAGEngineService> EnsureRAGServiceAsync()
+        {
+            System.Diagnostics.Debug.WriteLine("A3sist: User requested RAG features - loading RAG service...");
+            return await GetServiceAsync<IRAGEngineService>();
+        }
+
+        /// <summary>
+        /// Load agent mode service when user activates agent analysis
+        /// </summary>
+        public async Task<A3sist.Agent.IAgentModeService> EnsureAgentServiceAsync()
+        {
+            System.Diagnostics.Debug.WriteLine("A3sist: User activated agent mode - loading agent service...");
+            return await GetServiceAsync<A3sist.Agent.IAgentModeService>();
         }
 
         /// <summary>
@@ -561,10 +655,25 @@ namespace A3sist
         /// </summary>
         public bool IsServiceReady<T>()
         {
-            lock (_serviceLock)
-            {
-                return _serviceStatus.ContainsKey(typeof(T)) && _serviceStatus[typeof(T)];
-            }
+            var serviceType = typeof(T);
+            return _serviceStatus.TryGetValue(serviceType, out var status) && status == ServiceStatus.Ready;
+        }
+        
+        /// <summary>
+        /// Check if a specific service is loading
+        /// </summary>
+        public bool IsServiceLoading<T>()
+        {
+            var serviceType = typeof(T);
+            return _serviceStatus.TryGetValue(serviceType, out var status) && status == ServiceStatus.Loading;
+        }
+        
+        /// <summary>
+        /// Get all service statuses for debugging
+        /// </summary>
+        public Dictionary<string, ServiceStatus> GetAllServiceStatuses()
+        {
+            return _serviceStatus.ToDictionary(kvp => kvp.Key.Name, kvp => kvp.Value);
         }
 
         protected override void Dispose(bool disposing)
@@ -575,12 +684,47 @@ namespace A3sist
                 {
                     System.Diagnostics.Debug.WriteLine("A3sist: Disposing package...");
                     
+                    // Cancel any ongoing loading tasks
+                    foreach (var loadingTask in _loadingTasks.Values)
+                    {
+                        try
+                        {
+                            if (!loadingTask.IsCompleted)
+                            {
+                                loadingTask.Wait(TimeSpan.FromSeconds(5)); // Give tasks time to complete
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error waiting for loading task: {ex.Message}");
+                        }
+                    }
+                    _loadingTasks.Clear();
+                    
+                    // Dispose semaphores
+                    foreach (var semaphore in _serviceSemaphores.Values)
+                    {
+                        try
+                        {
+                            semaphore?.Dispose();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error disposing semaphore: {ex.Message}");
+                        }
+                    }
+                    _serviceSemaphores.Clear();
+                    
+                    // Dispose service provider
                     if (_serviceProvider != null)
                     {
                         _serviceProvider.Dispose();
                         _serviceProvider = null;
                         System.Diagnostics.Debug.WriteLine("A3sist: Service provider disposed");
                     }
+                    
+                    // Clear service status
+                    _serviceStatus.Clear();
                     
                     // Clear static instance
                     Instance = null;
