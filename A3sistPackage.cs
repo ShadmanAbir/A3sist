@@ -8,6 +8,8 @@ using System.Threading;
 using A3sist.Services;
 using A3sist.Commands;
 using Task = System.Threading.Tasks.Task;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace A3sist
 {
@@ -32,7 +34,7 @@ namespace A3sist
     [Guid(A3sistPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
     [ProvideToolWindow(typeof(A3sist.UI.A3sistToolWindowPane), Style = VsDockStyle.Float, Window = ToolWindowGuids80.SolutionExplorer)]
-    [ProvideAutoLoad(UIContextGuids.SolutionExists, PackageAutoLoadFlags.BackgroundLoad)]
+    [ProvideAutoLoad(UIContextGuids.CodeWindow, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideService(typeof(IA3sistConfigurationService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IChatService), IsAsyncQueryable = true)]
     public class A3sistPackage : AsyncPackage
@@ -48,6 +50,27 @@ namespace A3sist
         /// Gets the current package instance
         /// </summary>
         public static A3sistPackage Instance { get; private set; }
+
+        /// <summary>
+        /// Indicates whether all services are fully initialized
+        /// </summary>
+        public bool AreServicesReady { get; private set; } = false;
+
+        /// <summary>
+        /// Tracks which services are initialized
+        /// </summary>
+        private readonly Dictionary<Type, bool> _serviceStatus = new Dictionary<Type, bool>();
+        private readonly object _serviceLock = new object();
+
+        /// <summary>
+        /// Event fired when a specific service becomes ready
+        /// </summary>
+        public event EventHandler<ServiceReadyEventArgs> ServiceReady;
+
+        /// <summary>
+        /// Event fired when all services become ready
+        /// </summary>
+        public event EventHandler ServicesReady;
 
         #region Package Members
 
@@ -65,35 +88,29 @@ namespace A3sist
                 // Set the static instance
                 Instance = this;
                 
-                System.Diagnostics.Debug.WriteLine("A3sist: Starting minimal package initialization...");
+                System.Diagnostics.Debug.WriteLine("A3sist: Starting ultra-minimal package initialization...");
                 
-                // Initialize only the absolute minimum required for Visual Studio
                 await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
-
-                // Initialize only commands - defer everything else
-                await InitializeCommandsAsync();
-
                 await base.InitializeAsync(cancellationToken, progress);
 
-                await ShowToolWindowAsync();
+                // Initialize only tool window commands - NO services, NO background loading
+                await InitializeEssentialCommandsAsync();
 
-                System.Diagnostics.Debug.WriteLine("A3sist: Minimal package initialization completed.");
+                // Tool window will be created but services load only on user interaction
+                System.Diagnostics.Debug.WriteLine("A3sist: Ultra-minimal initialization completed - services load on-demand only");
             }
             catch (Exception ex)
             {
-                // Log the error but don't throw to prevent VS from failing to load the package
                 System.Diagnostics.Debug.WriteLine($"A3sist package initialization error: {ex.Message}");
                 
                 try
                 {
-                    // Try to continue with base initialization even if our services fail
                     await base.InitializeAsync(cancellationToken, progress);
                     System.Diagnostics.Debug.WriteLine("A3sist: Base package initialization completed despite errors.");
                 }
                 catch (Exception baseEx)
                 {
                     System.Diagnostics.Debug.WriteLine($"A3sist: Base package initialization error: {baseEx.Message}");
-                    // Still don't throw - let VS continue
                 }
             }
         }
@@ -227,18 +244,18 @@ namespace A3sist
         }
 
 
-        private async Task InitializeCommandsAsync()
+        private async Task InitializeEssentialCommandsAsync()
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("A3sist: Initializing commands...");
+                System.Diagnostics.Debug.WriteLine("A3sist: Initializing essential commands only...");
                 
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
                 OleMenuCommandService commandService = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
                 if (commandService != null)
                 {
-                    // Initialize only essential commands to speed up installation
+                    // Initialize only tool window commands for immediate access
                     try
                     {
                         ShowA3sistToolWindowCommand.Initialize(this, commandService);
@@ -259,8 +276,7 @@ namespace A3sist
                         System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ShowA3sistToolWindowViewCommand: {ex.Message}");
                     }
                     
-                    // Defer other commands until services are available
-                    System.Diagnostics.Debug.WriteLine("A3sist: Essential command initialization completed");
+                    System.Diagnostics.Debug.WriteLine("A3sist: Essential commands ready - tool window accessible");
                 }
                 else
                 {
@@ -269,7 +285,7 @@ namespace A3sist
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing commands: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing essential commands: {ex.Message}");
             }
         }
 
@@ -305,30 +321,23 @@ namespace A3sist
         {
             try
             {
-                // Initialize services on first access to avoid startup delays
-                if (_serviceProvider == null)
+                // Check if this specific service is already available
+                if (_serviceProvider != null)
                 {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: First service request for {typeof(T).Name}, initializing services...");
-                    _ = Task.Run(async () => await InitializeServicesAsync());
-                    return null; // Return null for first call, services will be available on subsequent calls
+                    var service = _serviceProvider.GetService<T>();
+                    if (service != null)
+                    {
+                        return service;
+                    }
                 }
+
+                // Service not available - trigger on-demand loading
+                System.Diagnostics.Debug.WriteLine($"A3sist: Service {typeof(T).Name} requested - triggering on-demand loading");
                 
-                var service = _serviceProvider.GetService<T>();
-                if (service == null)
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Service {typeof(T).Name} not found, attempting lazy initialization...");
-                    
-                    // Try to initialize remaining services if this is the first time a heavy service is requested
-                    _ = Task.Run(async () => await InitializeRemainingServicesAsync());
-                    
-                    return null;
-                }
-                else
-                {
-                    System.Diagnostics.Debug.WriteLine($"A3sist: Successfully retrieved service {typeof(T).Name}");
-                }
+                // Start loading this specific service in background
+                _ = Task.Run(async () => await LoadServiceOnDemandAsync<T>());
                 
-                return service;
+                return null; // Service will be available on next call
             }
             catch (Exception ex)
             {
@@ -337,109 +346,224 @@ namespace A3sist
             }
         }
 
-        private async Task InitializeRemainingServicesAsync()
+        /// <summary>
+        /// Load a specific service on-demand with multi-threading
+        /// </summary>
+        public async Task<T> LoadServiceOnDemandAsync<T>() where T : class
         {
             try
             {
-                System.Diagnostics.Debug.WriteLine("A3sist: Initializing remaining services...");
+                var serviceType = typeof(T);
                 
+                // Check if already loading or loaded
+                lock (_serviceLock)
+                {
+                    if (_serviceStatus.ContainsKey(serviceType))
+                    {
+                        return _serviceProvider?.GetService<T>();
+                    }
+                    _serviceStatus[serviceType] = false; // Mark as loading
+                }
+
+                System.Diagnostics.Debug.WriteLine($"A3sist: Loading service {serviceType.Name} on-demand...");
+
+                // Initialize minimal services if not done yet
+                if (_serviceProvider == null)
+                {
+                    await InitializeMinimalServicesAsync();
+                }
+
+                // Load specific service based on type
+                await LoadSpecificServiceAsync<T>();
+                
+                // Mark as ready and notify
+                lock (_serviceLock)
+                {
+                    _serviceStatus[serviceType] = true;
+                }
+
+                ServiceReady?.Invoke(this, new ServiceReadyEventArgs { ServiceType = serviceType });
+                System.Diagnostics.Debug.WriteLine($"A3sist: Service {serviceType.Name} loaded successfully");
+                
+                return _serviceProvider?.GetService<T>();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error loading service {typeof(T).Name}: {ex.Message}");
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Initialize only configuration service for basic functionality
+        /// </summary>
+        private async Task InitializeMinimalServicesAsync()
+        {
+            try
+            {
+                if (_serviceProvider != null) return; // Already initialized
+
+                System.Diagnostics.Debug.WriteLine("A3sist: Initializing minimal services (configuration only)...");
+                
+                var services = new ServiceCollection();
+                services.AddSingleton<IA3sistConfigurationService, A3sistConfigurationService>();
+                
+                _serviceProvider = services.BuildServiceProvider();
+                
+                // Register with VS Shell
+                AddService(typeof(IA3sistConfigurationService), async (container, ct, type) =>
+                {
+                    return _serviceProvider?.GetService<IA3sistConfigurationService>();
+                }, true);
+                
+                System.Diagnostics.Debug.WriteLine("A3sist: Minimal services initialized");
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing minimal services: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// Load a specific service type on-demand
+        /// </summary>
+        private async Task LoadSpecificServiceAsync<T>()
+        {
+            try
+            {
+                var serviceType = typeof(T);
                 var services = new ServiceCollection();
                 
                 // Copy existing services
                 if (_serviceProvider != null)
                 {
-                    var existingConfig = _serviceProvider.GetService<IA3sistConfigurationService>();
-                    var existingChat = _serviceProvider.GetService<IChatService>();
-                    
-                    if (existingConfig != null)
-                        services.AddSingleton(existingConfig);
-                    if (existingChat != null)
-                        services.AddSingleton(existingChat);
+                    foreach (var existingService in _serviceProvider.GetServices<object>())
+                    {
+                        if (existingService != null)
+                        {
+                            services.AddSingleton(existingService.GetType(), existingService);
+                        }
+                    }
                 }
-                
-                // Add the heavy services that were deferred
-                services.AddSingleton<IModelManagementService, ModelManagementService>();
-                services.AddSingleton<IMCPClientService, MCPClientService>();
-                services.AddSingleton<IRAGEngineService, RAGEngineService>();
-                services.AddSingleton<ICodeAnalysisService, CodeAnalysisService>();
-                services.AddSingleton<IRefactoringService, RefactoringService>();
-                services.AddSingleton<IAutoCompleteService, AutoCompleteService>();
-                services.AddSingleton<A3sist.Agent.IAgentModeService, A3sist.Agent.AgentModeService>();
-                
+
+                // Add the specific requested service and its dependencies
+                if (serviceType == typeof(IChatService))
+                {
+                    services.AddSingleton<IChatService, ChatService>();
+                    
+                    // Chat might need model management
+                    if (!_serviceStatus.ContainsKey(typeof(IModelManagementService)))
+                    {
+                        _ = Task.Run(async () => await LoadServiceOnDemandAsync<IModelManagementService>());
+                    }
+                }
+                else if (serviceType == typeof(IModelManagementService))
+                {
+                    services.AddSingleton<IModelManagementService, ModelManagementService>();
+                }
+                else if (serviceType == typeof(IRefactoringService))
+                {
+                    services.AddSingleton<IRefactoringService, RefactoringService>();
+                    
+                    // Refactoring needs code analysis
+                    if (!_serviceStatus.ContainsKey(typeof(ICodeAnalysisService)))
+                    {
+                        _ = Task.Run(async () => await LoadServiceOnDemandAsync<ICodeAnalysisService>());
+                    }
+                }
+                else if (serviceType == typeof(ICodeAnalysisService))
+                {
+                    services.AddSingleton<ICodeAnalysisService, CodeAnalysisService>();
+                }
+                else if (serviceType == typeof(IAutoCompleteService))
+                {
+                    services.AddSingleton<IAutoCompleteService, AutoCompleteService>();
+                }
+                else if (serviceType == typeof(IRAGEngineService))
+                {
+                    services.AddSingleton<IRAGEngineService, RAGEngineService>();
+                }
+                else if (serviceType == typeof(IMCPClientService))
+                {
+                    services.AddSingleton<IMCPClientService, MCPClientService>();
+                }
+                else if (serviceType == typeof(A3sist.Agent.IAgentModeService))
+                {
+                    services.AddSingleton<A3sist.Agent.IAgentModeService, A3sist.Agent.AgentModeService>();
+                }
+
                 // Replace service provider
                 var oldProvider = _serviceProvider;
                 _serviceProvider = services.BuildServiceProvider();
                 oldProvider?.Dispose();
                 
-                // Initialize remaining commands now that services are available
-                await InitializeRemainingCommandsAsync();
+                // Register with VS Shell if needed
+                AddService(serviceType, async (container, ct, type) =>
+                {
+                    return _serviceProvider?.GetService(serviceType);
+                }, true);
                 
-                System.Diagnostics.Debug.WriteLine("A3sist: Remaining services initialized successfully");
+                System.Diagnostics.Debug.WriteLine($"A3sist: Service {serviceType.Name} loaded and registered");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing remaining services: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"A3sist: Error loading specific service {typeof(T).Name}: {ex.Message}");
             }
         }
 
-        private async Task InitializeRemainingCommandsAsync()
+        /// <summary>
+        /// Load chat service when user starts using chat functionality
+        /// </summary>
+        public async Task<IChatService> EnsureChatServiceAsync()
         {
-            try
+            System.Diagnostics.Debug.WriteLine("A3sist: User requested chat - loading chat service...");
+            return await LoadServiceOnDemandAsync<IChatService>();
+        }
+
+        /// <summary>
+        /// Load refactoring service when user tries to refactor code
+        /// </summary>
+        public async Task<IRefactoringService> EnsureRefactoringServiceAsync()
+        {
+            System.Diagnostics.Debug.WriteLine("A3sist: User requested refactoring - loading refactoring service...");
+            return await LoadServiceOnDemandAsync<IRefactoringService>();
+        }
+
+        /// <summary>
+        /// Load model management when user opens configuration
+        /// </summary>
+        public async Task<IModelManagementService> EnsureModelServiceAsync()
+        {
+            System.Diagnostics.Debug.WriteLine("A3sist: User opened model config - loading model service...");
+            return await LoadServiceOnDemandAsync<IModelManagementService>();
+        }
+
+        /// <summary>
+        /// Load code analysis when user requests analysis
+        /// </summary>
+        public async Task<ICodeAnalysisService> EnsureCodeAnalysisServiceAsync()
+        {
+            System.Diagnostics.Debug.WriteLine("A3sist: User requested code analysis - loading analysis service...");
+            return await LoadServiceOnDemandAsync<ICodeAnalysisService>();
+        }
+
+        /// <summary>
+        /// Load autocomplete when user enables it
+        /// </summary>
+        public async Task<IAutoCompleteService> EnsureAutoCompleteServiceAsync()
+        {
+            System.Diagnostics.Debug.WriteLine("A3sist: User enabled autocomplete - loading autocomplete service...");
+            return await LoadServiceOnDemandAsync<IAutoCompleteService>();
+        }
+
+        /// <summary>
+        /// Check if a specific service is ready
+        /// </summary>
+        public bool IsServiceReady<T>()
+        {
+            lock (_serviceLock)
             {
-                System.Diagnostics.Debug.WriteLine("A3sist: Initializing remaining commands...");
-                
-                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
-                OleMenuCommandService commandService = await GetServiceAsync(typeof(IMenuCommandService)) as OleMenuCommandService;
-                if (commandService != null)
-                {
-                    // Initialize commands that require services
-                    try
-                    {
-                        OpenChatCommand.Initialize(this, commandService);
-                        System.Diagnostics.Debug.WriteLine("A3sist: OpenChatCommand initialized");
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing OpenChatCommand: {ex.Message}");
-                    }
-
-                    try
-                    {
-                        ConfigureA3sistCommand.Initialize(this, commandService);
-                        System.Diagnostics.Debug.WriteLine("A3sist: ConfigureA3sistCommand initialized");
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ConfigureA3sistCommand: {ex.Message}");
-                    }
-
-                    try
-                    {
-                        ToggleAutoCompleteCommand.Initialize(this, commandService);
-                        System.Diagnostics.Debug.WriteLine("A3sist: ToggleAutoCompleteCommand initialized");
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing ToggleAutoCompleteCommand: {ex.Message}");
-                    }
-
-                    try
-                    {
-                        RefactorCodeCommand.Initialize(this, commandService);
-                        System.Diagnostics.Debug.WriteLine("A3sist: RefactorCodeCommand initialized");
-                    }
-                    catch (Exception ex)
-                    {
-                        System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing RefactorCodeCommand: {ex.Message}");
-                    }
-                    
-                    System.Diagnostics.Debug.WriteLine("A3sist: Remaining commands initialized");
-                }
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Error initializing remaining commands: {ex.Message}");
+                return _serviceStatus.ContainsKey(typeof(T)) && _serviceStatus[typeof(T)];
             }
         }
 
@@ -480,5 +604,13 @@ namespace A3sist
         }
 
         #endregion
+    }
+
+    /// <summary>
+    /// Event arguments for when a service becomes ready
+    /// </summary>
+    public class ServiceReadyEventArgs : EventArgs
+    {
+        public Type ServiceType { get; set; }
     }
 }
