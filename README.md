@@ -48,50 +48,30 @@ This architecture delivers:
 
 ### Installation
 
-#### 🚀 Quick Start (Recommended)
+#### 🚀 One-Command Setup (Recommended)
 ```batch
-# Run as Administrator
-setup.bat
+setup_all.bat
 ```
-This automated installer will build both projects and install everything for you!
+**That's it!** This single script handles everything:
+- ✅ Detects Visual Studio automatically
+- ✅ Verifies .NET 9 SDK
+- ✅ Builds both API and UI projects
+- ✅ Installs the Visual Studio extension
+- ✅ Starts the API service
+- ✅ No administrator privileges required
 
-#### 📦 Installation Options
+#### 📖 Manual Installation (Advanced Users)
+```bash
+# Build API
+cd A3sist.API
+dotnet build --configuration Release
 
-1. **Automated Setup** (Easiest)
-   ```batch
-   setup.bat          # Master setup script
-   ```
+# Build UI Extension  
+cd ../A3sist.UI
+# Open A3sist.sln in Visual Studio and build
 
-2. **Standard Installation**
-   ```batch
-   build.bat          # Build projects
-   install.bat        # Install (run as Administrator)
-   ```
-
-3. **Advanced Installation**
-   ```powershell
-   build.bat          # Build projects
-   # Run PowerShell as Administrator
-   PowerShell -ExecutionPolicy Bypass -File install.ps1
-   ```
-
-4. **Manual Installation**
-   ```bash
-   # Build API
-   cd A3sist.API
-   dotnet build --configuration Release
-   
-   # Build UI Extension
-   cd ../A3sist.UI
-   # Open A3sist.sln in Visual Studio and build
-   
-   # Install extension manually
-   # Double-click A3sist.UI/bin/Release/A3sist.UI.vsix
-   ```
-
-#### ✅ Verify Installation
-```batch
-verify.bat           # Check if everything is working
+# Install extension manually
+# Double-click A3sist.UI/bin/Release/A3sist.UI.vsix
 ```
 
 #### 🎯 Access A3sist
@@ -134,11 +114,6 @@ The new architecture delivers significant performance improvements:
 
 ## 🐛 Troubleshooting
 
-### Quick Diagnostics
-```batch
-verify.bat           # Check installation status
-```
-
 ### Common Issues
 
 #### Extension Not Loading
@@ -164,22 +139,6 @@ verify.bat           # Check installation status
 - Clear extension cache: Delete `%AppData%\A3sist\` folder and reinstall
 
 For detailed troubleshooting, see **[INSTALLER_GUIDE.md](INSTALLER_GUIDE.md)**
-
-## 🗑️ Uninstallation
-
-```batch
-# Run as Administrator
-uninstall.bat        # Complete removal of A3sist
-```
-
-This removes:
-- Windows service
-- Installation files  
-- Configuration files
-- Desktop shortcuts
-- Firewall rules
-
-**Note:** Visual Studio extension must be removed manually through Extensions Manager.
 
 ## 🤝 Contributing
 
