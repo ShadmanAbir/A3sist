@@ -5,6 +5,8 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
+using MSAnalysisSyntaxNode = Microsoft.CodeAnalysis.SyntaxNode;
+using A3sistSyntaxNode = A3sist.API.Models.SyntaxNode;
 
 namespace A3sist.API.Services;
 
@@ -214,7 +216,7 @@ public class RefactoringService : IRefactoringService, IDisposable
         return suggestions;
     }
 
-    private async Task<List<RefactoringSuggestion>> GetExtractMethodSuggestionsAsync(SyntaxNode root, string code)
+    private async Task<List<RefactoringSuggestion>> GetExtractMethodSuggestionsAsync(MSAnalysisSyntaxNode root, string code)
     {
         await Task.CompletedTask;
         var suggestions = new List<RefactoringSuggestion>();
@@ -263,7 +265,7 @@ public class RefactoringService : IRefactoringService, IDisposable
         return suggestions;
     }
 
-    private async Task<List<RefactoringSuggestion>> GetRenameVariableSuggestionsAsync(SyntaxNode root, string code)
+    private async Task<List<RefactoringSuggestion>> GetRenameVariableSuggestionsAsync(MSAnalysisSyntaxNode root, string code)
     {
         await Task.CompletedTask;
         var suggestions = new List<RefactoringSuggestion>();
@@ -309,7 +311,7 @@ public class RefactoringService : IRefactoringService, IDisposable
         return suggestions;
     }
 
-    private async Task<List<RefactoringSuggestion>> GetSimplifyExpressionSuggestionsAsync(SyntaxNode root, string code)
+    private async Task<List<RefactoringSuggestion>> GetSimplifyExpressionSuggestionsAsync(MSAnalysisSyntaxNode root, string code)
     {
         await Task.CompletedTask;
         var suggestions = new List<RefactoringSuggestion>();
@@ -587,7 +589,7 @@ public class RefactoringService : IRefactoringService, IDisposable
         return line;
     }
 
-    private HashSet<string> GetUsedNamespaces(SyntaxNode root)
+    private HashSet<string> GetUsedNamespaces(MSAnalysisSyntaxNode root)
     {
         var usedNamespaces = new HashSet<string>();
         

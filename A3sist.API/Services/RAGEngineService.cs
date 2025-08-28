@@ -428,7 +428,7 @@ public class RAGEngineService : IRAGEngineService, IDisposable
     {
         // Use relative path as document ID to handle path changes
         return Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(documentPath))
-               .Replace('+', '-').Replace('/', '_').Replace('=', '');
+               .Replace('+', '-').Replace('/', '_').Replace("=", "");
     }
 
     private async Task SaveIndexToDiskAsync()

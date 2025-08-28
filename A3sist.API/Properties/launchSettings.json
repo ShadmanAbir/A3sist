@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "A3sist.API": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:10097;http://localhost:10098"
+    }
+  }
+}

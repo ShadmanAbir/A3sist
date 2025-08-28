@@ -48,12 +48,35 @@ This architecture delivers:
 
 ### Installation
 
-1. **Build the Projects**
+#### 🚀 Quick Start (Recommended)
+```batch
+# Run as Administrator
+setup.bat
+```
+This automated installer will build both projects and install everything for you!
+
+#### 📦 Installation Options
+
+1. **Automated Setup** (Easiest)
+   ```batch
+   setup.bat          # Master setup script
+   ```
+
+2. **Standard Installation**
+   ```batch
+   build.bat          # Build projects
+   install.bat        # Install (run as Administrator)
+   ```
+
+3. **Advanced Installation**
+   ```powershell
+   build.bat          # Build projects
+   # Run PowerShell as Administrator
+   PowerShell -ExecutionPolicy Bypass -File install.ps1
+   ```
+
+4. **Manual Installation**
    ```bash
-   # Clone the repository
-   git clone https://github.com/A3sist/A3sist.git
-   cd A3sist
-   
    # Build API
    cd A3sist.API
    dotnet build --configuration Release
@@ -61,23 +84,22 @@ This architecture delivers:
    # Build UI Extension
    cd ../A3sist.UI
    # Open A3sist.sln in Visual Studio and build
+   
+   # Install extension manually
+   # Double-click A3sist.UI/bin/Release/A3sist.UI.vsix
    ```
 
-2. **Start the API Service**
-   ```bash
-   cd A3sist.API
-   dotnet run --urls "http://localhost:8341"
-   ```
+#### ✅ Verify Installation
+```batch
+verify.bat           # Check if everything is working
+```
 
-3. **Install the Extension**
-   - Build A3sist.UI in Release mode
-   - Double-click `A3sist.UI/bin/Release/A3sist.UI.vsix`
-   - Restart Visual Studio
+#### 🎯 Access A3sist
+- Open Visual Studio 2022
+- Go to **View** → **Other Windows** → **A3sist Assistant**
+- Start using AI-powered features!
 
-4. **Access A3sist**
-   - Go to **View** → **Other Windows** → **A3sist Assistant**
-   - Configure API connection in the Configuration tab
-   - Start using AI-powered features!
+For detailed installation instructions, see **[INSTALLER_GUIDE.md](INSTALLER_GUIDE.md)**
 
 ## 📖 Documentation
 
@@ -112,20 +134,52 @@ The new architecture delivers significant performance improvements:
 
 ## 🐛 Troubleshooting
 
-### Extension Not Loading
+### Quick Diagnostics
+```batch
+verify.bat           # Check installation status
+```
+
+### Common Issues
+
+#### Extension Not Loading
 - Check **Extensions** → **Manage Extensions** → **Installed** to ensure A3sist is enabled
 - Verify Visual Studio 2022 (17.8+) is installed
 - Check Visual Studio Output window for errors
+- Try restarting Visual Studio
 
-### API Connection Issues
-- Ensure A3sist.API is running on http://localhost:8341
+#### API Connection Issues
+- Ensure A3sist.API service is running: `sc query A3sistAPI`
 - Check Windows Firewall settings
 - Verify no other applications are using port 8341
+- Test API manually: `curl http://localhost:8341/api/health`
 
-### Performance Issues
+#### Service Won't Start
+- Verify .NET 9 runtime is installed
+- Check Windows Event Logs
+- Run API manually: `cd "C:\Program Files\A3sist\API" && dotnet A3sist.API.dll`
+
+#### Performance Issues
 - Close unused Visual Studio instances
-- Restart the A3sist.API service
-- Clear extension cache: Delete `%AppData%\A3sist\` folder
+- Restart the A3sist.API service: `sc restart A3sistAPI`
+- Clear extension cache: Delete `%AppData%\A3sist\` folder and reinstall
+
+For detailed troubleshooting, see **[INSTALLER_GUIDE.md](INSTALLER_GUIDE.md)**
+
+## 🗑️ Uninstallation
+
+```batch
+# Run as Administrator
+uninstall.bat        # Complete removal of A3sist
+```
+
+This removes:
+- Windows service
+- Installation files  
+- Configuration files
+- Desktop shortcuts
+- Firewall rules
+
+**Note:** Visual Studio extension must be removed manually through Extensions Manager.
 
 ## 🤝 Contributing
 

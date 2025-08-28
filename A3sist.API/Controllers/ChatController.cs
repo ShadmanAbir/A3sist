@@ -8,11 +8,12 @@ namespace A3sist.API.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class ChatController : ControllerBase
+public class ChatController : ControllerBase, IDisposable
 {
     private readonly IChatService _chatService;
     private readonly IHubContext<A3sistHub> _hubContext;
     private readonly ILogger<ChatController> _logger;
+    private bool _disposed = false;
 
     public ChatController(
         IChatService chatService,
@@ -134,12 +135,18 @@ public class ChatController : ControllerBase
         }
     }
 
-    protected override void Dispose(bool disposing)
+    protected virtual void Dispose(bool disposing)
     {
-        if (disposing)
+        if (!_disposed && disposing)
         {
             _chatService.MessageReceived -= OnMessageReceived;
+            _disposed = true;
         }
-        base.Dispose(disposing);
+    }
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
     }
 }

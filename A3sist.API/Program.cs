@@ -72,9 +72,9 @@ app.MapHub<A3sistHub>("/a3sistHub");
 app.MapGet("/api/health", () => Results.Ok(new { status = "healthy", timestamp = DateTime.UtcNow }));
 
 // Default port for A3sist API
-app.Urls.Add("http://localhost:8341");
+app.Urls.Add("http://localhost:8342");
 
-Console.WriteLine("A3sist API Server starting on http://localhost:8341");
-Console.WriteLine("Swagger UI available at http://localhost:8341/swagger");
+Console.WriteLine("A3sist API Server starting on http://localhost:8342");
+Console.WriteLine("Swagger UI available at http://localhost:8342/swagger");
 
 app.Run();

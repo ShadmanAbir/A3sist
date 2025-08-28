@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
+  
+  <!-- Product definition -->
+  <Product Id="*" 
+           Name="A3sist AI Assistant" 
+           Language="1033" 
+           Version="1.0.0.0" 
+           Manufacturer="A3sist Team" 
+           UpgradeCode="12345678-1234-1234-1234-123456789012">
+    
+    <Package InstallerVersion="200" 
+             Compressed="yes" 
+             InstallScope="perMachine" 
+             Description="A3sist AI-powered development assistant for Visual Studio"
+             Comments="Installs A3sist API service and Visual Studio extension" />
+
+    <!-- Media and source -->
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Features -->
+    <Feature Id="ProductFeature" Title="A3sist AI Assistant" Level="1">
+      <ComponentGroupRef Id="ProductComponents" />
+      <ComponentGroupRef Id="APIServiceComponents" />
+      <ComponentGroupRef Id="ConfigurationComponents" />
+      <ComponentGroupRef Id="ShortcutComponents" />
+    </Feature>
+
+    <!-- Prerequisites -->
+    <PropertyRef Id="WIX_IS_NETFRAMEWORK_472_OR_LATER_INSTALLED"/>
+    <Condition Message="This application requires .NET Framework 4.7.2 or later.">
+      <![CDATA[Installed OR WIX_IS_NETFRAMEWORK_472_OR_LATER_INSTALLED]]>
+    </Condition>
+
+    <!-- Custom actions for .NET 9 check -->
+    <Property Id="DOTNET9_INSTALLED">
+      <DirectorySearch Id="DotNet9Search" Path="[ProgramFilesFolder]dotnet\shared\Microsoft.NETCore.App">
+        <DirectorySearch Id="DotNet9Version" Path="9.*" />
+      </DirectorySearch>
+    </Property>
+    
+    <Condition Message="This application requires .NET 9 runtime. Please install it from https://dotnet.microsoft.com/download/dotnet/9.0">
+      <![CDATA[Installed OR DOTNET9_INSTALLED]]>
+    </Condition>
+
+    <!-- Installation directories -->
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="INSTALLFOLDER" Name="A3sist">
+          <Directory Id="APIFOLDER" Name="API" />
+        </Directory>
+      </Directory>
+      <Directory Id="AppDataFolder">
+        <Directory Id="A3SISTCONFIGFOLDER" Name="A3sist" />
+      </Directory>
+      <Directory Id="DesktopFolder" Name="Desktop" />
+      <Directory Id="ProgramMenuFolder" Name="Programs">
+        <Directory Id="ApplicationProgramsFolder" Name="A3sist AI Assistant" />
+      </Directory>
+    </Directory>
+
+    <!-- Components -->
+    <ComponentGroup Id="ProductComponents">
+      <Component Id="MainExecutable" Directory="INSTALLFOLDER" Guid="*">
+        <File Id="ReadmeFile" Source="README.md" KeyPath="yes" />
+        <File Id="LicenseFile" Source="LICENSE" />
+        <File Id="BuildGuideFile" Source="BUILD_AND_DEPLOYMENT.md" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="APIServiceComponents">
+      <Component Id="APIService" Directory="APIFOLDER" Guid="*">
+        <!-- API files will be added here -->
+        <File Id="APIExecutable" Source="A3sist.API\bin\Release\net9.0\A3sist.API.dll" KeyPath="yes" />
+        <File Id="APIConfig" Source="A3sist.API\bin\Release\net9.0\appsettings.json" />
+        
+        <!-- Service installation -->
+        <ServiceInstall Id="A3sistAPIService"
+                        Type="ownProcess"
+                        Vital="yes"
+                        Name="A3sistAPI"
+                        DisplayName="A3sist API Service"
+                        Description="A3sist AI Assistant API Service"
+                        Start="auto"
+                        Account="LocalSystem"
+                        ErrorControl="ignore"
+                        Interactive="no">
+          <ServiceDependency Id="HTTP" />
+        </ServiceInstall>
+        
+        <ServiceControl Id="StartA3sistAPIService"
+                        Start="install"
+                        Stop="both"
+                        Remove="uninstall"
+                        Name="A3sistAPI"
+                        Wait="yes" />
+      </Component>
+      
+      <!-- Firewall exception -->
+      <Component Id="FirewallException" Directory="APIFOLDER" Guid="*">
+        <CreateFolder />
+        <fire:FirewallException Id="A3sistAPIFirewall"
+                                Name="A3sist API"
+                                Port="8341"
+                                Protocol="tcp"
+                                Scope="localSubnet"
+                                xmlns:fire="http://schemas.microsoft.com/wix/FirewallExtension" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="ConfigurationComponents">
+      <Component Id="DefaultConfiguration" Directory="A3SISTCONFIGFOLDER" Guid="*">
+        <CreateFolder />
+        <File Id="DefaultConfigFile" Source="config.json" KeyPath="yes" />
+        <RemoveFile Id="RemoveConfigOnUninstall" Name="config.json" On="uninstall" />
+      </Component>
+    </ComponentGroup>
+
+    <ComponentGroup Id="ShortcutComponents">
+      <!-- Desktop shortcuts -->
+      <Component Id="DesktopShortcuts" Directory="DesktopFolder" Guid="*">
+        <CreateFolder />
+        <Shortcut Id="APIManagerShortcut"
+                  Name="A3sist API Manager"
+                  Target="[APIFOLDER]manage-api.bat"
+                  WorkingDirectory="APIFOLDER"
+                  Icon="A3sistIcon" />
+        <Shortcut Id="ConfigShortcut"
+                  Name="A3sist Configuration"
+                  Target="notepad.exe"
+                  Arguments="[A3SISTCONFIGFOLDER]config.json"
+                  Icon="A3sistIcon" />
+        <RemoveFolder Id="RemoveDesktopShortcuts" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\A3sist\Installer" Name="DesktopShortcuts" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+
+      <!-- Start menu shortcuts -->
+      <Component Id="StartMenuShortcuts" Directory="ApplicationProgramsFolder" Guid="*">
+        <CreateFolder />
+        <Shortcut Id="StartMenuAPIManager"
+                  Name="A3sist API Manager"
+                  Target="[APIFOLDER]manage-api.bat"
+                  WorkingDirectory="APIFOLDER"
+                  Icon="A3sistIcon" />
+        <Shortcut Id="StartMenuConfig"
+                  Name="A3sist Configuration"
+                  Target="notepad.exe"
+                  Arguments="[A3SISTCONFIGFOLDER]config.json"
+                  Icon="A3sistIcon" />
+        <Shortcut Id="StartMenuUninstall"
+                  Name="Uninstall A3sist"
+                  Target="[SystemFolder]msiexec.exe"
+                  Arguments="/x [ProductCode]"
+                  Icon="A3sistIcon" />
+        <RemoveFolder Id="RemoveStartMenuFolder" On="uninstall" />
+        <RegistryValue Root="HKCU" Key="Software\A3sist\Installer" Name="StartMenuShortcuts" Type="integer" Value="1" KeyPath="yes" />
+      </Component>
+    </ComponentGroup>
+
+    <!-- Custom actions for Visual Studio extension -->
+    <Binary Id="InstallVSExtension" SourceFile="install-vsix.exe" />
+    
+    <CustomAction Id="InstallVSIX"
+                  BinaryKey="InstallVSExtension"
+                  ExeCommand="/install [INSTALLFOLDER]A3sist.UI.vsix"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="check" />
+
+    <CustomAction Id="UninstallVSIX"
+                  BinaryKey="InstallVSExtension"
+                  ExeCommand="/uninstall A3sist.UI"
+                  Execute="deferred"
+                  Impersonate="no"
+                  Return="ignore" />
+
+    <!-- Installation sequence -->
+    <InstallExecuteSequence>
+      <Custom Action="InstallVSIX" After="InstallFiles">NOT Installed</Custom>
+      <Custom Action="UninstallVSIX" After="RemoveFiles">REMOVE="ALL"</Custom>
+    </InstallExecuteSequence>
+
+    <!-- UI -->
+    <UIRef Id="WixUI_FeatureTree" />
+    <UIRef Id="WixUI_ErrorProgressText" />
+
+    <!-- Icon -->
+    <Icon Id="A3sistIcon" SourceFile="A3sist.UI\A3sist.ico" />
+    <Property Id="ARPPRODUCTICON" Value="A3sistIcon" />
+
+    <!-- License -->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+  </Product>
+</Wix>

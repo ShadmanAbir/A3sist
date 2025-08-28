@@ -5,13 +5,16 @@ using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Concurrent;
 using System.Text.RegularExpressions;
+using MSAnalysisSyntaxTree = Microsoft.CodeAnalysis.SyntaxTree;
+using A3sistSyntaxTree = A3sist.API.Models.SyntaxTree;
+using A3sistSyntaxNode = A3sist.API.Models.SyntaxNode;
 
 namespace A3sist.API.Services;
 
 public class CodeAnalysisService : ICodeAnalysisService, IDisposable
 {
     private readonly ILogger<CodeAnalysisService> _logger;
-    private readonly ConcurrentDictionary<string, SyntaxTree> _syntaxTreeCache;
+    private readonly ConcurrentDictionary<string, A3sistSyntaxTree> _syntaxTreeCache;
     private readonly SemaphoreSlim _semaphore;
     private bool _disposed;
 
@@ -32,7 +35,7 @@ public class CodeAnalysisService : ICodeAnalysisService, IDisposable
     public CodeAnalysisService(ILogger<CodeAnalysisService> logger)
     {
         _logger = logger;
-        _syntaxTreeCache = new ConcurrentDictionary<string, SyntaxTree>();
+        _syntaxTreeCache = new ConcurrentDictionary<string, A3sistSyntaxTree>();
         _semaphore = new SemaphoreSlim(1, 1);
     }
 
@@ -123,7 +126,7 @@ public class CodeAnalysisService : ICodeAnalysisService, IDisposable
         }
     }
 
-    public async Task<SyntaxTree> GetSyntaxTreeAsync(string code, string language)
+    public async Task<A3sistSyntaxTree> GetSyntaxTreeAsync(string code, string language)
     {
         try
         {
@@ -350,16 +353,16 @@ public class CodeAnalysisService : ICodeAnalysisService, IDisposable
         return issues;
     }
 
-    private async Task<SyntaxTree> CreateSyntaxTreeAsync(string code, string language)
+    private async Task<A3sistSyntaxTree> CreateSyntaxTreeAsync(string code, string language)
     {
         await Task.CompletedTask;
 
-        return new SyntaxTree
+        return new A3sistSyntaxTree
         {
             Language = language,
             SourceCode = code,
             Text = code,
-            Root = new SyntaxNode
+            Root = new A3sistSyntaxNode
             {
                 Type = "Root",
                 Name = "Document",
@@ -370,25 +373,25 @@ public class CodeAnalysisService : ICodeAnalysisService, IDisposable
                 Text = code,
                 Start = 0,
                 End = code.Length,
-                Children = new List<SyntaxNode>(),
+                Children = new List<A3sistSyntaxNode>(),
                 Properties = new Dictionary<string, object> { ["Language"] = language }
             },
-            Nodes = new List<SyntaxNode>(),
+            Nodes = new List<A3sistSyntaxNode>(),
             Issues = new List<CodeIssue>(),
             Start = 0,
             End = code.Length
         };
     }
 
-    private SyntaxTree CreateEmptySyntaxTree(string code)
+    private A3sistSyntaxTree CreateEmptySyntaxTree(string code)
     {
-        return new SyntaxTree
+        return new A3sistSyntaxTree
         {
             Language = "text",
             SourceCode = code,
             Text = code,
-            Root = new SyntaxNode(),
-            Nodes = new List<SyntaxNode>(),
+            Root = new A3sistSyntaxNode(),
+            Nodes = new List<A3sistSyntaxNode>(),
             Issues = new List<CodeIssue>(),
             Start = 0,
             End = code.Length
