@@ -4,9 +4,8 @@
         <Identity Id="A3sist.285cd009-b086-4f05-a305-35790de8f3d1" Version="1.0.3" Language="en-US" Publisher="Shadman sakib" />
         <DisplayName>A3sist - AI Code Assistant</DisplayName>
         <Description>AI-powered development assistant for Visual Studio. Provides intelligent chat, code analysis, refactoring suggestions, and context-aware assistance with support for local and remote AI models.</Description>
-        <Preview>true</Preview>
     </Metadata>
-    <Installation AllUsers="true" InstalledByMsi="true">
+    <Installation AllUsers="true">
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>

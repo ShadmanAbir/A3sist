@@ -31,7 +31,7 @@ namespace A3sist
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(A3sistPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(A3sist.UI.A3sistToolWindowPane), Style = VsDockStyle.Float, Window = ToolWindowGuids80.SolutionExplorer)]
+    [ProvideToolWindow(typeof(A3sist.UI.A3sistToolWindowPane), Style = VsDockStyle.Tabbed, Window = ToolWindowGuids80.SolutionExplorer)]
     [ProvideAutoLoad(UIContextGuids.NoSolution, PackageAutoLoadFlags.BackgroundLoad)]
     [ProvideService(typeof(IA3sistConfigurationService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IModelManagementService), IsAsyncQueryable = true)]
@@ -39,6 +39,9 @@ namespace A3sist
     [ProvideService(typeof(IRAGEngineService), IsAsyncQueryable = true)]
     [ProvideService(typeof(ICodeAnalysisService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IChatService), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IRefactoringService), IsAsyncQueryable = true)]
+    [ProvideService(typeof(IAutoCompleteService), IsAsyncQueryable = true)]
+    [ProvideService(typeof(A3sist.Agent.IAgentModeService), IsAsyncQueryable = true)]
     public class A3sistPackage : AsyncPackage
     {
         /// <summary>
@@ -75,13 +78,14 @@ namespace A3sist
                 // Do any initialization that requires the UI thread after switching to the UI thread.
                 await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);
 
+                await ShowToolWindowAsync();
                 // Initialize dependency injection with error handling
                 await InitializeServicesAsync();
 
                 // Initialize commands with error handling
                 await InitializeCommandsAsync();
 
-                await ShowToolWindowAsync();
+                
 
                 await base.InitializeAsync(cancellationToken, progress);
                 
@@ -376,6 +380,69 @@ namespace A3sist
                 catch (Exception ex)
                 {
                     System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IChatService with VS Shell: {ex.Message}");
+                }
+
+                try
+                {
+                    AddService(typeof(IRefactoringService), async (container, ct, type) =>
+                    {
+                        try
+                        {
+                            return _serviceProvider?.GetService<IRefactoringService>();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IRefactoringService: {ex.Message}");
+                            return null;
+                        }
+                    }, true);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IRefactoringService with VS Shell");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IRefactoringService with VS Shell: {ex.Message}");
+                }
+
+                try
+                {
+                    AddService(typeof(IAutoCompleteService), async (container, ct, type) =>
+                    {
+                        try
+                        {
+                            return _serviceProvider?.GetService<IAutoCompleteService>();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IAutoCompleteService: {ex.Message}");
+                            return null;
+                        }
+                    }, true);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IAutoCompleteService with VS Shell");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IAutoCompleteService with VS Shell: {ex.Message}");
+                }
+
+                try
+                {
+                    AddService(typeof(A3sist.Agent.IAgentModeService), async (container, ct, type) =>
+                    {
+                        try
+                        {
+                            return _serviceProvider?.GetService<A3sist.Agent.IAgentModeService>();
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"A3sist: Error creating IAgentModeService: {ex.Message}");
+                            return null;
+                        }
+                    }, true);
+                    System.Diagnostics.Debug.WriteLine("A3sist: Registered IAgentModeService with VS Shell");
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"A3sist: Failed to register IAgentModeService with VS Shell: {ex.Message}");
                 }
                 
                 System.Diagnostics.Debug.WriteLine("A3sist: VS Shell service registration completed");
