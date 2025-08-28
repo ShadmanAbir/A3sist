@@ -90,3 +90,9 @@ nunit-*.xml
 .vs/A3sist/DesignTimeBuild/.dtbcache.v2
 .vs/A3sist/v17/.futdcache.v2
 .vs/A3sist/v17/.suo
+/.vs/A3sist.csproj.dtbcache.json
+/.vs/A3sist/CopilotIndices/17.14.698.11175
+*.vsidx
+/.vs/A3sist/v17/.suo
+/.vs/A3sist/v17/DocumentLayout.backup.json
+/.vs/A3sist/v17/DocumentLayout.json
