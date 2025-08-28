@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <OutputType>Exe</OutputType>
+    <AssemblyName>A3sist.API</AssemblyName>
+    <RootNamespace>A3sist.API</RootNamespace>
+    <UserSecretsId>A3sist-API-Secrets</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.1.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" Version="9.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.2.0" />
+    <PackageReference Include="System.Text.Json" Version="9.0.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis" Version="4.14.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.14.0" />
+  </ItemGroup>
+
+</Project>
