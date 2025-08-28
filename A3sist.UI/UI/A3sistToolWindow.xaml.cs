@@ -544,7 +544,7 @@ namespace A3sist.UI.UI
             // This would need to be implemented based on the actual XAML structure
         }
 
-        private void ShowError(string message)
+        public void ShowError(string message)
         {
             Application.Current.Dispatcher.Invoke(() =>
             {

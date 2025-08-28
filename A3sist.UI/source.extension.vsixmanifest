@@ -5,14 +5,20 @@
     <DisplayName>A3sist AI Assistant</DisplayName>
     <Description xml:space="preserve">AI-powered development assistant for Visual Studio with chat, code analysis, refactoring, and intelligent completions.</Description>
     <MoreInfo>https://github.com/A3sist/A3sist</MoreInfo>
-    <License>LICENSE</License>
+
     <Icon>A3sist.ico</Icon>
     <Tags>AI, Assistant, Chat, Code Analysis, Refactoring, IntelliSense, Productivity</Tags>
   </Metadata>
   <Installation>
-    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)" />
-    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[17.0,18.0)" />
-    <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,18.0)" />
+    <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0,18.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Pro" Version="[17.0,18.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
+    <InstallationTarget Id="Microsoft.VisualStudio.Enterprise" Version="[17.0,18.0)">
+      <ProductArchitecture>amd64</ProductArchitecture>
+    </InstallationTarget>
   </Installation>
   <Dependencies>
     <Dependency Id="Microsoft.Framework.NDP" DisplayName="Microsoft .NET Framework" d:Source="Manual" Version="[4.7.2,)" />

@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
 using A3sist.UI.Models;
 using A3sist.UI.Services;
+using Microsoft.VisualStudio.Imaging.Interop;
 
 namespace A3sist.UI.QuickFix
 {
@@ -432,7 +433,7 @@ namespace A3sist.UI.QuickFix
                     // In a real scenario, you'd apply the specific fix to the specific location
                     var line = _textBuffer.CurrentSnapshot.GetLineFromLineNumber(_issue.Line);
                     var edit = _textBuffer.CreateEdit();
-                    edit.Replace(line.Span, fix);
+                    edit.Replace(line.Extent, fix);
                     edit.Apply();
                 }
                 catch (Exception ex)

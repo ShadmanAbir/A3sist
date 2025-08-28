@@ -33,6 +33,36 @@ namespace A3sist.UI
         /// </summary>
         public const string PackageGuidString = "11b6ba66-9b93-4de6-acc0-7baecb76a619";
 
+        /// <summary>
+        /// Gets the singleton instance of the package.
+        /// </summary>
+        public static A3sistPackage Instance { get; private set; }
+
+        private Services.IA3sistApiClient _apiClient;
+        private Services.IA3sistConfigurationService _configService;
+
+        /// <summary>
+        /// Gets the API client service.
+        /// </summary>
+        public Services.IA3sistApiClient GetApiClient() => _apiClient;
+
+        /// <summary>
+        /// Gets the configuration service.
+        /// </summary>
+        public Services.IA3sistConfigurationService GetConfigurationService() => _configService;
+
+        /// <summary>
+        /// Gets a service by type (compatibility method).
+        /// </summary>
+        public T GetService<T>() where T : class
+        {
+            if (typeof(T) == typeof(Services.IA3sistApiClient))
+                return _apiClient as T;
+            if (typeof(T) == typeof(Services.IA3sistConfigurationService))
+                return _configService as T;
+            return null;
+        }
+
         #region Package Members
 
         /// <summary>
@@ -44,6 +74,13 @@ namespace A3sist.UI
         /// <returns>A task representing the async work of package initialization, or an already completed task if there is none. Do not return null from this method.</returns>
         protected override async Task InitializeAsync(CancellationToken cancellationToken, IProgress<ServiceProgressData> progress)
         {
+            // Set the singleton instance
+            Instance = this;
+
+            // Initialize services
+            _configService = new Services.A3sistConfigurationService();
+            _apiClient = new Services.A3sistApiClient();
+
             // When initialized asynchronously, the current thread may be a background thread at this point.
             // Do any initialization that requires the UI thread after switching to the UI thread.
             await this.JoinableTaskFactory.SwitchToMainThreadAsync(cancellationToken);

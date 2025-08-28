@@ -595,7 +595,7 @@ namespace A3sist.UI.UI
                 if (result == MessageBoxResult.Yes)
                 {
                     e.Cancel = true;
-                    _ = SaveButton_Click(SaveButton, new RoutedEventArgs());
+                    SaveButton_Click(SaveButton, new RoutedEventArgs());
                 }
                 else if (result == MessageBoxResult.Cancel)
                 {
