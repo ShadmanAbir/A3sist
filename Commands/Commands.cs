@@ -25,7 +25,7 @@ namespace A3sist.Commands
         /// <summary>
         /// Command menu group (command set GUID).
         /// </summary>
-        public static readonly Guid CommandSet = new Guid("12345678-1234-1234-1234-123456789123");
+        public static readonly Guid CommandSet = new Guid("285cd009-b086-4f05-a305-35790de8f3d2");
 
         /// <summary>
         /// VS Package that provides this command, not null.
@@ -132,7 +132,7 @@ namespace A3sist.Commands
     internal sealed class ConfigureA3sistCommand
     {
         public const int CommandId = 0x0101;
-        public static readonly Guid CommandSet = new Guid("12345678-1234-1234-1234-123456789123");
+        public static readonly Guid CommandSet = new Guid("285cd009-b086-4f05-a305-35790de8f3d2");
         private readonly AsyncPackage package;
 
         private ConfigureA3sistCommand(AsyncPackage package, OleMenuCommandService commandService)
@@ -197,7 +197,7 @@ namespace A3sist.Commands
     internal sealed class ToggleAutoCompleteCommand
     {
         public const int CommandId = 0x0102;
-        public static readonly Guid CommandSet = new Guid("12345678-1234-1234-1234-123456789123");
+        public static readonly Guid CommandSet = new Guid("285cd009-b086-4f05-a305-35790de8f3d2");
         private readonly AsyncPackage package;
 
         private ToggleAutoCompleteCommand(AsyncPackage package, OleMenuCommandService commandService)
@@ -283,7 +283,7 @@ namespace A3sist.Commands
     internal sealed class RefactorCodeCommand
     {
         public const int CommandId = 0x0103;
-        public static readonly Guid CommandSet = new Guid("12345678-1234-1234-1234-123456789123");
+        public static readonly Guid CommandSet = new Guid("285cd009-b086-4f05-a305-35790de8f3d2");
         private readonly AsyncPackage package;
 
         private RefactorCodeCommand(AsyncPackage package, OleMenuCommandService commandService)
@@ -384,7 +384,7 @@ namespace A3sist.Commands
     internal sealed class ShowA3sistToolWindowCommand
     {
         public const int CommandId = 0x0104;
-        public static readonly Guid CommandSet = new Guid("12345678-1234-1234-1234-123456789123");
+        public static readonly Guid CommandSet = new Guid("285cd009-b086-4f05-a305-35790de8f3d2");
         private readonly AsyncPackage package;
 
         private ShowA3sistToolWindowCommand(AsyncPackage package, OleMenuCommandService commandService)
@@ -448,7 +448,7 @@ namespace A3sist.Commands
     internal sealed class ShowA3sistToolWindowViewCommand
     {
         public const int CommandId = 0x0105;
-        public static readonly Guid CommandSet = new Guid("12345678-1234-1234-1234-123456789123");
+        public static readonly Guid CommandSet = new Guid("285cd009-b086-4f05-a305-35790de8f3d2");
         private readonly AsyncPackage package;
 
         private ShowA3sistToolWindowViewCommand(AsyncPackage package, OleMenuCommandService commandService)

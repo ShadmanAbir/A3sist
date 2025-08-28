@@ -78,9 +78,9 @@
   </Commands>
 
   <Symbols>
-    <GuidSymbol name="guidA3sistPackage" value="{12345678-1234-1234-1234-123456789012}" />
+    <GuidSymbol name="guidA3sistPackage" value="{285cd009-b086-4f05-a305-35790de8f3d1}" />
     
-    <GuidSymbol name="guidA3sistPackageCmdSet" value="{12345678-1234-1234-1234-123456789123}">
+    <GuidSymbol name="guidA3sistPackageCmdSet" value="{285cd009-b086-4f05-a305-35790de8f3d2}">
       <IDSymbol name="A3sistMenu" value="0x1021" />
       <IDSymbol name="A3sistMenuGroup" value="0x1020" />
       <IDSymbol name="A3sistViewMenuGroup" value="0x1022" />
@@ -92,7 +92,7 @@
       <IDSymbol name="ShowA3sistToolWindowViewCommandId" value="0x0105" />
     </GuidSymbol>
 
-    <GuidSymbol name="guidImages" value="{12345678-1234-1234-1234-123456789124}">
+    <GuidSymbol name="guidImages" value="{285cd009-b086-4f05-a305-35790de8f3d3}">
       <IDSymbol name="bmpPic1" value="1" />
       <IDSymbol name="bmpPic2" value="2" />
     </GuidSymbol>
