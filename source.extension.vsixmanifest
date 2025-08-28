@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="A3sist.285cd009-b086-4f05-a305-35790de8f3d1" Version="1.0.2" Language="en-US" Publisher="Shadman sakib" />
+        <Identity Id="A3sist.285cd009-b086-4f05-a305-35790de8f3d1" Version="1.0.3" Language="en-US" Publisher="Shadman sakib" />
         <DisplayName>A3sist - AI Code Assistant</DisplayName>
         <Description>AI-powered development assistant for Visual Studio. Provides intelligent chat, code analysis, refactoring suggestions, and context-aware assistance with support for local and remote AI models.</Description>
+        <Preview>true</Preview>
     </Metadata>
-    <Installation>
+    <Installation AllUsers="true" InstalledByMsi="true">
         <InstallationTarget Id="Microsoft.VisualStudio.Community" Version="[17.0, 18.0)">
             <ProductArchitecture>amd64</ProductArchitecture>
         </InstallationTarget>

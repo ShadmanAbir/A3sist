@@ -13,7 +13,7 @@ namespace A3sist.UI
     /// This class derives from the ToolWindowPane class provided by the Managed Package Framework
     /// which provides an implementation of a tool window that is compatible with the Visual Studio shell.
     /// </summary>
-    [Guid("a3bce2e1-8f4c-4b2d-9a7f-5c1e3d2b4a6f")]
+    [Guid("285cd009-b086-4f05-a305-35790de8f3d1")]
     public class A3sistToolWindowPane : ToolWindowPane
     {
         /// <summary>

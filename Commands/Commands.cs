@@ -9,13 +9,14 @@ using System.Threading.Tasks;
 using A3sist.UI;
 using A3sist.Services;
 using Task = System.Threading.Tasks.Task;
+using A3sist;
 
 namespace A3sist.Commands
 {
     /// <summary>
     /// Command handler for opening the A3sist chat window
     /// </summary>
-    internal sealed class OpenChatCommand
+    public sealed class OpenChatCommand
     {
         /// <summary>
         /// Command ID.

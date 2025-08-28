@@ -39,7 +39,7 @@ namespace A3sist
     [ProvideService(typeof(IRAGEngineService), IsAsyncQueryable = true)]
     [ProvideService(typeof(ICodeAnalysisService), IsAsyncQueryable = true)]
     [ProvideService(typeof(IChatService), IsAsyncQueryable = true)]
-    public sealed class A3sistPackage : AsyncPackage
+    public class A3sistPackage : AsyncPackage
     {
         /// <summary>
         /// A3sistPackage GUID string.
@@ -80,6 +80,8 @@ namespace A3sist
 
                 // Initialize commands with error handling
                 await InitializeCommandsAsync();
+
+                await ShowToolWindowAsync();
 
                 await base.InitializeAsync(cancellationToken, progress);
                 

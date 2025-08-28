@@ -47,7 +47,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="A3sistPackage.cs" />
+    <EmbeddedResource Include="A3sistPackage.cs" />
     <Compile Include="Agent\AgentModeService.cs" />
     <Compile Include="Commands\Commands.cs" />
     <Compile Include="Completion\A3sistCompletionSource.cs" />
