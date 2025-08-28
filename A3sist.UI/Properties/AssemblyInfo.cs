@@ -5,14 +5,14 @@ using System.Runtime.Versioning;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle(\"A3sist.UI\")]
-[assembly: AssemblyDescription(\"A3sist AI Assistant Visual Studio Extension\")]
-[assembly: AssemblyConfiguration(\"\")]
-[assembly: AssemblyCompany(\"A3sist\")]
-[assembly: AssemblyProduct(\"A3sist AI Assistant\")]
-[assembly: AssemblyCopyright(\"Copyright © A3sist 2024\")]
-[assembly: AssemblyTrademark(\"\")]
-[assembly: AssemblyCulture(\"\")]
+[assembly: AssemblyTitle("A3sist.UI")]
+[assembly: AssemblyDescription("A3sist AI Assistant Visual Studio Extension")]
+[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyCompany("A3sist")]
+[assembly: AssemblyProduct("A3sist AI Assistant")]
+[assembly: AssemblyCopyright("Copyright © A3sist 2024")]
+[assembly: AssemblyTrademark("")]
+[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible 
 // to COM components.  If you need to access a type in this assembly from 
@@ -28,6 +28,6 @@ using System.Runtime.Versioning;
 //
 // You can specify all the values or you can default the Build and Revision Numbers 
 // by using the '*' as shown below:
-// [assembly: AssemblyVersion(\"1.0.*\")]
-[assembly: AssemblyVersion(\"1.0.0.0\")]
-[assembly: AssemblyFileVersion(\"1.0.0.0\")]
+// [assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.0.0.0")]
+[assembly: AssemblyFileVersion("1.0.0.0")]

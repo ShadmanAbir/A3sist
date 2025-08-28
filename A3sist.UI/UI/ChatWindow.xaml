@@ -129,8 +129,7 @@
             <Border Grid.Row="0" BorderBrush="#FFCCCCCC" BorderThickness="1" CornerRadius="4">
                 <TextBox x:Name="ChatInput" AcceptsReturn="True" TextWrapping="Wrap" 
                         MaxHeight="100" VerticalScrollBarVisibility="Auto" BorderThickness="0"
-                        Padding="8" FontSize="13" KeyDown="ChatInput_KeyDown"
-                        Placeholder="Type your message... (Ctrl+Enter to send)"/>
+                        Padding="8" FontSize="13" KeyDown="ChatInput_KeyDown"/>
             </Border>
             
             <!-- Send Controls -->

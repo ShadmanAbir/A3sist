@@ -27,7 +27,7 @@ namespace A3sist.UI.QuickFix
         }
     }
 
-    internal class A3sistSuggestedActionsSource : ISuggestedActionsSource
+    internal class A3sistSuggestedActionsSource : ISuggestedActionsSource, ITelemetryIdProvider<Guid>
     {
         private readonly ITextView _textView;
         private readonly ITextBuffer _textBuffer;
@@ -43,6 +43,12 @@ namespace A3sist.UI.QuickFix
             _textBuffer = textBuffer;
             
             InitializeServices();
+        }
+
+        public bool TryGetTelemetryId(out Guid telemetryId)
+        {
+            telemetryId = new Guid("12345678-1234-1234-1234-123456789012"); // A3sist suggested actions telemetry ID
+            return true;
         }
 
         private void InitializeServices()
@@ -307,6 +313,8 @@ namespace A3sist.UI.QuickFix
         public string IconAutomationText => "A3sist Refactoring";
         public string InputGestureText => null;
         public bool HasActionSets => false;
+        public ImageMoniker IconMoniker => default(ImageMoniker);
+        public bool HasPreview => true;
 
         public A3sistRefactoringAction(RefactoringSuggestion suggestion, ITextView textView, 
             ITextBuffer textBuffer, IA3sistApiClient apiClient)
@@ -391,6 +399,8 @@ namespace A3sist.UI.QuickFix
         public string IconAutomationText => "A3sist Code Fix";
         public string InputGestureText => null;
         public bool HasActionSets => false;
+        public ImageMoniker IconMoniker => default(ImageMoniker);
+        public bool HasPreview => true;
 
         public A3sistCodeFixAction(CodeIssue issue, ITextView textView, ITextBuffer textBuffer, IA3sistApiClient apiClient)
         {
