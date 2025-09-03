@@ -3,7 +3,7 @@ using Microsoft.VisualStudio.Shell.Interop;
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
-using Task = System.Threading.Tasks.Task;
+using System.Threading.Tasks;
 
 namespace A3sist.UI
 {
@@ -27,7 +27,7 @@ namespace A3sist.UI
     [PackageRegistration(UseManagedResourcesOnly = true, AllowsBackgroundLoading = true)]
     [Guid(A3sistPackage.PackageGuidString)]
     [ProvideMenuResource("Menus.ctmenu", 1)]
-    [ProvideToolWindow(typeof(UI.A3sistToolWindowPane), Style = VsDockStyle.Tabbed, Window = "3ae79031-e1bc-11d0-8f78-00a0c9110057", MultiInstances = false, Transient = false)]
+    [ProvideToolWindow(typeof(UI.A3sistToolWindowPane), Style = VsDockStyle.Float, Window = "3ae79031-e1bc-11d0-8f78-00a0c9110057", MultiInstances = false, Transient = false)]
     [ProvideService(typeof(Services.IA3sistApiClient), ServiceName = "A3sist API Client")]
     [ProvideService(typeof(Services.IA3sistConfigurationService), ServiceName = "A3sist Configuration Service")]
     public sealed class A3sistPackage : AsyncPackage
