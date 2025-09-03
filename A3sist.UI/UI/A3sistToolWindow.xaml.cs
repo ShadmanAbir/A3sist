@@ -9,6 +9,7 @@ using A3sist.UI.Models;
 using A3sist.UI.Services;
 using Microsoft.VisualStudio.Shell;
 
+
 namespace A3sist.UI.UI
 {
     public partial class A3sistToolWindow : UserControl
@@ -94,43 +95,37 @@ namespace A3sist.UI.UI
         }
 
         // Event Handlers
-        private void OnConnectionStateChanged(object sender, EventArgs e)
+        private async void OnConnectionStateChanged(object sender, EventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                UpdateConnectionStatus(_apiClient.IsConnected);
-                UpdateSendButtonState();
-            });
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            UpdateConnectionStatus(_apiClient.IsConnected);
+            UpdateSendButtonState();
         }
 
-        private void OnChatMessageReceived(object sender, ChatMessageReceivedEventArgs e)
+        private async void OnChatMessageReceived(object sender, ChatMessageReceivedEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                _chatMessages.Add(e.Message);
-                ScrollChatToBottom();
-            });
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            _chatMessages.Add(e.Message);
+            ScrollChatToBottom();
         }
 
-        private void OnAgentProgressChanged(object sender, AgentProgressEventArgs e)
+        private async void OnAgentProgressChanged(object sender, AgentProgressEventArgs e)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            AgentStatusText.Text = e.StatusMessage;
+            AgentProgressBar.Value = e.ProgressPercentage;
+            AgentProgressText.Text = $"{e.FilesProcessed}/{e.TotalFiles} files processed";
+
+            if (e.Status == AgentAnalysisStatus.Running)
             {
-                AgentStatusText.Text = e.StatusMessage;
-                AgentProgressBar.Value = e.ProgressPercentage;
-                AgentProgressText.Text = $"{e.FilesProcessed}/{e.TotalFiles} files processed";
-                
-                if (e.Status == AgentAnalysisStatus.Running)
-                {
-                    StartAgentButton.IsEnabled = false;
-                    StopAgentButton.IsEnabled = true;
-                }
-                else
-                {
-                    StartAgentButton.IsEnabled = true;
-                    StopAgentButton.IsEnabled = false;
-                }
-            });
+                StartAgentButton.IsEnabled = false;
+                StopAgentButton.IsEnabled = true;
+            }
+            else
+            {
+                StartAgentButton.IsEnabled = true;
+                StopAgentButton.IsEnabled = false;
+            }
         }
 
         private void OnActiveModelChanged(object sender, ModelChangedEventArgs e)
@@ -179,18 +174,16 @@ namespace A3sist.UI.UI
             try
             {
                 if (!_apiClient.IsConnected) return;
-                
+
                 var history = await _apiClient.GetChatHistoryAsync();
-                
-                Application.Current.Dispatcher.Invoke(() =>
+
+                await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                _chatMessages.Clear();
+                foreach (var message in history)
                 {
-                    _chatMessages.Clear();
-                    foreach (var message in history)
-                    {
-                        _chatMessages.Add(message);
-                    }
-                    ScrollChatToBottom();
-                });
+                    _chatMessages.Add(message);
+                }
+                ScrollChatToBottom();
             }
             catch (Exception ex)
             {
@@ -544,13 +537,11 @@ namespace A3sist.UI.UI
             // This would need to be implemented based on the actual XAML structure
         }
 
-        public void ShowError(string message)
+        public async void ShowError(string message)
         {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                StatusText.Text = $"Error: {message}";
-                MessageBox.Show(message, "A3sist Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            });
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            StatusText.Text = $"Error: {message}";
+            MessageBox.Show(message, "A3sist Error", MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         // Public methods for tool window pane integration
@@ -579,27 +570,25 @@ namespace A3sist.UI.UI
             }
         }
 
-        public void UpdateConnectionStatus(bool isConnected)
+        public async void UpdateConnectionStatus(bool isConnected)
         {
-            Application.Current.Dispatcher.Invoke(() =>
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+            if (isConnected)
             {
-                if (isConnected)
-                {
-                    ConnectionIndicator.Fill = System.Windows.Media.Brushes.Green;
-                    ConnectionStatus.Text = "Connected";
-                    StatusText.Text = "Connected to A3sist API";
-                    ConnectButton.IsEnabled = false;
-                    DisconnectButton.IsEnabled = true;
-                }
-                else
-                {
-                    ConnectionIndicator.Fill = System.Windows.Media.Brushes.Red;
-                    ConnectionStatus.Text = "Disconnected";
-                    StatusText.Text = "Disconnected from A3sist API";
-                    ConnectButton.IsEnabled = true;
-                    DisconnectButton.IsEnabled = false;
-                }
-            });
+                ConnectionIndicator.Fill = System.Windows.Media.Brushes.Green;
+                ConnectionStatus.Text = "Connected";
+                StatusText.Text = "Connected to A3sist API";
+                ConnectButton.IsEnabled = false;
+                DisconnectButton.IsEnabled = true;
+            }
+            else
+            {
+                ConnectionIndicator.Fill = System.Windows.Media.Brushes.Red;
+                ConnectionStatus.Text = "Disconnected";
+                StatusText.Text = "Disconnected from A3sist API";
+                ConnectButton.IsEnabled = true;
+                DisconnectButton.IsEnabled = false;
+            }
         }
 
         private async Task UpdateRAGStatusAsync()
