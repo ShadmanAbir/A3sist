@@ -76,8 +76,8 @@ namespace A3sist.UI.Services
     {
         private readonly HttpClient _httpClient;
         private HubConnection _hubConnection;
-        private const string API_BASE_URL = "http://localhost:8341/api";
-        private const string HUB_URL = "http://localhost:8341/a3sistHub";
+        private const string API_BASE_URL = "http://localhost:8342/api";
+        private const string HUB_URL = "http://localhost:8342/a3sistHub";
         private bool _disposed = false;
 
         public bool IsConnected => _hubConnection?.State == HubConnectionState.Connected;

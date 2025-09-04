@@ -193,8 +193,9 @@ namespace A3sist.UI.Services
             {
                 if (File.Exists(_configPath))
                 {
-                    using var stream = new FileStream(_configPath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true);
-                    using var document = await JsonDocument.ParseAsync(stream);
+                    using (var stream = new FileStream(_configPath, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 4096, useAsync: true))
+                    using (var document = await JsonDocument.ParseAsync(stream))
+                    {
                     
                     var newSettings = new Dictionary<string, object>();
                     
@@ -203,13 +204,14 @@ namespace A3sist.UI.Services
                         newSettings[property.Name] = property.Value.Clone();
                     }
                     
-                    lock (_lock)
-                    {
-                        _settings = newSettings;
-                        _isLoaded = true;
+                        lock (_lock)
+                        {
+                            _settings = newSettings;
+                            _isLoaded = true;
+                        }
+                        
+                        System.Diagnostics.Debug.WriteLine($"A3sist configuration loaded from {_configPath}");
                     }
-                    
-                    System.Diagnostics.Debug.WriteLine($"A3sist configuration loaded from {_configPath}");
                 }
                 else
                 {
@@ -257,9 +259,12 @@ namespace A3sist.UI.Services
                 
                 var json = JsonSerializer.Serialize(settingsToSave, options);
                 
-                using var stream = new FileStream(_configPath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true);
-                await stream.WriteAsync(System.Text.Encoding.UTF8.GetBytes(json));
-                await stream.FlushAsync();
+                using (var stream = new FileStream(_configPath, FileMode.Create, FileAccess.Write, FileShare.None, bufferSize: 4096, useAsync: true))
+                {
+                    var jsonBytes = System.Text.Encoding.UTF8.GetBytes(json);
+                    await stream.WriteAsync(jsonBytes, 0, jsonBytes.Length);
+                    await stream.FlushAsync();
+                }
                 
                 System.Diagnostics.Debug.WriteLine($"A3sist configuration saved to {_configPath}");
             }

@@ -32,24 +32,7 @@ namespace A3sist.UI.UI
             
             InitializeServices();
             
-            // Create the control that will be hosted in the tool window
-            if (_apiClient != null && _configService != null)
-            {
-                _control = new A3sistToolWindow(_apiClient, _configService);
-                this.Content = _control;
-            }
-            else
-            {
-                // Fallback: create a simple error display
-                var errorText = new System.Windows.Controls.TextBlock
-                {
-                    Text = "Failed to initialize A3sist services. Please restart Visual Studio.",
-                    Margin = new System.Windows.Thickness(20),
-                    TextWrapping = System.Windows.TextWrapping.Wrap,
-                    Foreground = System.Windows.Media.Brushes.Red
-                };
-                this.Content = errorText;
-            }
+            
 
             // Set the tool window icon
             this.BitmapResourceID = 301;
@@ -60,12 +43,19 @@ namespace A3sist.UI.UI
         {
             try
             {
-                // Get the package instance to access services
-                var package = A3sistPackage.Instance;
-                if (package != null)
+                // Get services from the global provider since package might not be ready
+                _apiClient = ServiceProvider.GlobalProvider.GetService(typeof(IA3sistApiClient)) as IA3sistApiClient;
+                _configService = ServiceProvider.GlobalProvider.GetService(typeof(IA3sistConfigurationService)) as IA3sistConfigurationService;
+
+                // Fallback: try to get from package instance
+                if (_apiClient == null || _configService == null)
                 {
-                    _apiClient = package.GetService<IA3sistApiClient>();
-                    _configService = package.GetService<IA3sistConfigurationService>();
+                    var package = A3sistPackage.Instance;
+                    if (package != null)
+                    {
+                        _apiClient = package.GetApiClient();
+                        _configService = package.GetConfigurationService();
+                    }
                 }
             }
             catch (Exception ex)
@@ -86,17 +76,23 @@ namespace A3sist.UI.UI
         {
             base.Initialize();
 
-            try
+            InitializeServices();
+
+            if (_apiClient != null && _configService != null)
             {
-                // Additional initialization if needed
-                if (_control != null)
-                {
-                    // The control will handle its own initialization when loaded
-                }
+                _control = new A3sistToolWindow(_apiClient, _configService);
+                this.Content = _control;
             }
-            catch (Exception ex)
+            else
             {
-                System.Diagnostics.Debug.WriteLine($"A3sist: Tool window initialization error: {ex.Message}");
+                var errorText = new System.Windows.Controls.TextBlock
+                {
+                    Text = "Failed to initialize A3sist services. Please restart Visual Studio.",
+                    Margin = new System.Windows.Thickness(20),
+                    TextWrapping = System.Windows.TextWrapping.Wrap,
+                    Foreground = System.Windows.Media.Brushes.Red
+                };
+                this.Content = errorText;
             }
         }
 

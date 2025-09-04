@@ -98,6 +98,9 @@ nunit-*.xml
 /.vs/A3sist/v17/DocumentLayout.json
 /.vs/A3sist/CopilotIndices/17.14.1091.29919/CodeChunks.db
 /.vs/A3sist/CopilotIndices/17.14.1091.29919/SemanticSymbols.db
-/.vs/A3sist/v17/.futdcache.v2
-/.vs/ProjectEvaluation
 /A3sist.UI/.vs/A3sist.UI.csproj.dtbcache.json
+/.vs/ProjectEvaluation/a3sist.metadata.v9.bin
+/.vs/ProjectEvaluation/a3sist.projects.v9.bin
+/.vs/ProjectEvaluation/a3sist.strings.v9.bin
+/.vs/A3sist/v17/.futdcache.v2
+/.vs/A3sist/DesignTimeBuild/.dtbcache.v2
