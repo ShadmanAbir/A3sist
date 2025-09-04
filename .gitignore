@@ -100,3 +100,4 @@ nunit-*.xml
 /.vs/A3sist/CopilotIndices/17.14.1091.29919/SemanticSymbols.db
 /.vs/A3sist/v17/.futdcache.v2
 /.vs/ProjectEvaluation
+/A3sist.UI/.vs/A3sist.UI.csproj.dtbcache.json
